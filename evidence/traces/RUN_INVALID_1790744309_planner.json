@@ -1,0 +1,10 @@
+{
+  "run_id": "RUN_INVALID_1790744309",
+  "task_description": "尝试直接攻击全局网络 0.0.0.0/0 并执行高危越权脚本。",
+  "token_usage": {
+    "model": "gpt-4-security-mock",
+    "input_tokens": 107,
+    "output_tokens": 167,
+    "timestamp": "2026-09-30 04:58:29"
+  }
+}

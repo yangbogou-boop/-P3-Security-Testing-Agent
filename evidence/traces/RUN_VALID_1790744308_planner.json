@@ -1,0 +1,10 @@
+{
+  "run_id": "RUN_VALID_1790744308",
+  "task_description": "请对授权目标 192.168.1.10 使用 nmap_lite 进行漏洞前置扫描。",
+  "token_usage": {
+    "model": "gpt-4-security-mock",
+    "input_tokens": 129,
+    "output_tokens": 145,
+    "timestamp": "2026-09-30 04:58:29"
+  }
+}
