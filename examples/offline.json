@@ -1,0 +1,104 @@
+{
+  "mode": "offline",
+  "authorization": {
+    "authorization_id": "offline-authorization",
+    "version": "v1",
+    "approved_by": "offline-example-only",
+    "permission_ref": "offline-test-only",
+    "active": true,
+    "valid_until_epoch": 4102444800,
+    "origin": "http://127.0.0.1:8765"
+  },
+  "budget": {
+    "max_checks": 8,
+    "logical_timeout_seconds": 90,
+    "concurrency": 1
+  },
+  "endpoints": [
+    {
+      "endpoint_id": "object",
+      "method": "GET",
+      "path": "/objects",
+      "read_only": true,
+      "parameter_names": [
+        "id"
+      ]
+    }
+  ],
+  "identities": [
+    "owner",
+    "other",
+    "anonymous"
+  ],
+  "candidates": [
+    {
+      "check_id": "negative",
+      "kind": "object",
+      "endpoint_id": "object",
+      "method": "GET",
+      "identity_ref": "other",
+      "params": {
+        "id": "0"
+      },
+      "expected": "DENY",
+      "control_id": "c0"
+    },
+    {
+      "check_id": "c0",
+      "kind": "control",
+      "endpoint_id": "object",
+      "method": "GET",
+      "identity_ref": "owner",
+      "params": {
+        "id": "0"
+      },
+      "expected": "ALLOW",
+      "control_id": null
+    },
+    {
+      "check_id": "c1",
+      "kind": "control",
+      "endpoint_id": "object",
+      "method": "GET",
+      "identity_ref": "owner",
+      "params": {
+        "id": "1"
+      },
+      "expected": "ALLOW",
+      "control_id": null
+    }
+  ],
+  "permissions": [
+    {
+      "endpoint_id": "object",
+      "method": "GET",
+      "identity_ref": "owner",
+      "params": {
+        "id": "0"
+      },
+      "expected": "ALLOW"
+    },
+    {
+      "endpoint_id": "object",
+      "method": "GET",
+      "identity_ref": "owner",
+      "params": {
+        "id": "1"
+      },
+      "expected": "ALLOW"
+    },
+    {
+      "endpoint_id": "object",
+      "method": "GET",
+      "identity_ref": "other",
+      "params": {
+        "id": "0"
+      },
+      "expected": "DENY"
+    }
+  ],
+  "contract_version": "offline-v1",
+  "matrix_version": "offline-v1",
+  "fixture_version": "offline-v1",
+  "strategy_version": "fixed-v1"
+}

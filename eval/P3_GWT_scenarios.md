@@ -1,6 +1,6 @@
 # P3 黑盒授权安全测试 Agent — GWT 验收场景
 
-版本：Specification V1.0-RC2 配套候选修订，2026-10-14，待审核。以下均为待执行规格，本轮没有运行测试、扫描或生成证据。
+版本：Specification V1.0-RC2 配套候选修订，2026-10-14，文档已由负责人审核。完整 HTTP 验收仍未执行；第三阶段第一轮已运行离线控制子场景，详见 [验证记录](P3_offline_core_validation.md)。下表“未执行”指完整场景，不抹去离线子场景结果，也不将它们升级为完整验收通过。
 
 依据：[Specification](../brief/P3_specification_v1.0-rc2.md)、[授权边界](../brief/P3_authorization_boundary.md)、[Problem Frame](../brief/P3_problem_frame.md) 及历史 [ADR 001](../design/ADR_001_controller_split.md)、[ADR 002](../design/ADR_002_black_box_api_scope.md)。
 
@@ -56,7 +56,7 @@
 
 动态策略根据既有结果选取／追加批准候选，但不能改授权、矩阵、时钟、预算或评价标准。REQ-021 比较是完整交付的 MUST，先做基础闭环；指标、重复条件及接受标准按 C-02 实验卡，6／3 仅示例。试跑必须满足许可，正式班级数字预算待 A-02 冻结。
 
-### GWT-A01 的无新增证据正反例（均未执行）
+### GWT-A01 的无新增证据正反例（离线控制子场景已验证，HTTP 版本未执行）
 
 以下变体关联 P3-REQ-010、014、017；沿用现有组 ID，仅增加子场景。各变体均先满足原授权、预算和撤权规则。
 

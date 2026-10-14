@@ -11,12 +11,13 @@ V1 仅面向经批准的本地隔离模拟 API，使用模拟身份和已批准�
 
 ## 文档与当前实现状态
 
-[Specification V1.0-RC2](brief/P3_specification_v1.0-rc2.md)（当前候选；[RC1](brief/P3_specification_v1.0-rc1.md) 为原样历史快照） 是工程治理修订待负责人审核的候选基线，正式课程契约及目录／预算门槛单独登记；[Problem Frame](brief/P3_problem_frame.md)、[授权边界](brief/P3_authorization_boundary.md)、[ADR 001](design/ADR_001_controller_split.md)、[ADR 002](design/ADR_002_black_box_api_scope.md) 记录定位、边界和历史取舍；[eval GWT](eval/P3_GWT_scenarios.md) 提供需求映射及正向、异常、对抗场景，均未在本轮执行。审批依据、A/B/C 决策与实验条件见 [治理登记](brief/P3_decision_governance.md)。
+[Specification V1.0-RC2](brief/P3_specification_v1.0-rc2.md)（当前候选；[RC1](brief/P3_specification_v1.0-rc1.md) 为原样历史快照） 是已获负责人文档审核的工程候选基线，正式课程契约及目录／预算门槛单独登记；[Problem Frame](brief/P3_problem_frame.md)、[授权边界](brief/P3_authorization_boundary.md)、[ADR 001](design/ADR_001_controller_split.md)、[ADR 002](design/ADR_002_black_box_api_scope.md) 记录定位、边界和历史取舍；[eval GWT](eval/P3_GWT_scenarios.md) 提供完整需求及场景定义；本轮仅执行离线控制子场景，状态见 [离线验证记录](eval/P3_offline_core_validation.md)。审批依据、A/B/C 决策与实验条件见 [治理登记](brief/P3_decision_governance.md)。
 
 | 层次 | 状态 |
 | --- | --- |
-| 当前原型（源码静态核对） | Planner 按关键词生成固定扫描意图；Controller 检查目标／工具，返回模拟成功结果；有部分演示轨迹。 |
-| V1 待实现 | HTTP Executor、本地模拟 API、三类权限检查、完整契约、预算、撤权、拒绝审计和有限结果报告。 |
+| 历史原型（保留） | `src/main.py`、`src/planner/`、`src/controller/` 的关键词扫描与模拟成功演示原样保留；不作为当前入口。 |
+| 当前离线核心 | `src/p3_core/`：结构化模型、固定 Planner、独立 Controller、预算／撤权／终态、JSONL／Manifest／有限报告及 CLI；假派发不发送 HTTP。 |
+| V1 待实现 | HTTP Executor、本地模拟 API、真实响应断言及三类权限安全结论、真实请求超时／取消、动态策略比较与正式 GWT 验收。离线模型不是完整 HTTP 契约。 |
 | 架构保证范围 | 当前为同进程模块分离，未实现物理隔离；不宣称能抵御任意同进程恶意代码。 |
 | 已有证据 | 历史轨迹及公式模拟 Token 原样保留，不能证明真实 HTTP 测试、真实 LLM 成本或新版验收通过。 |
 | 必做工程取舍 | 基础闭环后完成 REQ-021 固定／动态比较及 ADR 决定，依据课程任务映射为 MUST；可以保留固定 Baseline，不要求动态胜出或接入 LLM。 |
@@ -26,7 +27,7 @@ V1 仅面向经批准的本地隔离模拟 API，使用模拟身份和已批准�
 
 固定／动态比较按 REQ-021 必做，采用相同声明目标、输入、授权、重置夹具与预算，报告课程七项指标及规划开销；6 项固定／3 项动态为示例，不强制照搬，不预设动态更优。课程资料核对后的第三轮修订已纠正旧 MAY；最终教学契约及任何正式豁免按 A-03／05 办理。
 
-V1 不支持任意公网扫描、未经批准的写操作；图形界面和真实 LLM 不列为首版必需能力。后续先由负责人确认推荐方案，纯模拟验证计划／停止／证据，再在教师目录和目标所有者授权齐备后开放本地 HTTP，完成验收、预算试跑及工程比较；现有演示与 CI 不替代验收。新框架／证据建议见 [ADR 003（Proposed）](design/ADR_003_local_execution_and_evidence.md)。本轮只改 Markdown，结束后等待人工审核，不自动开始开发。
+V1 不支持任意公网扫描、未经批准的写操作；图形界面和真实 LLM 不列为首版必需能力。负责人已确认 [ADR 003（Accepted：技术方案）](design/ADR_003_local_execution_and_evidence.md)，本轮只实现离线闭环；接入本地 HTTP 前仍须教师目录和目标所有者授权齐备，完成请求／响应契约、取消设计和后续验收。现有演示、离线测试与 CI 不替代真实请求验收。
 
 ## 👤 开发者信息
 * 姓名：何镓欢
@@ -39,9 +40,31 @@ V1 不支持任意公网扫描、未经批准的写操作；图形界面和真�
 * `brief/` - 项目契约、边界定义与威胁建模
 * `design/` - 架构决策记录 (ADR)
 * `eval/` - 待执行的 Given-When-Then 验收定义与需求映射（Markdown，不是自动化测试）
-* `src/` - 当前演示原型源码（计划器与控制器模块）
+* `src/p3_core/` - 当前离线核心；其余 `src/` 旧演示源码保留
+* `tests/` - 标准库 unittest 离线自动化测试
+* `examples/offline.json` - 仅供离线控制验证的可信示例配置，不构成网络测试许可
 * `evidence/` - 保留历史演示轨迹、模拟 Token 数据与工程证据
 * `release/` - 规划目录：一键复现与环境部署说明，目前未建立
 * `review/` - 规划目录：变更记录与漏洞 Finding 报告，目前未建立
 
 2026-10-14：当前候选升级 RC2，历史 RC1 保留；教师事项只在对应执行／预算／验收／教学／评分阶段生效。NO_NEW_EVIDENCE 仅防无价值循环，不能因一次未发现漏洞跳过有价值的批准检查或必要对照；详见 RC2 与 GWT-A01-a～c。
+
+
+## 离线运行与测试（Python 3.9+，仅标准库）
+
+在仓库根目录的 PowerShell 执行：
+
+```powershell
+$env:PYTHONPATH = 'src'
+$env:PYTHONDONTWRITEBYTECODE = '1'
+python -m unittest discover -s tests -v
+python -m p3_core --config examples/offline.json --output "$env:TEMP/p3-offline-runs"
+```
+
+Linux/macOS：`PYTHONPATH=src python -m unittest discover -s tests -v`；CLI 同样设置 `PYTHONPATH=src` 后运行。输出目录每次新建唯一 run 子目录，不覆盖历史 evidence。读取报告可用 `python -m json.tool <run目录>/report.json`，同时检查 Manifest 和 `audit_gap`。
+
+CLI 退出码：0 表示离线计划正常处理完成，2 表示输入无效或运行停止，3 表示审计不完整。0 不代表 API 安全 PASS；本轮所有 API 结论为 INCONCLUSIVE，`request_count` 恒为 0。配置中的审批引用明确标记为离线夹具，不是实际目标授权。
+
+测试使用假派发器、可控单调时钟和临时目录，并禁止创建网络套接字。CI 仅以只读仓库权限运行测试，不运行历史演示，不自动提交／推送 Evidence。旧演示中的模拟 EXECUTED 和公式 Token 仅属历史数据；不要用旧入口生成新版验收证据。
+
+Controller 的 `start` 先静态预检再计时规划；`round(proposals=..., repeat=...)` 先处理检查及待决追加，再判定结束；可信宿主通过独立 `Revocation` 入口撤权，调用 `poll` 或下一调度检查点观察停止。Planner 无权获得该入口。具体映射、限制与真实测试结果见 [验证记录](eval/P3_offline_core_validation.md)。

@@ -66,3 +66,6 @@
 ## 2026-10-14 当前规格引用更新
 
 活动需求入口更新为 [Specification V1.0-RC2](../brief/P3_specification_v1.0-rc2.md)。上文带日期的 RC1 引用、历史正文及决策记录原样保留；[RC1 文件](../brief/P3_specification_v1.0-rc1.md) 是第三轮修订后的历史快照。RC2 仅承接本轮阶段分类和无价值重复循环的防误停澄清，不改变本 ADR 决策状态或原授权／预算／撤权不变量。
+
+
+2026-10-14 第三阶段第一轮：ADR 003 技术路线已由项目负责人明确接受；其此前 Proposed 记录保留。新增离线核心的实现与测试见 [验证记录](../eval/P3_offline_core_validation.md)，不构成物理隔离或 HTTP 验收通过。

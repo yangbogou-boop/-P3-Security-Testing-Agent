@@ -1,32 +1,22 @@
-name: P3 Agent Cloud Runner & Evidence Generation
+name: P3 Offline Core Tests
 
 on: [push, pull_request]
 
+permissions:
+  contents: read
+
 jobs:
-  run-agent:
+  offline-tests:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write  # 赋予写入权限，以便自动提交生成的证据
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-
-      - name: Run P3 Agent and Generate Traces
-        run: |
-          echo "=== 正在云端运行 P3 Agent 并生成 Trace 证据 ==="
-          python src/main.py
-
-      - name: Commit and Push Evidence Traces
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add evidence/traces/
-          git status
-          # 如果有新生成的证据文件，自动提交并推送到仓库
-          git commit -m "chore(evidence): auto-generate execution traces from CI runner" || echo "No changes to commit"
-          git push
+      - name: Run offline unittest suite
+        env:
+          PYTHONPATH: src
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python -m unittest discover -s tests -v
