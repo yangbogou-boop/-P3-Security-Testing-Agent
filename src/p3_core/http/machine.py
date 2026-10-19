@@ -1,7 +1,7 @@
-"""Single-owner no-network dispatch machine; revoke shares only a short gate.
+"""Shared single-owner machine; SimulationRun uses memory transport only.
 
-Actual request_count is always zero. model_request_count models positive sends
-from MemoryTransport, never actual HTTP. Offline Controller stays unchanged.
+Live subclass owns real transport creation/counting. Revoke shares a short gate;
+all persistence remains outside it. Original offline Controller stays unchanged.
 """
 import copy
 from dataclasses import dataclass, field
@@ -11,7 +11,8 @@ import time
 from ..evidence import MemoryEvidence, Redactor, unique_id
 from ..models import InvalidInput, number
 from .contract import HttpConfig, HttpCheck, IDENTITIES
-from .protocol import build_request, ResponseParser, evaluate
+from .protocol import build_request, ResponseParser, evaluate, evidence_projection
+from .strategies import FixedSelection
 from .transport import MemoryTransport
 
 
@@ -26,6 +27,11 @@ class Slot:
     action_id: object = None
     assertion: str = 'NOT_ATTEMPTED'
     simulated_conclusion: str = 'INCONCLUSIVE'
+    execution: str = 'NOT_EXECUTED'
+    conclusion: str = 'INCONCLUSIVE'
+    evidence_ids: list = field(default_factory=list)
+    status: object = None
+    headers_received: bool = False
 
 
 class SimulationRun:
@@ -35,8 +41,16 @@ class SimulationRun:
     never waits for readiness. Injected transports must be memory test doubles.
     All audit I/O is outside gate, including during concurrent revocation.
     """
+    simulation = True
+    provenance = 'NO_NETWORK_SIMULATION'
+    mode = 'http-local-simulation'
+    io_event_kind = 'model_io'
+
     def __init__(self, raw, registry, *, clock=time.monotonic, wall_clock=time.time,
-                 evidence=None, credentials=None):
+                 evidence=None, credentials=None, selection=None):
+        self.selection = selection if selection is not None else FixedSelection()
+        self.planning_seconds = 0.0
+        self._requests = 0
         self._raw = copy.deepcopy(raw)
         self._registry = registry
         self.clock, self.wall_clock = clock, wall_clock
@@ -59,6 +73,7 @@ class SimulationRun:
         self._active = None
         self._pending_controls = {}
         self._audit_gap = False
+        self._cleanup_failed = False
         self._finalized = False
         self._seq = 0
         try:
@@ -74,7 +89,7 @@ class SimulationRun:
 
     def _counts_locked(self):
         return dict(plan_count=len(self._slots), attempt_count=self._attempts,
-                    request_count=0, model_request_count=self._model_requests)
+                    request_count=self._requests, model_request_count=self._model_requests)
 
     def _conditions_locked(self, error=None):
         reasons = []
@@ -125,11 +140,14 @@ class SimulationRun:
     def _emit(self, kind, **safe):
         if self._audit_gap: return False
         self._seq += 1
-        event = dict(mode='http-local-simulation', provenance='NO_NETWORK_SIMULATION',
+        event = dict(mode=self.mode, provenance=self.provenance,
                      run_id=self.run_id, evidence_id=unique_id('evidence'), sequence=self._seq,
                      kind=kind, counts=self.counts, **safe)
         try:
             self.evidence.emit(self._redactor.clean(event))
+            for slot in self._slots:
+                if slot.action_id and slot.action_id == safe.get('action_id'):
+                    slot.evidence_ids.append(event['evidence_id'])
             return True
         except Exception:
             with self._gate:
@@ -145,13 +163,41 @@ class SimulationRun:
             if check: self._by_id[check.check_id] = slot
         return slot
 
+    def _snapshot_for_run(self, wall):
+        return self._registry.snapshot(self.config, wall, simulation=True)
+
+    def _make_transport(self, supplied, request):
+        if not isinstance(supplied, MemoryTransport):
+            raise InvalidInput('MEMORY_TRANSPORT_REQUIRED')
+        return supplied
+
+    def _first_send_locked(self):
+        self._model_requests += 1
+
+    def _select_pending(self):
+        pending = [s for s in self._slots if not s.processed]
+        # Invalid proposals still consume their first attempt; selection cannot hide them.
+        if pending and pending[0].check not in self.config.candidates: return pending[0]
+        eligible = tuple(s.check for s in pending)
+        completed = {s.check.check_id: s.assertion for s in self._slots
+                     if s.processed and s.authorization == 'ALLOW' and s.check in self.config.candidates}
+        started = time.perf_counter()
+        try:
+            selected = self.selection.choose(tuple(s.check for s in self._slots if s.check in self.config.candidates), completed)
+        finally:
+            self.planning_seconds += time.perf_counter() - started
+        if not eligible and selected is None: return None
+        slot = next((s for s in pending if s.check.check_id == selected), None)
+        if slot is None: raise InvalidInput('SELECTION_OUT_OF_SCOPE')
+        return slot
+
     def start(self, planner=None):
         with self._lock:
             if self.state != 'READY': return
             try:
                 self.config = HttpConfig.parse(self._raw)
                 wall = number(self.wall_clock())
-                self.snapshot = self._registry.snapshot(self.config, wall, simulation=True)
+                self.snapshot = self._snapshot_for_run(wall)
                 # Verify credential bindings statically, without serializing their values.
                 needed = {row[3] for row in IDENTITIES if row[3] is not None}
                 if set(self._credentials) != needed: raise InvalidInput('MISSING_CREDENTIAL_BINDING')
@@ -172,11 +218,14 @@ class SimulationRun:
             if not self.poll(): return
             self._emit('started', snapshot_id=self.snapshot.snapshot_id)
             if not self.poll(): return
+            planning_started = time.perf_counter()
             try:
                 plan = ([c.to_dict() for c in self.config.candidates] if planner is None
                         else planner.plan(self.config.candidates))
             except Exception:
                 self.poll('RUNTIME_ERROR'); return
+            finally:
+                self.planning_seconds += time.perf_counter() - planning_started
             if not self.poll(): return
             try:
                 if type(plan) is not list or len(plan) > self.config.budget.max_checks:
@@ -231,8 +280,21 @@ class SimulationRun:
         if self._active:
             if not self._active.get('closed'):
                 try: self._active['transport'].close()
-                except Exception: pass
+                except Exception:
+                    self._cleanup_failed = True
+                    self.poll('RUNTIME_ERROR')
+                    self._emit('cleanup_failure', action_id=self._active['slot'].action_id)
+                    return
                 self._active['closed'] = True
+            if not self.simulation and not self._active['slot'].processed:
+                s = self._active['slot']
+                if s.headers_received:
+                    s.execution = 'EXECUTED'
+                elif self._active['sent']:
+                    s.execution = ('CANCELLED' if self.reason == 'REVOKED' else
+                                   'TIMEOUT' if self.reason in ('TIMEOUT','BUDGET_EXHAUSTED') else 'ERROR')
+                elif self.reason in ('TRANSPORT_ERROR','RUNTIME_ERROR'):
+                    s.execution = 'ERROR'
             self._active['request'] = None
 
     def step(self, transport=None):
@@ -243,6 +305,7 @@ class SimulationRun:
                 raise InvalidInput('SINGLE_IO_OWNER_REQUIRED')
             self._stepping = True
             try: self._step(transport)
+            except Exception: self.poll('RUNTIME_ERROR')
             finally:
                 self._stepping = False
                 if self.state == 'STOPPED': self._cleanup()
@@ -250,11 +313,9 @@ class SimulationRun:
     def _step(self, transport):
         if not self.poll(): return
         if self._active is None:
-            slot = next((s for s in self._slots if not s.processed), None)
+            slot = self._select_pending()
             if slot is None: return
             if not self._authorize(slot): return
-            if not isinstance(transport, MemoryTransport):
-                self.poll('RUNTIME_ERROR'); return
             slot.action_id = unique_id('action')
             ref = next(row[3] for row in IDENTITIES if row[0] == slot.check.identity_ref)
             try:
@@ -262,6 +323,9 @@ class SimulationRun:
                                         self._credentials.get(ref))
             except Exception:
                 self.poll('AUTHORIZATION_INVALID'); return
+            try: transport = self._make_transport(transport, request)
+            except Exception:
+                self.poll('RUNTIME_ERROR'); return
             self._active = dict(slot=slot, transport=transport, request=request, generation=self.generation,
                                 phase='CONNECT', offset=0, sent=False, parser=ResponseParser(self.config.limits))
             self._emit('prepared', slot_id=slot.slot_id, action_id=slot.action_id)
@@ -287,7 +351,7 @@ class SimulationRun:
                         if type(n) is not int or not 0 < n <= len(wire) - active['offset']: raise OSError()
                         if not active['sent']:
                             active['sent'] = True
-                            self._model_requests += 1
+                            self._first_send_locked()
                         active['offset'] += n
                         if active['offset'] == len(wire): active['phase'] = 'READ'
                 except BlockingIOError:
@@ -296,7 +360,7 @@ class SimulationRun:
                 except OSError: error = 'TRANSPORT_ERROR'
                 except Exception: error = 'RUNTIME_ERROR'
                 self._checkpoint_locked(error)
-            self._emit('model_io', action_id=slot.action_id, phase=phase, gate_sequence=seq,
+            self._emit(self.io_event_kind, action_id=slot.action_id, phase=phase, gate_sequence=seq,
                        sent_bytes=active['offset'], dispatch_started=active['sent'])
             return
         try:
@@ -311,6 +375,10 @@ class SimulationRun:
                 if not self.poll(): return  # late data cannot complete a stopped action.
                 if chunk:
                     active['parser'].feed(chunk)
+                    if active['parser'].headers_observed and not slot.headers_received:
+                        slot.status=active['parser'].status_observed
+                        slot.headers_received=True
+                        if not self._emit('response_headers',action_id=slot.action_id,status=slot.status): return
                     if active['parser']._failure:
                         self.poll('RESPONSE_ERROR')
                     return
@@ -319,13 +387,19 @@ class SimulationRun:
                 control = controls.get(slot.check.control_id)
                 verdict = evaluate(self.config, slot.check, slot.action_id, observation,
                                    control_pass=bool(control and control.simulated_conclusion == 'PASS'))
-                # Persist only validated assertion codes; no raw body/headers/exceptions.
-                if not self._emit('simulated_assertion', action_id=slot.action_id,
-                                  assertion=verdict.assertion, simulated_conclusion=verdict.simulated_conclusion):
+                projection = evidence_projection(self.config, slot.check, slot.action_id, observation, verdict)
+                if not self._emit('response_evidence', action_id=slot.action_id, **projection): return
+                # Persist only validated fields; no raw body/headers/exceptions.
+                if not self._emit('simulated_assertion' if self.simulation else 'security_assertion', action_id=slot.action_id,
+                                  assertion=verdict.assertion, evaluated_conclusion=verdict.simulated_conclusion):
                     return
                 with self._gate:
                     if not self._checkpoint_locked(): return
                     slot.simulated_conclusion, slot.assertion = verdict.simulated_conclusion, verdict.assertion
+                    slot.status = observation.status
+                    if not self.simulation:
+                        slot.execution = 'EXECUTED' if slot.headers_received else 'ERROR'
+                        slot.conclusion = verdict.simulated_conclusion
                     slot.processed = True
                 if verdict.assertion == 'MISSING_CONTROL':
                     self._pending_controls[slot.slot_id] = (slot, observation)
@@ -348,6 +422,7 @@ class SimulationRun:
             with self._gate:
                 if not self._checkpoint_locked(): return
                 slot.simulated_conclusion, slot.assertion = verdict.simulated_conclusion, verdict.assertion
+                if not self.simulation: slot.conclusion = verdict.simulated_conclusion
             del self._pending_controls[key]
 
     def settle(self, proposals=(), repeat=False):
@@ -388,12 +463,17 @@ class SimulationRun:
                 rows.append(dict(slot_id=s.slot_id, proposal_id=s.proposal_id,
                                  check_id=s.check.check_id if approved else None,
                                  attempt_id=s.attempt_id, action_id=s.action_id, processed=s.processed,
-                                 authorization=s.authorization, execution='NOT_EXECUTED', conclusion='INCONCLUSIVE',
-                                 simulated_conclusion=s.simulated_conclusion, assertion=s.assertion))
-            return self._redactor.clean(dict(run_id=self.run_id, mode='http-local-simulation',
-                provenance='NO_NETWORK_SIMULATION', state=self.state, reason=self.reason,
+                                 authorization=s.authorization, execution=s.execution, conclusion=s.conclusion,
+                                 simulated_conclusion=s.simulated_conclusion if self.simulation else None,
+                                 assertion=s.assertion, status=s.status, headers_received=s.headers_received,
+                                 transport_issue=self.reason if s.action_id and not s.processed else None,
+                                 evidence_ids=list(s.evidence_ids)))
+            return self._redactor.clean(dict(run_id=self.run_id, mode=self.mode,
+                provenance=self.provenance, strategy_id=self.selection.strategy_id, planning_seconds=self.planning_seconds,
+                scope_digest=self.config.scope_digest if self.config else None,
+                snapshot_id=self.snapshot.snapshot_id if self.snapshot else None, state=self.state, reason=self.reason,
                 stop_conditions=list(self.conditions), counts=self.counts, checks=rows,
-                audit_gap=self._audit_gap, revoke_received=self._revoke_received,
+                audit_gap=self._audit_gap, cleanup_failed=self._cleanup_failed, revoke_received=self._revoke_received,
                 revoke_effective_sequence=self._revoke_effective,
                 unperformed_approved_candidates=[] if not self.config else [c.check_id for c in self.config.candidates
                   if not any(s.check == c and s.processed and s.authorization == 'ALLOW' for s in self._slots)]))
@@ -405,7 +485,7 @@ class SimulationRun:
                 self._cleanup()
                 self._finalized = True
                 try:
-                    self.evidence.finish(dict(run_id=self.run_id, provenance='NO_NETWORK_SIMULATION',
+                    self.evidence.finish(dict(run_id=self.run_id, provenance=self.provenance,
                                               counts=self.counts, audit_gap=self._audit_gap), self.report())
                 except Exception: self._audit_gap = True
             return self.report()

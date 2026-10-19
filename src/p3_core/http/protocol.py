@@ -55,6 +55,22 @@ class ResponseParser:
         self._buffer = bytearray()
         self._closed = False
         self._failure = None
+        self.status_observed = None
+        self.headers_observed = False
+
+    def _observe_headers(self, chunk):
+        # Safe HTTP fact only, not framing validity or a security verdict. Bounded
+        # prefix survives body overflow/timeout without retaining a raw header.
+        if self.headers_observed: return
+        prefix=(bytes(self._buffer)+chunk[:self.limits.header_bytes])[:self.limits.header_bytes]
+        split=prefix.find(b'\r\n\r\n')
+        if split<0: return
+        lines=prefix[:split].split(b'\r\n')
+        if not re.fullmatch(rb'HTTP/1\.1 [1-5][0-9]{2} [\x20-\x7e]*',lines[0]): return
+        for line in lines[1:]:
+            if not re.fullmatch(rb'[A-Za-z0-9-]+:[\x20-\x7e]*',line): return
+        self.status_observed=int(lines[0][9:12])
+        self.headers_observed=True
 
     def _fail(self, code):
         self._buffer.clear()
@@ -67,6 +83,7 @@ class ResponseParser:
             return
         if type(chunk) is not bytes:
             self._fail('INVALID_CHUNK'); return
+        self._observe_headers(chunk)
         if len(chunk) + len(self._buffer) > self.limits.response_bytes:
             self._fail('RESPONSE_TOO_LARGE'); return
         self._buffer.extend(chunk)
@@ -178,3 +195,20 @@ def evaluate(config, check, action_id, observation, *, control_pass=False, ident
         if denial and status == wanted:
             return Verdict('PASS', None, 'REFUSAL_WITH_CONTROL') if control_pass else inconclusive(None, 'MISSING_CONTROL')
     return inconclusive('RESPONSE_ERROR', 'UNEXPECTED_RESPONSE')
+
+
+def evidence_projection(config, check, action_id, observation, verdict):
+    """Persist only fully validated synthetic contract values, never raw input."""
+    approved_assertions = {'AUTHORIZED_CONTENT', 'REFUSAL_WITH_CONTROL', 'MISSING_CONTROL',
+                           'CONFIRMED_DISCLOSURE', 'CONFIRMED_OVERDENIAL'}
+    safe = None
+    checked = evaluate(config, check, action_id, observation,
+                       control_pass=verdict.assertion == 'REFUSAL_WITH_CONTROL')
+    if (observation.valid and checked.assertion == verdict.assertion and verdict.assertion in approved_assertions
+            and check in config.candidates):
+        # evaluate has already checked exact closed schema and finite values.
+        import copy
+        safe = copy.deepcopy(observation.body)
+    return dict(status=observation.status, response_valid=observation.valid,
+                assertions_complete=safe is not None, response_fields=safe,
+                diagnostic=observation.diagnostic, assertion=verdict.assertion)
