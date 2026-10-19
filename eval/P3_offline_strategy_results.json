@@ -1,0 +1,2588 @@
+{
+  "provenance": "NO_NETWORK_SIMULATION",
+  "network_status": "PENDING_AUTHORIZATION",
+  "repeats": 3,
+  "runs": [
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "good",
+      "strategy": "fixed",
+      "fault": null,
+      "order": [
+        "HTTP-C-AUTH",
+        "HTTP-N-AUTH",
+        "HTTP-C-BOLA",
+        "HTTP-N-BOLA",
+        "HTTP-C-RBAC",
+        "HTTP-N-RBAC"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.020849599999999996,
+          "planning_seconds": 5.789999999994411e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_56bdf9b0d5094456ab61ab398c6e4ac1",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 1,
+      "run_id": "run_56bdf9b0d5094456ab61ab398c6e4ac1",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 6,
+        "request_count": 0,
+        "model_request_count": 6
+      },
+      "state": "COMPLETED",
+      "reason": null,
+      "unperformed": []
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "good",
+      "strategy": "dynamic",
+      "fault": null,
+      "order": [
+        "HTTP-N-AUTH",
+        "HTTP-C-AUTH",
+        "HTTP-N-BOLA",
+        "HTTP-C-BOLA",
+        "HTTP-N-RBAC",
+        "HTTP-C-RBAC"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.019335200000000025,
+          "planning_seconds": 5.849999999996136e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_24430bac5ed34d23b98985a5eb00c0ac",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 1,
+      "run_id": "run_24430bac5ed34d23b98985a5eb00c0ac",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 6,
+        "request_count": 0,
+        "model_request_count": 6
+      },
+      "state": "COMPLETED",
+      "reason": null,
+      "unperformed": []
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "good",
+      "strategy": "fixed",
+      "fault": null,
+      "order": [
+        "HTTP-C-AUTH",
+        "HTTP-N-AUTH",
+        "HTTP-C-BOLA",
+        "HTTP-N-BOLA",
+        "HTTP-C-RBAC",
+        "HTTP-N-RBAC"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.019120599999999988,
+          "planning_seconds": 5.500000000002725e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_34e0706acc7c47fe90c1dc37b29714d4",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 2,
+      "run_id": "run_34e0706acc7c47fe90c1dc37b29714d4",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 6,
+        "request_count": 0,
+        "model_request_count": 6
+      },
+      "state": "COMPLETED",
+      "reason": null,
+      "unperformed": []
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "good",
+      "strategy": "dynamic",
+      "fault": null,
+      "order": [
+        "HTTP-N-AUTH",
+        "HTTP-C-AUTH",
+        "HTTP-N-BOLA",
+        "HTTP-C-BOLA",
+        "HTTP-N-RBAC",
+        "HTTP-C-RBAC"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.02226990000000001,
+          "planning_seconds": 5.950000000004563e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_206487cc3ce64151aba31132903980ed",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 2,
+      "run_id": "run_206487cc3ce64151aba31132903980ed",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 6,
+        "request_count": 0,
+        "model_request_count": 6
+      },
+      "state": "COMPLETED",
+      "reason": null,
+      "unperformed": []
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "good",
+      "strategy": "fixed",
+      "fault": null,
+      "order": [
+        "HTTP-C-AUTH",
+        "HTTP-N-AUTH",
+        "HTTP-C-BOLA",
+        "HTTP-N-BOLA",
+        "HTTP-C-RBAC",
+        "HTTP-N-RBAC"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.01913910000000002,
+          "planning_seconds": 5.9499999999934605e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_467bb41a81f64589a9402a7702c8ba9e",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 3,
+      "run_id": "run_467bb41a81f64589a9402a7702c8ba9e",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 6,
+        "request_count": 0,
+        "model_request_count": 6
+      },
+      "state": "COMPLETED",
+      "reason": null,
+      "unperformed": []
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "good",
+      "strategy": "dynamic",
+      "fault": null,
+      "order": [
+        "HTTP-N-AUTH",
+        "HTTP-C-AUTH",
+        "HTTP-N-BOLA",
+        "HTTP-C-BOLA",
+        "HTTP-N-RBAC",
+        "HTTP-C-RBAC"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.020911599999999975,
+          "planning_seconds": 5.939999999987622e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_b00f54439db94fa8814c1ee5a5bd68f4",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 3,
+      "run_id": "run_b00f54439db94fa8814c1ee5a5bd68f4",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 6,
+        "request_count": 0,
+        "model_request_count": 6
+      },
+      "state": "COMPLETED",
+      "reason": null,
+      "unperformed": []
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "auth",
+      "strategy": "fixed",
+      "fault": null,
+      "order": [
+        "HTTP-C-AUTH",
+        "HTTP-N-AUTH",
+        "HTTP-C-BOLA",
+        "HTTP-N-BOLA",
+        "HTTP-C-RBAC",
+        "HTTP-N-RBAC"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.0257096,
+          "planning_seconds": 5.7100000000087636e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_00b137c3a2fc4bae8eb7ec5749c81efa",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 1,
+      "run_id": "run_00b137c3a2fc4bae8eb7ec5749c81efa",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 6,
+        "request_count": 0,
+        "model_request_count": 6
+      },
+      "state": "COMPLETED",
+      "reason": null,
+      "unperformed": []
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "auth",
+      "strategy": "dynamic",
+      "fault": null,
+      "order": [
+        "HTTP-N-AUTH",
+        "HTTP-N-BOLA",
+        "HTTP-C-BOLA",
+        "HTTP-N-RBAC",
+        "HTTP-C-RBAC",
+        "HTTP-C-AUTH"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.020631399999999966,
+          "planning_seconds": 5.830000000001112e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_6c049a68ed5640479bd9a4e4a949bbca",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 1,
+      "run_id": "run_6c049a68ed5640479bd9a4e4a949bbca",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 6,
+        "request_count": 0,
+        "model_request_count": 6
+      },
+      "state": "COMPLETED",
+      "reason": null,
+      "unperformed": []
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "auth",
+      "strategy": "fixed",
+      "fault": null,
+      "order": [
+        "HTTP-C-AUTH",
+        "HTTP-N-AUTH",
+        "HTTP-C-BOLA",
+        "HTTP-N-BOLA",
+        "HTTP-C-RBAC",
+        "HTTP-N-RBAC"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.02055679999999993,
+          "planning_seconds": 5.88000000000255e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_8c96ebffc6964c21b027d71fd679e1bb",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 2,
+      "run_id": "run_8c96ebffc6964c21b027d71fd679e1bb",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 6,
+        "request_count": 0,
+        "model_request_count": 6
+      },
+      "state": "COMPLETED",
+      "reason": null,
+      "unperformed": []
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "auth",
+      "strategy": "dynamic",
+      "fault": null,
+      "order": [
+        "HTTP-N-AUTH",
+        "HTTP-N-BOLA",
+        "HTTP-C-BOLA",
+        "HTTP-N-RBAC",
+        "HTTP-C-RBAC",
+        "HTTP-C-AUTH"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.02085400000000004,
+          "planning_seconds": 5.9000000000364317e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_e3ccf1b67e274505a7ea0524614e89ae",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 2,
+      "run_id": "run_e3ccf1b67e274505a7ea0524614e89ae",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 6,
+        "request_count": 0,
+        "model_request_count": 6
+      },
+      "state": "COMPLETED",
+      "reason": null,
+      "unperformed": []
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "auth",
+      "strategy": "fixed",
+      "fault": null,
+      "order": [
+        "HTTP-C-AUTH",
+        "HTTP-N-AUTH",
+        "HTTP-C-BOLA",
+        "HTTP-N-BOLA",
+        "HTTP-C-RBAC",
+        "HTTP-N-RBAC"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.02003330000000003,
+          "planning_seconds": 5.7699999999938356e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_7c4c6e9df65f4a9fa7ce9a7684bc34a1",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 3,
+      "run_id": "run_7c4c6e9df65f4a9fa7ce9a7684bc34a1",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 6,
+        "request_count": 0,
+        "model_request_count": 6
+      },
+      "state": "COMPLETED",
+      "reason": null,
+      "unperformed": []
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "auth",
+      "strategy": "dynamic",
+      "fault": null,
+      "order": [
+        "HTTP-N-AUTH",
+        "HTTP-N-BOLA",
+        "HTTP-C-BOLA",
+        "HTTP-N-RBAC",
+        "HTTP-C-RBAC",
+        "HTTP-C-AUTH"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.02909329999999999,
+          "planning_seconds": 6.210000000028693e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_fcf7bc74a30a4a3db091a0c834958fc4",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 3,
+      "run_id": "run_fcf7bc74a30a4a3db091a0c834958fc4",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 6,
+        "request_count": 0,
+        "model_request_count": 6
+      },
+      "state": "COMPLETED",
+      "reason": null,
+      "unperformed": []
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "bola",
+      "strategy": "fixed",
+      "fault": null,
+      "order": [
+        "HTTP-C-AUTH",
+        "HTTP-N-AUTH",
+        "HTTP-C-BOLA",
+        "HTTP-N-BOLA",
+        "HTTP-C-RBAC",
+        "HTTP-N-RBAC"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.019853700000000085,
+          "planning_seconds": 6.180000000011177e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_bb544fda8972472da14b4134268c5580",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 1,
+      "run_id": "run_bb544fda8972472da14b4134268c5580",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 6,
+        "request_count": 0,
+        "model_request_count": 6
+      },
+      "state": "COMPLETED",
+      "reason": null,
+      "unperformed": []
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "bola",
+      "strategy": "dynamic",
+      "fault": null,
+      "order": [
+        "HTTP-N-AUTH",
+        "HTTP-C-AUTH",
+        "HTTP-N-BOLA",
+        "HTTP-N-RBAC",
+        "HTTP-C-RBAC",
+        "HTTP-C-BOLA"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.022349900000000034,
+          "planning_seconds": 6.010000000011839e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_304cf47e8fdd4b8dad773fb87ebbe59a",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 1,
+      "run_id": "run_304cf47e8fdd4b8dad773fb87ebbe59a",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 6,
+        "request_count": 0,
+        "model_request_count": 6
+      },
+      "state": "COMPLETED",
+      "reason": null,
+      "unperformed": []
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "bola",
+      "strategy": "fixed",
+      "fault": null,
+      "order": [
+        "HTTP-C-AUTH",
+        "HTTP-N-AUTH",
+        "HTTP-C-BOLA",
+        "HTTP-N-BOLA",
+        "HTTP-C-RBAC",
+        "HTTP-N-RBAC"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.020547300000000046,
+          "planning_seconds": 6.569999999994636e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_69c7d96c861a4972a2242627956f3bc6",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 2,
+      "run_id": "run_69c7d96c861a4972a2242627956f3bc6",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 6,
+        "request_count": 0,
+        "model_request_count": 6
+      },
+      "state": "COMPLETED",
+      "reason": null,
+      "unperformed": []
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "bola",
+      "strategy": "dynamic",
+      "fault": null,
+      "order": [
+        "HTTP-N-AUTH",
+        "HTTP-C-AUTH",
+        "HTTP-N-BOLA",
+        "HTTP-N-RBAC",
+        "HTTP-C-RBAC",
+        "HTTP-C-BOLA"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.021128999999999953,
+          "planning_seconds": 5.7699999999938356e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_ea440b064ba34fd7ad6bb3e2152445a5",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 2,
+      "run_id": "run_ea440b064ba34fd7ad6bb3e2152445a5",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 6,
+        "request_count": 0,
+        "model_request_count": 6
+      },
+      "state": "COMPLETED",
+      "reason": null,
+      "unperformed": []
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "bola",
+      "strategy": "fixed",
+      "fault": null,
+      "order": [
+        "HTTP-C-AUTH",
+        "HTTP-N-AUTH",
+        "HTTP-C-BOLA",
+        "HTTP-N-BOLA",
+        "HTTP-C-RBAC",
+        "HTTP-N-RBAC"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.020505100000000054,
+          "planning_seconds": 6.0599999999966236e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_72b19b5b05da4b84bd65c786338bbd70",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 3,
+      "run_id": "run_72b19b5b05da4b84bd65c786338bbd70",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 6,
+        "request_count": 0,
+        "model_request_count": 6
+      },
+      "state": "COMPLETED",
+      "reason": null,
+      "unperformed": []
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "bola",
+      "strategy": "dynamic",
+      "fault": null,
+      "order": [
+        "HTTP-N-AUTH",
+        "HTTP-C-AUTH",
+        "HTTP-N-BOLA",
+        "HTTP-N-RBAC",
+        "HTTP-C-RBAC",
+        "HTTP-C-BOLA"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.020940999999999987,
+          "planning_seconds": 6.06999999999136e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_d240249623704329a44abf8e01d908b4",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 3,
+      "run_id": "run_d240249623704329a44abf8e01d908b4",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 6,
+        "request_count": 0,
+        "model_request_count": 6
+      },
+      "state": "COMPLETED",
+      "reason": null,
+      "unperformed": []
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "rbac",
+      "strategy": "fixed",
+      "fault": null,
+      "order": [
+        "HTTP-C-AUTH",
+        "HTTP-N-AUTH",
+        "HTTP-C-BOLA",
+        "HTTP-N-BOLA",
+        "HTTP-C-RBAC",
+        "HTTP-N-RBAC"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.020417300000000083,
+          "planning_seconds": 7.490000000009989e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_fa5fb72110ef4e6699547adb9de8f158",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 1,
+      "run_id": "run_fa5fb72110ef4e6699547adb9de8f158",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 6,
+        "request_count": 0,
+        "model_request_count": 6
+      },
+      "state": "COMPLETED",
+      "reason": null,
+      "unperformed": []
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "rbac",
+      "strategy": "dynamic",
+      "fault": null,
+      "order": [
+        "HTTP-N-AUTH",
+        "HTTP-C-AUTH",
+        "HTTP-N-BOLA",
+        "HTTP-C-BOLA",
+        "HTTP-N-RBAC",
+        "HTTP-C-RBAC"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.02150019999999997,
+          "planning_seconds": 5.699999999997374e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_a55a9c1f911f4606b6f27ec5a731ab8e",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 1,
+      "run_id": "run_a55a9c1f911f4606b6f27ec5a731ab8e",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 6,
+        "request_count": 0,
+        "model_request_count": 6
+      },
+      "state": "COMPLETED",
+      "reason": null,
+      "unperformed": []
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "rbac",
+      "strategy": "fixed",
+      "fault": null,
+      "order": [
+        "HTTP-C-AUTH",
+        "HTTP-N-AUTH",
+        "HTTP-C-BOLA",
+        "HTTP-N-BOLA",
+        "HTTP-C-RBAC",
+        "HTTP-N-RBAC"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.019924800000000076,
+          "planning_seconds": 5.680000000007901e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_72617c888ef9494388cec933a42a548e",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 2,
+      "run_id": "run_72617c888ef9494388cec933a42a548e",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 6,
+        "request_count": 0,
+        "model_request_count": 6
+      },
+      "state": "COMPLETED",
+      "reason": null,
+      "unperformed": []
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "rbac",
+      "strategy": "dynamic",
+      "fault": null,
+      "order": [
+        "HTTP-N-AUTH",
+        "HTTP-C-AUTH",
+        "HTTP-N-BOLA",
+        "HTTP-C-BOLA",
+        "HTTP-N-RBAC",
+        "HTTP-C-RBAC"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.020851399999999964,
+          "planning_seconds": 5.840000000012502e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_c97a95ae2a074c10a17788883cfa8cb2",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 2,
+      "run_id": "run_c97a95ae2a074c10a17788883cfa8cb2",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 6,
+        "request_count": 0,
+        "model_request_count": 6
+      },
+      "state": "COMPLETED",
+      "reason": null,
+      "unperformed": []
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "rbac",
+      "strategy": "fixed",
+      "fault": null,
+      "order": [
+        "HTTP-C-AUTH",
+        "HTTP-N-AUTH",
+        "HTTP-C-BOLA",
+        "HTTP-N-BOLA",
+        "HTTP-C-RBAC",
+        "HTTP-N-RBAC"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.019934899999999978,
+          "planning_seconds": 6.670000000008613e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_a123447caae44ed1b61cc8985afc9c57",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 3,
+      "run_id": "run_a123447caae44ed1b61cc8985afc9c57",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 6,
+        "request_count": 0,
+        "model_request_count": 6
+      },
+      "state": "COMPLETED",
+      "reason": null,
+      "unperformed": []
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "rbac",
+      "strategy": "dynamic",
+      "fault": null,
+      "order": [
+        "HTTP-N-AUTH",
+        "HTTP-C-AUTH",
+        "HTTP-N-BOLA",
+        "HTTP-C-BOLA",
+        "HTTP-N-RBAC",
+        "HTTP-C-RBAC"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.020402400000000043,
+          "planning_seconds": 5.829999999984459e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_86dbabd19e6d48638987767e3d421945",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 3,
+      "run_id": "run_86dbabd19e6d48638987767e3d421945",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 6,
+        "request_count": 0,
+        "model_request_count": 6
+      },
+      "state": "COMPLETED",
+      "reason": null,
+      "unperformed": []
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "good",
+      "strategy": "fixed",
+      "fault": "malformed",
+      "order": [
+        "HTTP-C-AUTH"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 0,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 6,
+        "tool_failures": 1,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 1,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 1,
+          "local_elapsed_seconds": 0.009987899999999827,
+          "planning_seconds": 1.4499999999806334e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_4ee0c2dd06134eccbf133f2e60b969e9",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 1,
+      "run_id": "run_4ee0c2dd06134eccbf133f2e60b969e9",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 1,
+        "request_count": 0,
+        "model_request_count": 1
+      },
+      "state": "STOPPED",
+      "reason": "RESPONSE_ERROR",
+      "unperformed": [
+        "HTTP-N-AUTH",
+        "HTTP-C-BOLA",
+        "HTTP-N-BOLA",
+        "HTTP-C-RBAC",
+        "HTTP-N-RBAC"
+      ]
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "good",
+      "strategy": "dynamic",
+      "fault": "malformed",
+      "order": [
+        "HTTP-N-AUTH"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 0,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 6,
+        "tool_failures": 1,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 1,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 1,
+          "local_elapsed_seconds": 0.013001599999999947,
+          "planning_seconds": 1.4499999999806334e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_40aae9b803534ae3b5875287ab715ec7",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 1,
+      "run_id": "run_40aae9b803534ae3b5875287ab715ec7",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 1,
+        "request_count": 0,
+        "model_request_count": 1
+      },
+      "state": "STOPPED",
+      "reason": "RESPONSE_ERROR",
+      "unperformed": [
+        "HTTP-C-AUTH",
+        "HTTP-C-BOLA",
+        "HTTP-N-BOLA",
+        "HTTP-C-RBAC",
+        "HTTP-N-RBAC"
+      ]
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "good",
+      "strategy": "fixed",
+      "fault": "malformed",
+      "order": [
+        "HTTP-C-AUTH"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 0,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 6,
+        "tool_failures": 1,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 1,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 1,
+          "local_elapsed_seconds": 0.010686699999999938,
+          "planning_seconds": 1.4399999999969992e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_53b531666c54438fb3c9e5ebc5a58805",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 2,
+      "run_id": "run_53b531666c54438fb3c9e5ebc5a58805",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 1,
+        "request_count": 0,
+        "model_request_count": 1
+      },
+      "state": "STOPPED",
+      "reason": "RESPONSE_ERROR",
+      "unperformed": [
+        "HTTP-N-AUTH",
+        "HTTP-C-BOLA",
+        "HTTP-N-BOLA",
+        "HTTP-C-RBAC",
+        "HTTP-N-RBAC"
+      ]
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "good",
+      "strategy": "dynamic",
+      "fault": "malformed",
+      "order": [
+        "HTTP-N-AUTH"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 0,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 6,
+        "tool_failures": 1,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 1,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 1,
+          "local_elapsed_seconds": 0.010518899999999887,
+          "planning_seconds": 1.5899999999957615e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_5c6daf4e1111439e98f1642e28a47249",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 2,
+      "run_id": "run_5c6daf4e1111439e98f1642e28a47249",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 1,
+        "request_count": 0,
+        "model_request_count": 1
+      },
+      "state": "STOPPED",
+      "reason": "RESPONSE_ERROR",
+      "unperformed": [
+        "HTTP-C-AUTH",
+        "HTTP-C-BOLA",
+        "HTTP-N-BOLA",
+        "HTTP-C-RBAC",
+        "HTTP-N-RBAC"
+      ]
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "good",
+      "strategy": "fixed",
+      "fault": "malformed",
+      "order": [
+        "HTTP-C-AUTH"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 0,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 6,
+        "tool_failures": 1,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 1,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 1,
+          "local_elapsed_seconds": 0.010614400000000135,
+          "planning_seconds": 1.5499999999946112e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_77e53fe86ce946ab8a8c0a58813f6222",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 3,
+      "run_id": "run_77e53fe86ce946ab8a8c0a58813f6222",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 1,
+        "request_count": 0,
+        "model_request_count": 1
+      },
+      "state": "STOPPED",
+      "reason": "RESPONSE_ERROR",
+      "unperformed": [
+        "HTTP-N-AUTH",
+        "HTTP-C-BOLA",
+        "HTTP-N-BOLA",
+        "HTTP-C-RBAC",
+        "HTTP-N-RBAC"
+      ]
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "good",
+      "strategy": "dynamic",
+      "fault": "malformed",
+      "order": [
+        "HTTP-N-AUTH"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 0,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 6,
+        "tool_failures": 1,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 1,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 1,
+          "local_elapsed_seconds": 0.009937300000000038,
+          "planning_seconds": 1.8699999999816086e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_a0384cb1ce2149cdbcf07196cf5d325e",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 3,
+      "run_id": "run_a0384cb1ce2149cdbcf07196cf5d325e",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 1,
+        "request_count": 0,
+        "model_request_count": 1
+      },
+      "state": "STOPPED",
+      "reason": "RESPONSE_ERROR",
+      "unperformed": [
+        "HTTP-C-AUTH",
+        "HTTP-C-BOLA",
+        "HTTP-N-BOLA",
+        "HTTP-C-RBAC",
+        "HTTP-N-RBAC"
+      ]
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "good",
+      "strategy": "fixed",
+      "fault": "timeout",
+      "order": [
+        "HTTP-C-AUTH"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 0,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 6,
+        "tool_failures": 1,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 1,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 1,
+          "local_elapsed_seconds": 0.008933800000000103,
+          "planning_seconds": 1.5499999999946112e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_da3aead35c4c40968219b066247093db",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 1,
+      "run_id": "run_da3aead35c4c40968219b066247093db",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 1,
+        "request_count": 0,
+        "model_request_count": 1
+      },
+      "state": "STOPPED",
+      "reason": "TIMEOUT",
+      "unperformed": [
+        "HTTP-C-AUTH",
+        "HTTP-N-AUTH",
+        "HTTP-C-BOLA",
+        "HTTP-N-BOLA",
+        "HTTP-C-RBAC",
+        "HTTP-N-RBAC"
+      ]
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "good",
+      "strategy": "dynamic",
+      "fault": "timeout",
+      "order": [
+        "HTTP-N-AUTH"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 0,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 6,
+        "tool_failures": 1,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 1,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 1,
+          "local_elapsed_seconds": 0.009097999999999828,
+          "planning_seconds": 1.4499999999806334e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_16adc59609604cfb9d158050b674d2be",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 1,
+      "run_id": "run_16adc59609604cfb9d158050b674d2be",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 1,
+        "request_count": 0,
+        "model_request_count": 1
+      },
+      "state": "STOPPED",
+      "reason": "TIMEOUT",
+      "unperformed": [
+        "HTTP-C-AUTH",
+        "HTTP-N-AUTH",
+        "HTTP-C-BOLA",
+        "HTTP-N-BOLA",
+        "HTTP-C-RBAC",
+        "HTTP-N-RBAC"
+      ]
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "good",
+      "strategy": "fixed",
+      "fault": "timeout",
+      "order": [
+        "HTTP-C-AUTH"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 0,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 6,
+        "tool_failures": 1,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 1,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 1,
+          "local_elapsed_seconds": 0.009506100000000073,
+          "planning_seconds": 1.5800000000121273e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_dc108b54824f4e86aebbf6c3dfb78f27",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 2,
+      "run_id": "run_dc108b54824f4e86aebbf6c3dfb78f27",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 1,
+        "request_count": 0,
+        "model_request_count": 1
+      },
+      "state": "STOPPED",
+      "reason": "TIMEOUT",
+      "unperformed": [
+        "HTTP-C-AUTH",
+        "HTTP-N-AUTH",
+        "HTTP-C-BOLA",
+        "HTTP-N-BOLA",
+        "HTTP-C-RBAC",
+        "HTTP-N-RBAC"
+      ]
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "good",
+      "strategy": "dynamic",
+      "fault": "timeout",
+      "order": [
+        "HTTP-N-AUTH"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 0,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 6,
+        "tool_failures": 1,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 1,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 1,
+          "local_elapsed_seconds": 0.009723700000000113,
+          "planning_seconds": 1.4299999999911606e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_e5f6b38d188d481a97bed5f88a94d0a8",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 2,
+      "run_id": "run_e5f6b38d188d481a97bed5f88a94d0a8",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 1,
+        "request_count": 0,
+        "model_request_count": 1
+      },
+      "state": "STOPPED",
+      "reason": "TIMEOUT",
+      "unperformed": [
+        "HTTP-C-AUTH",
+        "HTTP-N-AUTH",
+        "HTTP-C-BOLA",
+        "HTTP-N-BOLA",
+        "HTTP-C-RBAC",
+        "HTTP-N-RBAC"
+      ]
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "good",
+      "strategy": "fixed",
+      "fault": "timeout",
+      "order": [
+        "HTTP-C-AUTH"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 0,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 6,
+        "tool_failures": 1,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 1,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 1,
+          "local_elapsed_seconds": 0.010110300000000016,
+          "planning_seconds": 1.9100000000049633e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_73b67e59bcb34096a74db6b1a312fb91",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 3,
+      "run_id": "run_73b67e59bcb34096a74db6b1a312fb91",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 1,
+        "request_count": 0,
+        "model_request_count": 1
+      },
+      "state": "STOPPED",
+      "reason": "TIMEOUT",
+      "unperformed": [
+        "HTTP-C-AUTH",
+        "HTTP-N-AUTH",
+        "HTTP-C-BOLA",
+        "HTTP-N-BOLA",
+        "HTTP-C-RBAC",
+        "HTTP-N-RBAC"
+      ]
+    },
+    {
+      "provenance": "NO_NETWORK_SIMULATION",
+      "network_status": "PENDING_AUTHORIZATION",
+      "mode": "good",
+      "strategy": "dynamic",
+      "fault": "timeout",
+      "order": [
+        "HTTP-N-AUTH"
+      ],
+      "metrics": {
+        "coverage": {
+          "numerator": 0,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 6,
+        "tool_failures": 1,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 1,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 1,
+          "local_elapsed_seconds": 0.009475899999999982,
+          "planning_seconds": 1.6000000000238046e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "integrity": {
+        "integrity": "VERIFIED",
+        "run_id": "run_2a6dd0c5f1754402b158c7167f98c6e2",
+        "provenance": "NO_NETWORK_SIMULATION",
+        "approval_verified": false,
+        "appended_bytes": 0
+      },
+      "experiment_contract": {
+        "candidates": "six-v1",
+        "matrix": "p3-matrix-v1",
+        "fixture": "synthetic-v1",
+        "budget": {
+          "max_checks": 8,
+          "logical_timeout_seconds": 90,
+          "concurrency": 1
+        },
+        "objective": "all six checks with controls",
+        "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+      },
+      "trial": 3,
+      "run_id": "run_2a6dd0c5f1754402b158c7167f98c6e2",
+      "counts": {
+        "plan_count": 6,
+        "attempt_count": 1,
+        "request_count": 0,
+        "model_request_count": 1
+      },
+      "state": "STOPPED",
+      "reason": "TIMEOUT",
+      "unperformed": [
+        "HTTP-C-AUTH",
+        "HTTP-N-AUTH",
+        "HTTP-C-BOLA",
+        "HTTP-N-BOLA",
+        "HTTP-C-RBAC",
+        "HTTP-N-RBAC"
+      ]
+    }
+  ],
+  "decision": "KEEP_FIXED_PENDING_REAL_EVIDENCE",
+  "limitations": [
+    "No actual HTTP measurements",
+    "Timing is local test-harness time, not network latency",
+    "Small sample, no statistical superiority claim",
+    "Preparation/human-review costs not measured"
+  ]
+}

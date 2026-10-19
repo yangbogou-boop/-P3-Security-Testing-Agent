@@ -18,7 +18,8 @@ V1 仅面向经批准的本地隔离模拟 API，使用模拟身份和已批准�
 | 历史原型（保留） | `src/main.py`、`src/planner/`、`src/controller/` 的关键词扫描与模拟成功演示原样保留；不作为当前入口。 |
 | 当前离线核心 | `src/p3_core/`：结构化模型、固定 Planner、独立 Controller、预算／撤权／终态、JSONL／Manifest／有限报告及 CLI；假派发不发送 HTTP。 |
 | 无网络 HTTP 核心 | `src/p3_core/http/`：独立配置／许可快照、有限 GET 构造、有界解析／模拟判定、单 I/O 所有者状态机、内存传输及审计前缀分析。实际 HTTP 派发数仍为 0。 |
-| V1 待实现 | HTTP Executor、本地模拟 API 的网络服务适配器、真实响应断言及三类权限安全结论、真实请求超时／取消、动态策略比较与正式 GWT 验收。离线模型不是完整 HTTP 契约。 |
+| 当前受控接入组件 | 已增加默认未激活的服务适配器、非阻塞 Executor、离线端到端框架、确定性策略比较及证据校验；实际网络路径尚未验收。 |
+| V1 待验收 | 真实目标许可／教师目录核验、真实 HTTP 集成、实际取消／端口／代理边界、正式策略比较及课程 GWT 验收；全部实际网络项目 PENDING_AUTHORIZATION。 |
 | 架构保证范围 | 当前为同进程模块分离，未实现物理隔离；不宣称能抵御任意同进程恶意代码。 |
 | 已有证据 | 历史轨迹及公式模拟 Token 原样保留，不能证明真实 HTTP 测试、真实 LLM 成本或新版验收通过。 |
 | 必做工程取舍 | 基础闭环后完成 REQ-021 固定／动态比较及 ADR 决定，依据课程任务映射为 MUST；可以保留固定 Baseline，不要求动态胜出或接入 LLM。 |
@@ -85,3 +86,12 @@ Controller 的 `start` 先静态预检再计时规划；`round(proposals=..., re
 完整 unittest 本地通过 **127 项（原 103＋新增 24）**；业务响应已与现有解析器、判定器及内存状态机兼容验证。新增单测可运行 `python -m unittest discover -s tests -p test_mock_api.py -v`，仍须设置 `PYTHONPATH=src`。真实 request_count 仍为 0，所有发现只属于无网络模拟。
 
 接口、四模式结果、许可阻塞项及 C-2 待办见 [C-1 人工审核报告](review/P3_mock_api_c1_review.md)。服务监听、真实 Executor／响应证据、集成验收和 REQ-021 策略比较尚未完成；本轮不启动 C-2。
+
+
+## 后续开发交付（2026-10-19，待人工代码审核）
+
+本轮本地 158 项 unittest 通过（原 127 项保留，新增 31 项）。模拟 Good、AUTH、BOLA、RBAC 均完成配对判定，实际请求数始终为 0。36 次离线策略试跑未显示动态策略减少请求；推荐保留固定默认，见 [ADR-005（Proposed）](design/ADR_005_deterministic_strategy_comparison.md)。未启动服务，没有真实 HTTP 或 LLM 调用，未提交／推送。
+
+新入口 `python -m p3_core.delivery` 提供 simulate、compare、validate、verify、network-plan；不提供真实网络启动开关。原 offline 入口保留。运行方法、可信宿主接口和许可门槛见 [交付说明](docs/P3_offline_delivery.md)。新增静态 live/service 模块只在可信宿主显式调用且登记核验通过后才可能创建 socket；本轮没有执行该路径。
+
+完整交付见 [人工审核报告](review/P3_remaining_development_review.md)、[22 项需求追踪](eval/P3_requirement_traceability.md)、[逐次比较结果](eval/P3_offline_strategy_results.json) 和 [真实集成待验清单](eval/P3_http_integration_status.json)。前述 B、C-1 段落为历史基线记录，历史 Evidence 保留。

@@ -1,0 +1,67 @@
+{
+  "network_status": "PENDING_AUTHORIZATION",
+  "cases": [
+    {
+      "case": "GOOD_PAIRED_CONTROLS",
+      "status": "PENDING_AUTHORIZATION"
+    },
+    {
+      "case": "AUTH_DISCLOSURE",
+      "status": "PENDING_AUTHORIZATION"
+    },
+    {
+      "case": "BOLA_DISCLOSURE",
+      "status": "PENDING_AUTHORIZATION"
+    },
+    {
+      "case": "RBAC_DISCLOSURE",
+      "status": "PENDING_AUTHORIZATION"
+    },
+    {
+      "case": "CONNECTION_FAILURE",
+      "status": "PENDING_AUTHORIZATION"
+    },
+    {
+      "case": "UNEXPECTED_STATUS",
+      "status": "PENDING_AUTHORIZATION"
+    },
+    {
+      "case": "INVALID_JSON",
+      "status": "PENDING_AUTHORIZATION"
+    },
+    {
+      "case": "TRUNCATION",
+      "status": "PENDING_AUTHORIZATION"
+    },
+    {
+      "case": "TIMEOUT",
+      "status": "PENDING_AUTHORIZATION"
+    },
+    {
+      "case": "REVOKE_CONNECT",
+      "status": "PENDING_AUTHORIZATION"
+    },
+    {
+      "case": "REVOKE_FIRST_SEND",
+      "status": "PENDING_AUTHORIZATION"
+    },
+    {
+      "case": "REVOKE_PARTIAL_SEND",
+      "status": "PENDING_AUTHORIZATION"
+    },
+    {
+      "case": "LATE_RESPONSE",
+      "status": "PENDING_AUTHORIZATION"
+    },
+    {
+      "case": "AUDIT_FAILURE",
+      "status": "PENDING_AUTHORIZATION"
+    }
+  ],
+  "required": [
+    "Verified target-owner/delegate permission",
+    "Teacher catalog record",
+    "Exact version/scope binding",
+    "Trusted fixture supervisor"
+  ]
+}
