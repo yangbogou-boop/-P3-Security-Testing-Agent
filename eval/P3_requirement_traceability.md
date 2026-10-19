@@ -36,3 +36,9 @@
 - GWT-A01-a/b/c 保留原测试；动态策略对 MISSING_CONTROL 优先补必要对照，不提前停止正常检查。
 - [C-3 清单](P3_http_integration_status.json) 全部真实网络场景为 PENDING_AUTHORIZATION。REQ-013、真实撤权／超时资源回收、REQ-021 实际成本及正式验收未完成。
 - 没有真实 LLM 或 Token 用量；准备和人工复核时间未测。模型 FAIL 只表示合成夹具判定，不是现实漏洞报告。
+
+## C-3A/B 离线加固补充（基线 30c98db）
+
+新增 [test_c3_preflight.py](../tests/test_c3_preflight.py) 24 项，本地共 182 项通过；上面的 158 项为前轮基线，不删除或替代原有测试。REQ-007／009／011／012：服务端非阻塞发送与撤权共用短 gate，等待及关闭在门外；REQ-010／015：正发送计数 hook、部分发送、预算到点与恢复记录仍由原控制规则约束；REQ-014／016／017：审计失败、错误绑定、最小摘要和关闭失败明确呈现，不新增确认性安全结论。
+
+服务端新增确定性用例覆盖撤权先／后赢、等待不阻塞撤权、部分发送、到期／超时、旧凭据、错实例与清理失败。真实分支计数 hook 的内存插桩不生成持久化 Evidence，不声称真实请求发生。全部实际 HTTP 场景仍待授权，见 [许可核验与 14 项验收卡](P3_c3_authorization_checklist.md) 和 [本轮审核报告](../review/P3_c3_preflight_review.md)。未变更 RC2 ID／强度，ADR-005 仍 Proposed。
