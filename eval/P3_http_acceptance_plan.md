@@ -77,3 +77,11 @@ GWT-P01/P02/N02 的真实请求响应、GWT-A03 的真实在途行为、GWT-N06/
 ## 5. 确定性竞争测试约束（2026-10-19 补充）
 
 HTTP-T27～T31 使用脚本化非阻塞假传输、门前／返回后的测试屏障、事件序号与可注入时钟，逐一强制双方先后顺序；不用 sleep 或大量随机线程碰撞作为通过依据。屏障仅在测试替身使用，不允许生产 gate 加入等待钩子。同步断言 connect/send 调用列表、offset、dispatch_started、generation、三计数快照和停止原因，而非只检查最终报告。模型中的首写计数不作为真实 HTTP Evidence；正常 offline 模式 request_count 仍为 0。所有新增场景目前仅设计、未执行。
+
+## 6. 第二轮 B 无网络验证状态（2026-10-19）
+
+本节更新 U 子场景状态，保留前文设计时“未执行”的历史描述；I/F 场景仍全部未执行。标准库 unittest 本地实际通过 103 项：既有 offline 49 项、新增 HTTP 模型 54 项。新测试在 setUp 禁止 socket/socket.create_connection/getaddrinfo；只用内存传输与临时 Evidence。
+
+HTTP-T27～T35 对应测试分别覆盖 connect／撤权先后、短门内正字节记账、部分写与暂不可写、规划及发送预算边界／审计缺口恢复、幂等撤权及迟到记录、批准材料与范围、只读快照、畸形响应不能由 canary 救回、完整 5xx 泄露与损坏响应区分。线程竞争使用 Event 屏障和有限 join，不以 sleep 猜测顺序；这些结果不证明真实 OS 网络取消延迟。
+
+完整命令、测试函数映射、未覆盖事项见 [本轮审核报告](../review/P3_http_offline_core_review.md)。HTTP-T09 环境代理、T10 真实实例替换、I 级故障／资源回收及真实容量实验不因假传输通过而计完成；REQ-021 MUST 比较及正式课程验收仍待后续。

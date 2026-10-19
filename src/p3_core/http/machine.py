@@ -139,8 +139,10 @@ class SimulationRun:
 
     def _register(self, check):
         slot = Slot(unique_id('slot'), unique_id('proposal'), check)
-        with self._gate: self._slots.append(slot)
-        if check: self._by_id[check.check_id] = slot
+        with self._gate:
+            if not self._checkpoint_locked(): return None
+            self._slots.append(slot)
+            if check: self._by_id[check.check_id] = slot
         return slot
 
     def start(self, planner=None):
@@ -173,14 +175,22 @@ class SimulationRun:
             try:
                 plan = ([c.to_dict() for c in self.config.candidates] if planner is None
                         else planner.plan(self.config.candidates))
-                if not self.poll(): return
+            except Exception:
+                self.poll('RUNTIME_ERROR'); return
+            if not self.poll(): return
+            try:
                 if type(plan) is not list or len(plan) > self.config.budget.max_checks:
                     raise InvalidInput('INVALID_PLAN')
                 checks = [HttpCheck.parse(p) for p in plan]
                 if len({c.check_id for c in checks}) != len(checks): raise InvalidInput('DUPLICATE_CHECK')
             except Exception:
                 self.poll('INVALID_INPUT'); return
-            for check in checks: self._register(check)
+            with self._gate:
+                if not self._checkpoint_locked(): return
+                for check in checks:
+                    slot = Slot(unique_id('slot'), unique_id('proposal'), check)
+                    self._slots.append(slot)
+                    self._by_id[check.check_id] = slot
             self._emit('plan_registered')
             self.poll()
 
@@ -200,17 +210,19 @@ class SimulationRun:
             try: check = HttpCheck.parse(raw)
             except Exception: check = None
             slot = self._register(check)
+            if slot is None: return
             self._emit('proposal_registered', proposal_id=slot.proposal_id, slot_id=slot.slot_id)
             if check is None: self._authorize(slot)
 
     def _authorize(self, slot):
-        if not self.poll(): return False
-        with self._gate: self._attempts += 1
-        slot.attempt_id = unique_id('attempt')
-        approved = slot.check in self.config.candidates
-        slot.authorization = 'ALLOW' if approved else 'DENY'
-        slot.assertion = 'APPROVED' if approved else 'NOT_APPROVED_CANDIDATE'
-        if not approved: slot.processed = True
+        with self._gate:
+            if not self._checkpoint_locked(): return False
+            self._attempts += 1
+            slot.attempt_id = unique_id('attempt')
+            approved = slot.check in self.config.candidates
+            slot.authorization = 'ALLOW' if approved else 'DENY'
+            slot.assertion = 'APPROVED' if approved else 'NOT_APPROVED_CANDIDATE'
+            if not approved: slot.processed = True
         self._emit('authorization', slot_id=slot.slot_id, proposal_id=slot.proposal_id,
                    attempt_id=slot.attempt_id, decision=slot.authorization, reason=slot.assertion)
         return approved and self.poll()

@@ -17,6 +17,7 @@ V1 仅面向经批准的本地隔离模拟 API，使用模拟身份和已批准�
 | --- | --- |
 | 历史原型（保留） | `src/main.py`、`src/planner/`、`src/controller/` 的关键词扫描与模拟成功演示原样保留；不作为当前入口。 |
 | 当前离线核心 | `src/p3_core/`：结构化模型、固定 Planner、独立 Controller、预算／撤权／终态、JSONL／Manifest／有限报告及 CLI；假派发不发送 HTTP。 |
+| 无网络 HTTP 核心 | `src/p3_core/http/`：独立配置／许可快照、有限 GET 构造、有界解析／模拟判定、单 I/O 所有者状态机、内存传输及审计前缀分析。实际 HTTP 派发数仍为 0。 |
 | V1 待实现 | HTTP Executor、本地模拟 API、真实响应断言及三类权限安全结论、真实请求超时／取消、动态策略比较与正式 GWT 验收。离线模型不是完整 HTTP 契约。 |
 | 架构保证范围 | 当前为同进程模块分离，未实现物理隔离；不宣称能抵御任意同进程恶意代码。 |
 | 已有证据 | 历史轨迹及公式模拟 Token 原样保留，不能证明真实 HTTP 测试、真实 LLM 成本或新版验收通过。 |
@@ -45,7 +46,7 @@ V1 不支持任意公网扫描、未经批准的写操作；图形界面和真�
 * `examples/offline.json` - 仅供离线控制验证的可信示例配置，不构成网络测试许可
 * `evidence/` - 保留历史演示轨迹、模拟 Token 数据与工程证据
 * `release/` - 规划目录：一键复现与环境部署说明，目前未建立
-* `review/` - 规划目录：变更记录与漏洞 Finding 报告，目前未建立
+* `review/` - HTTP 设计审核及无网络核心审核报告；不作为真实 HTTP Evidence
 
 2026-10-14：当前候选升级 RC2，历史 RC1 保留；教师事项只在对应执行／预算／验收／教学／评分阶段生效。NO_NEW_EVIDENCE 仅防无价值循环，不能因一次未发现漏洞跳过有价值的批准检查或必要对照；详见 RC2 与 GWT-A01-a～c。
 
@@ -68,3 +69,11 @@ CLI 退出码：0 表示离线计划正常处理完成，2 表示输入无效或
 测试使用假派发器、可控单调时钟和临时目录，并禁止创建网络套接字。CI 仅以只读仓库权限运行测试，不运行历史演示，不自动提交／推送 Evidence。旧演示中的模拟 EXECUTED 和公式 Token 仅属历史数据；不要用旧入口生成新版验收证据。
 
 Controller 的 `start` 先静态预检再计时规划；`round(proposals=..., repeat=...)` 先处理检查及待决追加，再判定结束；可信宿主通过独立 `Revocation` 入口撤权，调用 `poll` 或下一调度检查点观察停止。Planner 无权获得该入口。具体映射、限制与真实测试结果见 [验证记录](eval/P3_offline_core_validation.md)。
+
+## 第三阶段第二轮 B（2026-10-19）
+
+[ADR-004](design/ADR_004_http_dispatch_and_cancellation.md) 已 Accepted，仅确认分离状态机＋单 I/O 所有者技术路线。新增模块没有网络后端、服务器或真实 HTTP CLI；原 offline CLI 与 49 项测试保持不变。完整 unittest 本地通过 103 项，新增 54 项均为无网络模拟，结果和限制见 [审核报告](review/P3_http_offline_core_review.md)。
+
+测试命令沿用上文；只运行新增集可用 `python -m unittest discover -s tests -p test_http_core.py -v`（先设置 PYTHONPATH=src）。`SimulationRun.start/submit/step/settle/revoke/finalize` 提供模块级验证入口；使用方法和人工材料替身见 tests/test_http_core.py，不能把它当真实执行授权。step 只接受内存传输，一个 I/O 所有者逐步推进；settle 在待决追加后判断完成。
+
+报告明确分列 `model_request_count` 与恒为 0 的 `request_count`，`simulated_conclusion` 与实际 `conclusion=INCONCLUSIVE`。所有执行仍为 NOT_EXECUTED，标注 NO_NETWORK_SIMULATION。没有真实 LLM、动态策略或 HTTP 集成结果；下一轮接入必须先完成目标许可／教师目录、真实传输边界与对应验收。

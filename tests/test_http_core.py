@@ -17,6 +17,7 @@ from p3_core.http.authorization import ReviewedMaterial, LocalRegistry
 from p3_core.http.protocol import build_request, ResponseParser, evaluate
 from p3_core.http.machine import SimulationRun
 from p3_core.http.transport import MemoryTransport
+from p3_core.http.recovery import inspect_model_prefix
 
 
 def config():
@@ -439,6 +440,91 @@ class HttpTests(unittest.TestCase):
             def finish(self,*args):raise OSError('PRIVATE')
         c=self.run_model(evidence=Fail());c.start();c.revoke();r=c.finalize()
         self.assertTrue(r['audit_gap']);self.assertEqual(c.reason,'REVOKED')
+
+    def test_t30_audit_gap_after_positive_send_is_unknown_on_recovery(self):
+        class FailAfterSend(MemoryEvidence):
+            def emit(self,event):
+                if event['kind']=='model_io' and event['dispatch_started']:
+                    raise OSError('SIMULATED_CRASH_SECRET')
+                super().emit(event)
+        sink=FailAfterSend();c=self.run_model(evidence=sink);io=self.prepare(c)
+        c.step();c.step();c.step()
+        self.assertEqual(c.reason,'AUDIT_ERROR');self.assertEqual(c.counts['model_request_count'],1)
+        recovered=inspect_model_prefix(sink.events)
+        self.assertEqual(recovered['model_send_unknown'],1)
+        self.assertEqual(recovered['model_confirmed_sent'],0)
+        self.assertFalse(recovered['replay_allowed'])
+        self.assertNotIn('SIMULATED_CRASH_SECRET',json.dumps(sink.events))
+
+    def test_expiry_and_revoke_priority_and_monotonic_rollback(self):
+        c=self.run_model(registry=registry(until=3));self.prepare(c);self.clock.now=2;c.poll()
+        self.assertEqual(c.reason,'AUTHORIZATION_INVALID')
+        self.clock.now=0;c=self.run_model();self.prepare(c);self.clock.now=10;c.poll();self.clock.now=9;c.poll()
+        self.assertEqual(c.reason,'RUNTIME_ERROR')
+        self.clock.now=0;c=self.run_model();self.prepare(c);self.clock.now=90;c.revoke()
+        self.assertEqual(c.conditions,['REVOKED','BUDGET_EXHAUSTED'])
+
+    def test_read_timeout_and_transport_failure_no_raw_exception(self):
+        for error,reason in ((TimeoutError('SECRET'),'TIMEOUT'),(OSError('SECRET'),'TRANSPORT_ERROR')):
+            c=self.run_model();io=self.prepare(c,transport=MemoryTransport(chunks=(error,)))
+            for _ in range(6):c.step()
+            self.assertEqual(c.reason,reason);self.assertEqual(c.counts['model_request_count'],1)
+            self.assertNotIn('SECRET',json.dumps(c.report()))
+
+    def test_late_response_during_read_cannot_upgrade(self):
+        c=self.run_model()
+        class Late(MemoryTransport):
+            def receive(self):c.revoke();return super().receive()
+        c.start(Planner([self.raw['candidates'][0]]));io=Late();self.execute(c,io)
+        self.assertEqual(c.reason,'REVOKED')
+        self.assertEqual(c.report()['checks'][0]['simulated_conclusion'],'INCONCLUSIVE')
+
+    def test_response_secret_keys_and_values_do_not_enter_artifacts(self):
+        marker='UNTRUSTED_RESPONSE_PRIVATE'
+        with tempfile.TemporaryDirectory() as folder:
+            c=self.run_model(evidence=JsonlEvidence(folder));c.start(Planner([self.raw['candidates'][0]]))
+            io=MemoryTransport();c.step(io);slot=c._active['slot']
+            data=body(slot.check,slot.action_id);data[marker]=marker
+            io.chunks.append(response(data))
+            for _ in range(8):c.step()
+            self.assertEqual(c.reason,'RESPONSE_ERROR');c.finalize()
+            for p in Path(folder).rglob('*'):
+                if p.is_file():self.assertNotIn(marker,p.read_text(encoding='utf-8'))
+
+    def test_completion_audit_at_deadline_never_completes(self):
+        clock=self.clock
+        class Slow(MemoryEvidence):
+            def emit(self,event):
+                super().emit(event)
+                if event['kind']=='completion_ready':clock.now=90
+        c=self.run_model(evidence=Slow());c.start(Planner([self.raw['candidates'][0]]));self.execute(c);c.settle()
+        self.assertEqual((c.state,c.reason),('STOPPED','BUDGET_EXHAUSTED'))
+
+    def test_approved_candidate_pass_is_not_carried_to_broken_next_response(self):
+        c=self.run_model();c.start();self.execute(c)
+        io=MemoryTransport();c.step(io)
+        io.chunks.append(response({},payload=b'{"canary":"ALICE_PROFILE_CANARY"'))
+        for _ in range(8):c.step()
+        self.assertEqual(c._slots[0].simulated_conclusion,'PASS')
+        self.assertEqual(c._slots[1].simulated_conclusion,'INCONCLUSIVE')
+
+    def test_anonymous_request_forbids_supplied_credential(self):
+        with self.assertRaises(InvalidInput):
+            build_request(self.cfg,self.snap,self.cfg.candidates[1],'a','TOKEN')
+
+    def test_planner_exception_is_runtime_error_and_no_plan(self):
+        class Broken:
+            def plan(self,_):raise RuntimeError('SECRET_PLANNER')
+        c=self.run_model();c.start(Broken())
+        self.assertEqual(c.reason,'RUNTIME_ERROR');self.assertEqual(c.counts['plan_count'],0)
+        self.assertNotIn('SECRET_PLANNER',json.dumps(c.report()))
+
+    def test_revocation_inside_planner_blocks_registration(self):
+        c=self.run_model()
+        class Revoke:
+            def plan(self,candidates):c.revoke();return [x.to_dict() for x in candidates]
+        c.start(Revoke())
+        self.assertEqual(c.reason,'REVOKED');self.assertEqual(c.counts['plan_count'],0)
 
 
 if __name__ == '__main__':unittest.main()

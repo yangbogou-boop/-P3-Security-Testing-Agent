@@ -132,3 +132,18 @@
 ### 7.2 响应完整性约束的统一解释
 
 适用接入设计 §6.1：重复／冲突长度、非法 JSON、超长或截断响应均先判证据有效性，本次必要证据不完整则 INCONCLUSIVE，禁止扫描偶然 canary 后直接 FAIL。5xx 只有在 framing、完整 JSON、来源关联、泄露断言与持久化均有效时才可确认 FAIL，并同时 RESPONSE_ERROR；其他完整检查的既有结论与本次损坏检查分别报告。因断连／超时／审计失败导致的缺口分别按既有 TRANSPORT_ERROR／TIMEOUT（总预算优先）／AUDIT_ERROR 处理，不改变 RC2 停止优先级。
+
+## 8. 第二轮 B 无网络 schema 与接口（2026-10-19）
+
+`HttpConfig.parse` 接受独立 `mode=http-local`、`schema_version=http-core-v1`；这是从草案字段落实的版本名，不沿用 offline 授权。顶层字段严格为 mode、schema_version、target、budget、limits、authorization、fixture_instance_id、contract_version、matrix_version、candidate_version、fixture_version、budget_version、candidates。未知／缺失字段拒绝。
+
+- target 为精确 scheme=http、host=127.0.0.1、port；budget 为 max_checks、logical_timeout_seconds、concurrency=1。
+- limits 为 header_bytes、body_bytes、response_bytes，均为正整数且总容量至少容纳前两者；测试中的 1024／4096／5120 只是单元测试边界，非课程冻结或正式性能参数。
+- authorization 只含 authorization_id、authorization_version、registry_ref；不接受 active 或 approved_by 作为字段捷径。
+- contract_version=p3-http-v1、matrix_version=p3-matrix-v1 绑定本文有限端点／身份／矩阵；candidates 必须精确为六项原始候选，使用分离 path_params/query。扩展候选／契约需新版本和评审，不能由 Planner 扩展。
+
+可信宿主另提供 `LocalRegistry(registration_bytes, reviewed_materials)`。登记字节严格含 registry_ref、authorization_id、authorization_version、scope_digest、owner_ref、catalog_ref、delegation_ref。材料对象包含原字节及摘要、来源、核验者、授权主体／角色、共同范围摘要、有效期、撤销状态与 synthetic 标记；受托许可还核验委托记录。版本、目标、参数、身份、预算与夹具均纳入范围摘要。
+
+默认 snapshot 不接受 synthetic 材料；只在显式 simulation=True 时允许人工测试替身，仍不得用于真实网络。`SimulationRun` 仅能调用内存传输，所有测试许可明确是人工构造材料。程序核验字节／范围／版本的一致性，真实性和宿主目录写权限是调用者信任边界，不宣称自动识别伪造批准。
+
+凭据通过可信宿主独立内存映射传入 fixture/alice、fixture/bob、fixture/carol；不能由检查提案传头字段或原始 Token。示例和材料替身仅位于 tests/test_http_core.py，不提供可冒充真实许可的运行配置。批准材料全文、原始响应、未知参数和异常正文不进入 Evidence。

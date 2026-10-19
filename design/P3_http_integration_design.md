@@ -193,3 +193,11 @@ ALLOW／发送准备记录失败则不发送；实际发送后审计失败不能
 先审契约与 ADR-004，再分别实现无网络 schema／规范化／判定／状态机测试；保留旧离线模式。实际许可齐备后才启动模拟 API 和 HTTP 集成测试。接入后先验证六项 Good／单缺陷 Known Bad，再测网络故障、撤权竞态及证据失败，最后补预算／容量试跑；固定／动态比较仍为 REQ-021 MUST 后续工作。
 
 负责人需审核：有限响应协议是否足够、首字节派发记录边界、短门与单 I/O 所有者、许可核验者和字段、六项候选／断言。试跑待定：取消延迟可接受值、读入／存储限制与样本量。真实授权和教师目录记录目前未取得；技术决策本身不等待额外教师审批。本轮不实施任何上述接口。
+
+## 9. 第二轮 B 实现承接（2026-10-19）
+
+[ADR-004](ADR_004_http_dispatch_and_cancellation.md) 已由负责人接受技术路线，历史 Proposed 比较保留。新增 `src/p3_core/http/`：contract、authorization、protocol、machine、transport、recovery 模块，均无网络；原 Controller 和 CLI 不变。当前原型使用单 I/O 所有者调用 step，每步一次非阻塞假操作；不实现 selector 事件循环或真实 socket。
+
+模型首写计数为 `model_request_count`，实际 `request_count` 恒 0。模拟判定与实际 API 结论分开，所有新产物标 NO_NETWORK_SIMULATION。负向拒绝先出现时保存已校验观察，必要对照执行后再解析其模拟结论；撤权／预算仍优先，不能为了对照扩预算。
+
+接入接口、真实测试命令与限制见 [本轮审核报告](../review/P3_http_offline_core_review.md)。上文设计的 I/F 场景仍未执行；本轮只落实确定性 U 子场景，不把真实 Executor 或课程批准状态写成完成。
