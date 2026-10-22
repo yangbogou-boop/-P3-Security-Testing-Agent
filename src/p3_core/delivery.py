@@ -6,6 +6,11 @@ from pathlib import Path
 from .experiments import run_scenario, compare_strategies, MODES, STRATEGIES, FAULTS
 from .http.audit import verify_run
 from .http.contract import HttpConfig
+from .http.contract import strict_json
+from .preflight import authorization_preflight
+from .acceptance import acceptance_plan
+from .coordination import check_sidecar
+import time
 
 
 def integration_plan():
@@ -36,12 +41,27 @@ def main(argv=None):
     validate=sub.add_parser('validate');validate.add_argument('config')
     verify=sub.add_parser('verify');verify.add_argument('directory')
     sub.add_parser('network-plan')
+    sub.add_parser('supervisor-plan')
+    sub.add_parser('integration-status')
+    pre=sub.add_parser('authorization-preflight');pre.add_argument('document')
+    side=sub.add_parser('evidence-check');side.add_argument('directory')
     args=parser.parse_args(argv)
     try:
         if args.command=='simulate': result=run_scenario(args.mode,args.strategy,output=args.output,fault=args.fault)
         elif args.command=='compare':
             result=compare_strategies(args.output,args.repeats)
         elif args.command=='verify': result=verify_run(args.directory)
+        elif args.command=='integration-status':result=acceptance_plan()
+        elif args.command=='supervisor-plan':
+            result=dict(states=['BOUND','STOPPING','STOPPED','FAILED','RETIRED'],
+                        network_status='PENDING_AUTHORIZATION',execution_entrypoint=None,
+                        steps=['bind exact run/fixture/scope/version/generation','revoke both independent gates',
+                               'poll owner cleanup without waiting in locks','invalidate after cleanup','prepare new fixture'])
+        elif args.command=='evidence-check':result=check_sidecar(args.directory)
+        elif args.command=='authorization-preflight':
+            with Path(args.document).open('rb') as stream:data=stream.read(1048577)
+            if len(data)>1048576:raise ValueError()
+            result=authorization_preflight(strict_json(data),now=time.time())
         elif args.command=='validate':
             def pairs(items):
                 out={}
@@ -55,7 +75,7 @@ def main(argv=None):
             result=dict(schema='VALID',scope_digest=cfg.scope_digest,network_status='PENDING_AUTHORIZATION')
         else: result=integration_plan()
         print(json.dumps(result,ensure_ascii=False,indent=2))
-        return 1 if (result.get('integrity')=='INCOMPLETE_OR_INVALID' or
+        return 1 if (result.get('integrity') in ('INCOMPLETE_OR_INVALID','EVIDENCE_INCOMPLETE') or
                      result.get('report',{}).get('audit_gap') or
                      result.get('report',{}).get('state')=='STOPPED') else 0
     except (OSError,ValueError,TypeError,KeyError):

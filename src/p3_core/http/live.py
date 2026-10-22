@@ -165,6 +165,16 @@ class AuthorizedHttpRun(SimulationRun):
     def _first_send_locked(self):
         self._requests += 1
 
+    def lifecycle_status(self):
+        """Nonblocking observation; never closes another owner's socket."""
+        if not self._lock.acquire(blocking=False):
+            return dict(revoked=self._revoked, clean=False, failed=self._cleanup_failed or self._audit_gap)
+        try:
+            with self._gate:
+                clean=self._revoked and (self._active is None or self._active.get('closed',False))
+                return dict(revoked=self._revoked,clean=bool(clean),failed=self._cleanup_failed or self._audit_gap)
+        finally: self._lock.release()
+
     def run_until_terminal(self):
         """Explicit trusted-host driver only. Never called by ordinary CLI/tests."""
         self.start()

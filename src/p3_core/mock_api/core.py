@@ -147,6 +147,16 @@ class FixtureManager:
     """
     @staticmethod
     def reset(mode=Mode.GOOD):
+        # Compatibility factory. There is no global active instance to switch.
+        return FixtureManager.prepare(mode)
+
+    @staticmethod
+    def prepare(mode=Mode.GOOD):
+        """Allocate a private immutable candidate; no publication or activation.
+
+        UUID/credential generation stays outside the supervisor commit gate.
+        Discarding this candidate does not mutate an old instance or registry.
+        """
         if type(mode) is not Mode:
             raise RequestRejected('INVALID_FIXTURE_MODE')
         instance = uuid4().hex

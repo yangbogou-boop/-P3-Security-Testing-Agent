@@ -12,6 +12,10 @@ class ServiceAdapter:
         self.fixture, self.port, self.header_limit = fixture, port, header_limit
 
     def handle_bytes(self, raw):
+        return self.handle_with_action(raw)[0]
+
+    def handle_with_action(self, raw):
+        """Action is exposed only after the complete finite request is accepted."""
         if type(raw) is not bytes or len(raw) > self.header_limit:
             raise RequestRejected('INVALID_HTTP_REQUEST')
         if not raw.endswith(b'\r\n\r\n') or raw.count(b'\r\n\r\n') != 1:
@@ -40,4 +44,5 @@ class ServiceAdapter:
                 token=headers['authorization'][7:]
         except (ValueError, UnicodeError):
             raise RequestRejected('INVALID_HTTP_REQUEST') from None
-        return self.fixture.handle(MockRequest(method,target,headers['x-p3-action-id'],token)).to_bytes()
+        response=self.fixture.handle(MockRequest(method,target,headers['x-p3-action-id'],token)).to_bytes()
+        return response,headers['x-p3-action-id']

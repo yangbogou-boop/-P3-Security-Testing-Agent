@@ -30,12 +30,32 @@ class AuthorizedService:
         self.revoke_effective_at = None
         self.cleanup_failed = False
         self.last_connection = None
+        self._listener_closed = False
+        self._summary_consumer = None
+        self.summary_audit_failed = False
+        self.summary_sequence = 0
+
+    def attach_summary_consumer(self, consumer):
+        """Trusted host only, before any connection; cannot replace mid-lifecycle."""
+        with self._gate:
+            if self._handling or self.last_connection is not None or self._summary_consumer is not None:
+                raise InvalidInput('SUMMARY_CONSUMER_ALREADY_BOUND')
+            if not callable(consumer): raise InvalidInput('INVALID_SUMMARY_CONSUMER')
+            self._summary_consumer=consumer
+
+    def lifecycle_status(self):
+        with self._gate:
+            return dict(revoked=self._revoked,
+                        clean=self._revoked and not self._handling and (self._server is None or self._listener_closed),
+                        failed=self.cleanup_failed or self.summary_audit_failed)
 
     def _check(self):
         if self._revoked:
             raise InvalidInput('REVOKED')
         if self.cleanup_failed:
             raise InvalidInput('RUNTIME_ERROR')
+        if self.summary_audit_failed:
+            raise InvalidInput('AUDIT_ERROR')
         if self.snapshot is None or type(self.binding) is not FixtureBinding:
             raise InvalidInput('PENDING_AUTHORIZATION')
         self.binding.verify(self.config)
@@ -67,7 +87,7 @@ class AuthorizedService:
             if self._owner!=get_ident() or self._handling:
                 raise InvalidInput('SINGLE_IO_OWNER_REQUIRED')
             self._handling=True
-        record=dict(connection_id=unique_id('connection'),sent_bytes=0,received_bytes=0,
+        record=dict(connection_id=unique_id('connection'),action_id=None,sent_bytes=0,received_bytes=0,
                     first_send_sequence=None,last_send_sequence=None,reason=None,cleanup_failed=False)
         try:
             connection.setblocking(False)
@@ -84,7 +104,7 @@ class AuthorizedService:
                 if not piece: raise InvalidInput('TRUNCATED_REQUEST')
                 raw.extend(piece);record['received_bytes']+=len(piece)
                 if len(raw)>adapter.header_limit: raise InvalidInput('REQUEST_TOO_LARGE')
-            result=adapter.handle_bytes(bytes(raw))
+            result,record['action_id']=adapter.handle_with_action(bytes(raw))
             while record['sent_bytes']<len(result):
                 with self._gate: self._check_connection(deadline)
                 if not self._wait_ready(connection,True,deadline): continue
@@ -105,7 +125,7 @@ class AuthorizedService:
         except InvalidInput as error:
             allowed={'REVOKED','TIMEOUT','AUTHORIZATION_INVALID','PENDING_AUTHORIZATION',
                      'FIXTURE_BINDING_INVALID','CREDENTIAL_BINDING_INVALID','RUNTIME_ERROR',
-                     'TRUNCATED_REQUEST','REQUEST_TOO_LARGE','TRANSPORT_ERROR'}
+                     'TRUNCATED_REQUEST','REQUEST_TOO_LARGE','TRANSPORT_ERROR','AUDIT_ERROR'}
             record['reason']=str(error) if str(error) in allowed else 'INVALID_REQUEST'
         except RequestRejected: record['reason']='INVALID_REQUEST'
         except TimeoutError: record['reason']='TIMEOUT'
@@ -122,8 +142,20 @@ class AuthorizedService:
                 record['revoke_requested_at']=self.revoke_requested_at
                 record['revoke_effective_sequence']=self.revoke_effective_sequence
                 record['revoke_effective_at']=self.revoke_effective_at
-                self.last_connection=record
-                self._handling=False
+                self.summary_sequence+=1
+                record['summary_sequence']=self.summary_sequence
+                self.last_connection=dict(record)
+            # Bounded summary handoff before another connection can replace it.
+            # No component gate held across sink/coordination callbacks.
+            try:
+                if self._summary_consumer is not None:
+                    self._summary_consumer(dict(record))
+            except Exception:
+                self.summary_audit_failed=True
+                self.revoke()
+            finally:
+                with self._gate:
+                    self._handling=False
 
     def start(self):
         # Material read/verification occurs before the short bind authorization gate.
@@ -177,8 +209,12 @@ class AuthorizedService:
 
     def close(self):
         self.revoke()
+        if self._owner is not None and self._owner!=get_ident():
+            raise InvalidInput('SINGLE_IO_OWNER_REQUIRED')
         if self._server is not None:
-            try: self._server.server_close()
+            try:
+                self._server.server_close()
+                self._listener_closed=True
             except Exception:
                 self.cleanup_failed=True
                 raise InvalidInput('SERVICE_CLOSE_FAILED') from None
