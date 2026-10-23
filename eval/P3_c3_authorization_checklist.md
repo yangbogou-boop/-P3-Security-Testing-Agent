@@ -1,5 +1,7 @@
 # C-3 真实集成许可核验与验收卡
 
+C-3C 增量：新增 [机器可读 14 项清单](P3_c3_acceptance_manifest.json) 与 [只读预检／监督设计](../design/P3_supervisor_lifecycle.md)。所有用例仍待授权。服务端现在支持在下一连接前向可信消费者交付摘要；下文“仅保存最后摘要”是 C-3A/B 原限制，已补离线交付接口，但真实持久化、可信源、OS 资源及双端时间观察仍未验收。原审批状态、目录范围和用例名称不变。
+
 状态：**PENDING_AUTHORIZATION**。本文件不含批准记录，不构成实际执行许可。沿用 [14 项状态](P3_http_integration_status.json)、[RC2](../brief/P3_specification_v1.0-rc2.md)、[授权边界](../brief/P3_authorization_boundary.md) 和 [ADR-004](../design/ADR_004_http_dispatch_and_cancellation.md)，不改变稳定需求及强度。
 
 ## 共同前置条件与许可字段（全部待取得／核验）

@@ -1,5 +1,7 @@
 # P3 面向软件验收阶段的黑盒授权安全测试 Agent
 
+当前 C-3C 候选新增离线 Supervisor、服务端摘要交付、独立证据关联、只读许可预检与 14 项验收管理清单；等待人工代码审核，未执行真实 HTTP。使用说明见 [生命周期设计](design/P3_supervisor_lifecycle.md)，交付与限制见 [C-3C 审核报告](review/P3_c3_supervisor_review.md)。以下历史阶段记录保留；真实集成始终为 PENDING_AUTHORIZATION，ADR-005 仍 Proposed。
+
 > **课程名称**：专业综合能力提升
 > **项目代号**：P3 - 黑盒授权安全测试 Agent（Planner–Controller 独立授权架构）  
 

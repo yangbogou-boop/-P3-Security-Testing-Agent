@@ -1,0 +1,711 @@
+{
+  "schema_version": "p3-c3-management-v1",
+  "network_status": "PENDING_AUTHORIZATION",
+  "allowed_statuses": [
+    "PENDING_AUTHORIZATION",
+    "READY_FOR_HUMAN_REVIEW",
+    "NOT_EXECUTED",
+    "EXECUTED_PENDING_VERIFICATION",
+    "VERIFIED",
+    "FAILED"
+  ],
+  "execution_entrypoint": null,
+  "cases": [
+    {
+      "case": "GOOD_PAIRED_CONTROLS",
+      "status": "PENDING_AUTHORIZATION",
+      "scope": "Good: six paired checks",
+      "required_permissions": {
+        "owner": "original permission/delegation chain and source review",
+        "teacher": "approved target/endpoint/identity/check catalog",
+        "binding": "exact HttpConfig scope digest, versions, fixture and credentials",
+        "exception_scope": null
+      },
+      "criteria": "Three successful legal controls and complete 401/403 denial assertions; status alone is insufficient.",
+      "observations": [
+        "both revoke-request/effective timestamps and gate sequences",
+        "first/last positive send and byte counts",
+        "owner close completion/failure and OS resource observation"
+      ],
+      "preconditions": [
+        "owner_material",
+        "teacher_catalog",
+        "source_review",
+        "scope_version_match",
+        "fixture_credential_binding",
+        "budget_record",
+        "revocation_responsibility"
+      ],
+      "offline_tests": [
+        "test_good_all_six_fixed"
+      ],
+      "evidence_required": [
+        "client_events_manifest_report",
+        "server_connection_summary",
+        "run_fixture_action_connection_binding",
+        "revocation_gate_sequences",
+        "cleanup_observation"
+      ],
+      "cannot_prove_offline": [
+        "real_permission_authenticity",
+        "OS_send_and_close",
+        "cancellation_latency",
+        "actual_target_identity",
+        "durable_dual_source_capture"
+      ],
+      "result": {
+        "executed_at": null,
+        "execution_proof": null,
+        "reviewer_record": null,
+        "verdict": null
+      }
+    },
+    {
+      "case": "AUTH_DISCLOSURE",
+      "status": "PENDING_AUTHORIZATION",
+      "scope": "AUTH: anonymous profile plus legal control",
+      "required_permissions": {
+        "owner": "original permission/delegation chain and source review",
+        "teacher": "approved target/endpoint/identity/check catalog",
+        "binding": "exact HttpConfig scope digest, versions, fixture and credentials",
+        "exception_scope": null
+      },
+      "criteria": "Paired profile control plus complete, instance-bound protected anonymous response; fragment alone is inconclusive.",
+      "observations": [
+        "both revoke-request/effective timestamps and gate sequences",
+        "first/last positive send and byte counts",
+        "owner close completion/failure and OS resource observation"
+      ],
+      "preconditions": [
+        "owner_material",
+        "teacher_catalog",
+        "source_review",
+        "scope_version_match",
+        "fixture_credential_binding",
+        "budget_record",
+        "revocation_responsibility"
+      ],
+      "offline_tests": [
+        "test_three_defects_both_strategies"
+      ],
+      "evidence_required": [
+        "client_events_manifest_report",
+        "server_connection_summary",
+        "run_fixture_action_connection_binding",
+        "revocation_gate_sequences",
+        "cleanup_observation"
+      ],
+      "cannot_prove_offline": [
+        "real_permission_authenticity",
+        "OS_send_and_close",
+        "cancellation_latency",
+        "actual_target_identity",
+        "durable_dual_source_capture"
+      ],
+      "result": {
+        "executed_at": null,
+        "execution_proof": null,
+        "reviewer_record": null,
+        "verdict": null
+      }
+    },
+    {
+      "case": "BOLA_DISCLOSURE",
+      "status": "PENDING_AUTHORIZATION",
+      "scope": "BOLA: obj-b owner control",
+      "required_permissions": {
+        "owner": "original permission/delegation chain and source review",
+        "teacher": "approved target/endpoint/identity/check catalog",
+        "binding": "exact HttpConfig scope digest, versions, fixture and credentials",
+        "exception_scope": null
+      },
+      "criteria": "Paired bob control plus complete obj-b/owner=bob assertion for alice; wrong instance/object is inconclusive.",
+      "observations": [
+        "both revoke-request/effective timestamps and gate sequences",
+        "first/last positive send and byte counts",
+        "owner close completion/failure and OS resource observation"
+      ],
+      "preconditions": [
+        "owner_material",
+        "teacher_catalog",
+        "source_review",
+        "scope_version_match",
+        "fixture_credential_binding",
+        "budget_record",
+        "revocation_responsibility"
+      ],
+      "offline_tests": [
+        "test_three_defects_both_strategies"
+      ],
+      "evidence_required": [
+        "client_events_manifest_report",
+        "server_connection_summary",
+        "run_fixture_action_connection_binding",
+        "revocation_gate_sequences",
+        "cleanup_observation"
+      ],
+      "cannot_prove_offline": [
+        "real_permission_authenticity",
+        "OS_send_and_close",
+        "cancellation_latency",
+        "actual_target_identity",
+        "durable_dual_source_capture"
+      ],
+      "result": {
+        "executed_at": null,
+        "execution_proof": null,
+        "reviewer_record": null,
+        "verdict": null
+      }
+    },
+    {
+      "case": "RBAC_DISCLOSURE",
+      "status": "PENDING_AUTHORIZATION",
+      "scope": "RBAC: admin report control",
+      "required_permissions": {
+        "owner": "original permission/delegation chain and source review",
+        "teacher": "approved target/endpoint/identity/check catalog",
+        "binding": "exact HttpConfig scope digest, versions, fixture and credentials",
+        "exception_scope": null
+      },
+      "criteria": "Paired admin control plus complete period=demo/admin audience assertion for member.",
+      "observations": [
+        "both revoke-request/effective timestamps and gate sequences",
+        "first/last positive send and byte counts",
+        "owner close completion/failure and OS resource observation"
+      ],
+      "preconditions": [
+        "owner_material",
+        "teacher_catalog",
+        "source_review",
+        "scope_version_match",
+        "fixture_credential_binding",
+        "budget_record",
+        "revocation_responsibility"
+      ],
+      "offline_tests": [
+        "test_three_defects_both_strategies"
+      ],
+      "evidence_required": [
+        "client_events_manifest_report",
+        "server_connection_summary",
+        "run_fixture_action_connection_binding",
+        "revocation_gate_sequences",
+        "cleanup_observation"
+      ],
+      "cannot_prove_offline": [
+        "real_permission_authenticity",
+        "OS_send_and_close",
+        "cancellation_latency",
+        "actual_target_identity",
+        "durable_dual_source_capture"
+      ],
+      "result": {
+        "executed_at": null,
+        "execution_proof": null,
+        "reviewer_record": null,
+        "verdict": null
+      }
+    },
+    {
+      "case": "CONNECTION_FAILURE",
+      "status": "PENDING_AUTHORIZATION",
+      "scope": "Authorized connection fault",
+      "required_permissions": {
+        "owner": "original permission/delegation chain and source review",
+        "teacher": "approved target/endpoint/identity/check catalog",
+        "binding": "exact HttpConfig scope digest, versions, fixture and credentials",
+        "exception_scope": "CONNECTION_FAILURE"
+      },
+      "criteria": "ERROR/INCONCLUSIVE; zero requests before positive send, one after partial send; no retry.",
+      "observations": [
+        "both revoke-request/effective timestamps and gate sequences",
+        "first/last positive send and byte counts",
+        "owner close completion/failure and OS resource observation"
+      ],
+      "preconditions": [
+        "owner_material",
+        "teacher_catalog",
+        "source_review",
+        "scope_version_match",
+        "fixture_credential_binding",
+        "budget_record",
+        "revocation_responsibility",
+        "explicit_exception_permission"
+      ],
+      "offline_tests": [
+        "test_read_timeout_and_transport_failure_no_raw_exception"
+      ],
+      "evidence_required": [
+        "client_events_manifest_report",
+        "server_connection_summary",
+        "run_fixture_action_connection_binding",
+        "revocation_gate_sequences",
+        "cleanup_observation"
+      ],
+      "cannot_prove_offline": [
+        "real_permission_authenticity",
+        "OS_send_and_close",
+        "cancellation_latency",
+        "actual_target_identity",
+        "durable_dual_source_capture"
+      ],
+      "result": {
+        "executed_at": null,
+        "execution_proof": null,
+        "reviewer_record": null,
+        "verdict": null
+      }
+    },
+    {
+      "case": "UNEXPECTED_STATUS",
+      "status": "PENDING_AUTHORIZATION",
+      "scope": "404/5xx/redirect; no following redirect",
+      "required_permissions": {
+        "owner": "original permission/delegation chain and source review",
+        "teacher": "approved target/endpoint/identity/check catalog",
+        "binding": "exact HttpConfig scope digest, versions, fixture and credentials",
+        "exception_scope": "UNEXPECTED_STATUS"
+      },
+      "criteria": "INCONCLUSIVE/RESPONSE_ERROR unless independently complete protected disclosure meets existing contract; never follow redirect.",
+      "observations": [
+        "both revoke-request/effective timestamps and gate sequences",
+        "first/last positive send and byte counts",
+        "owner close completion/failure and OS resource observation"
+      ],
+      "preconditions": [
+        "owner_material",
+        "teacher_catalog",
+        "source_review",
+        "scope_version_match",
+        "fixture_credential_binding",
+        "budget_record",
+        "revocation_responsibility",
+        "explicit_exception_permission"
+      ],
+      "offline_tests": [
+        "test_404_and_5xx_no_leak_are_inconclusive"
+      ],
+      "evidence_required": [
+        "client_events_manifest_report",
+        "server_connection_summary",
+        "run_fixture_action_connection_binding",
+        "revocation_gate_sequences",
+        "cleanup_observation"
+      ],
+      "cannot_prove_offline": [
+        "real_permission_authenticity",
+        "OS_send_and_close",
+        "cancellation_latency",
+        "actual_target_identity",
+        "durable_dual_source_capture"
+      ],
+      "result": {
+        "executed_at": null,
+        "execution_proof": null,
+        "reviewer_record": null,
+        "verdict": null
+      }
+    },
+    {
+      "case": "INVALID_JSON",
+      "status": "PENDING_AUTHORIZATION",
+      "scope": "Malformed JSON/UTF8/duplicates",
+      "required_permissions": {
+        "owner": "original permission/delegation chain and source review",
+        "teacher": "approved target/endpoint/identity/check catalog",
+        "binding": "exact HttpConfig scope digest, versions, fixture and credentials",
+        "exception_scope": "INVALID_JSON"
+      },
+      "criteria": "INCONCLUSIVE/RESPONSE_ERROR for invalid UTF8, duplicate keys, unknown fields or conflicting lengths; no canary override.",
+      "observations": [
+        "both revoke-request/effective timestamps and gate sequences",
+        "first/last positive send and byte counts",
+        "owner close completion/failure and OS resource observation"
+      ],
+      "preconditions": [
+        "owner_material",
+        "teacher_catalog",
+        "source_review",
+        "scope_version_match",
+        "fixture_credential_binding",
+        "budget_record",
+        "revocation_responsibility",
+        "explicit_exception_permission"
+      ],
+      "offline_tests": [
+        "test_t34_canary_cannot_rescue_malformed_framing_or_json"
+      ],
+      "evidence_required": [
+        "client_events_manifest_report",
+        "server_connection_summary",
+        "run_fixture_action_connection_binding",
+        "revocation_gate_sequences",
+        "cleanup_observation"
+      ],
+      "cannot_prove_offline": [
+        "real_permission_authenticity",
+        "OS_send_and_close",
+        "cancellation_latency",
+        "actual_target_identity",
+        "durable_dual_source_capture"
+      ],
+      "result": {
+        "executed_at": null,
+        "execution_proof": null,
+        "reviewer_record": null,
+        "verdict": null
+      }
+    },
+    {
+      "case": "TRUNCATION",
+      "status": "PENDING_AUTHORIZATION",
+      "scope": "Incomplete or oversized response",
+      "required_permissions": {
+        "owner": "original permission/delegation chain and source review",
+        "teacher": "approved target/endpoint/identity/check catalog",
+        "binding": "exact HttpConfig scope digest, versions, fixture and credentials",
+        "exception_scope": "TRUNCATION"
+      },
+      "criteria": "Preserve recognized header fact but no confirmed conclusion for incomplete body; bounded storage and explicit gap.",
+      "observations": [
+        "both revoke-request/effective timestamps and gate sequences",
+        "first/last positive send and byte counts",
+        "owner close completion/failure and OS resource observation"
+      ],
+      "preconditions": [
+        "owner_material",
+        "teacher_catalog",
+        "source_review",
+        "scope_version_match",
+        "fixture_credential_binding",
+        "budget_record",
+        "revocation_responsibility",
+        "explicit_exception_permission"
+      ],
+      "offline_tests": [
+        "test_header_fact_survives_incomplete_body_without_verdict"
+      ],
+      "evidence_required": [
+        "client_events_manifest_report",
+        "server_connection_summary",
+        "run_fixture_action_connection_binding",
+        "revocation_gate_sequences",
+        "cleanup_observation"
+      ],
+      "cannot_prove_offline": [
+        "real_permission_authenticity",
+        "OS_send_and_close",
+        "cancellation_latency",
+        "actual_target_identity",
+        "durable_dual_source_capture"
+      ],
+      "result": {
+        "executed_at": null,
+        "execution_proof": null,
+        "reviewer_record": null,
+        "verdict": null
+      }
+    },
+    {
+      "case": "TIMEOUT",
+      "status": "PENDING_AUTHORIZATION",
+      "scope": "Read/write deadline fault",
+      "required_permissions": {
+        "owner": "original permission/delegation chain and source review",
+        "teacher": "approved target/endpoint/identity/check catalog",
+        "binding": "exact HttpConfig scope digest, versions, fixture and credentials",
+        "exception_scope": "TIMEOUT"
+      },
+      "criteria": "Stop at applicable deadline; no late upgrade; retain sent count and observe cleanup latency.",
+      "observations": [
+        "both revoke-request/effective timestamps and gate sequences",
+        "first/last positive send and byte counts",
+        "owner close completion/failure and OS resource observation"
+      ],
+      "preconditions": [
+        "owner_material",
+        "teacher_catalog",
+        "source_review",
+        "scope_version_match",
+        "fixture_credential_binding",
+        "budget_record",
+        "revocation_responsibility",
+        "explicit_exception_permission"
+      ],
+      "offline_tests": [
+        "test_service_timeout_read_and_partial_write_close"
+      ],
+      "evidence_required": [
+        "client_events_manifest_report",
+        "server_connection_summary",
+        "run_fixture_action_connection_binding",
+        "revocation_gate_sequences",
+        "cleanup_observation"
+      ],
+      "cannot_prove_offline": [
+        "real_permission_authenticity",
+        "OS_send_and_close",
+        "cancellation_latency",
+        "actual_target_identity",
+        "durable_dual_source_capture"
+      ],
+      "result": {
+        "executed_at": null,
+        "execution_proof": null,
+        "reviewer_record": null,
+        "verdict": null
+      }
+    },
+    {
+      "case": "REVOKE_CONNECT",
+      "status": "PENDING_AUTHORIZATION",
+      "scope": "Revoke before/after connect",
+      "required_permissions": {
+        "owner": "original permission/delegation chain and source review",
+        "teacher": "approved target/endpoint/identity/check catalog",
+        "binding": "exact HttpConfig scope digest, versions, fixture and credentials",
+        "exception_scope": "REVOKE_CONNECT"
+      },
+      "criteria": "No positive send after effective revoke; connect alone counts zero; cleanup without reconnect.",
+      "observations": [
+        "both revoke-request/effective timestamps and gate sequences",
+        "first/last positive send and byte counts",
+        "owner close completion/failure and OS resource observation"
+      ],
+      "preconditions": [
+        "owner_material",
+        "teacher_catalog",
+        "source_review",
+        "scope_version_match",
+        "fixture_credential_binding",
+        "budget_record",
+        "revocation_responsibility",
+        "explicit_exception_permission"
+      ],
+      "offline_tests": [
+        "test_t27_connect_then_revoke_before_first_send"
+      ],
+      "evidence_required": [
+        "client_events_manifest_report",
+        "server_connection_summary",
+        "run_fixture_action_connection_binding",
+        "revocation_gate_sequences",
+        "cleanup_observation"
+      ],
+      "cannot_prove_offline": [
+        "real_permission_authenticity",
+        "OS_send_and_close",
+        "cancellation_latency",
+        "actual_target_identity",
+        "durable_dual_source_capture"
+      ],
+      "result": {
+        "executed_at": null,
+        "execution_proof": null,
+        "reviewer_record": null,
+        "verdict": null
+      }
+    },
+    {
+      "case": "REVOKE_FIRST_SEND",
+      "status": "PENDING_AUTHORIZATION",
+      "scope": "Both gate orderings",
+      "required_permissions": {
+        "owner": "original permission/delegation chain and source review",
+        "teacher": "approved target/endpoint/identity/check catalog",
+        "binding": "exact HttpConfig scope digest, versions, fixture and credentials",
+        "exception_scope": "REVOKE_FIRST_SEND"
+      },
+      "criteria": "Exercise both gate orders; first positive send counts once, revoke winning prevents send; bytes cannot be recalled.",
+      "observations": [
+        "both revoke-request/effective timestamps and gate sequences",
+        "first/last positive send and byte counts",
+        "owner close completion/failure and OS resource observation"
+      ],
+      "preconditions": [
+        "owner_material",
+        "teacher_catalog",
+        "source_review",
+        "scope_version_match",
+        "fixture_credential_binding",
+        "budget_record",
+        "revocation_responsibility",
+        "explicit_exception_permission"
+      ],
+      "offline_tests": [
+        "test_service_send_and_revoke_have_total_gate_order"
+      ],
+      "evidence_required": [
+        "client_events_manifest_report",
+        "server_connection_summary",
+        "run_fixture_action_connection_binding",
+        "revocation_gate_sequences",
+        "cleanup_observation"
+      ],
+      "cannot_prove_offline": [
+        "real_permission_authenticity",
+        "OS_send_and_close",
+        "cancellation_latency",
+        "actual_target_identity",
+        "durable_dual_source_capture"
+      ],
+      "result": {
+        "executed_at": null,
+        "execution_proof": null,
+        "reviewer_record": null,
+        "verdict": null
+      }
+    },
+    {
+      "case": "REVOKE_PARTIAL_SEND",
+      "status": "PENDING_AUTHORIZATION",
+      "scope": "Revoke after partial positive send",
+      "required_permissions": {
+        "owner": "original permission/delegation chain and source review",
+        "teacher": "approved target/endpoint/identity/check catalog",
+        "binding": "exact HttpConfig scope digest, versions, fixture and credentials",
+        "exception_scope": "REVOKE_PARTIAL_SEND"
+      },
+      "criteria": "No continued write after effective revoke; retain one send count, unknown unfinished result and explicit close failure.",
+      "observations": [
+        "both revoke-request/effective timestamps and gate sequences",
+        "first/last positive send and byte counts",
+        "owner close completion/failure and OS resource observation"
+      ],
+      "preconditions": [
+        "owner_material",
+        "teacher_catalog",
+        "source_review",
+        "scope_version_match",
+        "fixture_credential_binding",
+        "budget_record",
+        "revocation_responsibility",
+        "explicit_exception_permission"
+      ],
+      "offline_tests": [
+        "test_service_partial_send_then_effective_revoke"
+      ],
+      "evidence_required": [
+        "client_events_manifest_report",
+        "server_connection_summary",
+        "run_fixture_action_connection_binding",
+        "revocation_gate_sequences",
+        "cleanup_observation"
+      ],
+      "cannot_prove_offline": [
+        "real_permission_authenticity",
+        "OS_send_and_close",
+        "cancellation_latency",
+        "actual_target_identity",
+        "durable_dual_source_capture"
+      ],
+      "result": {
+        "executed_at": null,
+        "execution_proof": null,
+        "reviewer_record": null,
+        "verdict": null
+      }
+    },
+    {
+      "case": "LATE_RESPONSE",
+      "status": "PENDING_AUTHORIZATION",
+      "scope": "Terminal late response and stale instance",
+      "required_permissions": {
+        "owner": "original permission/delegation chain and source review",
+        "teacher": "approved target/endpoint/identity/check catalog",
+        "binding": "exact HttpConfig scope digest, versions, fixture and credentials",
+        "exception_scope": "LATE_RESPONSE"
+      },
+      "criteria": "No terminal resurrection or stale instance/credential confirmation.",
+      "observations": [
+        "both revoke-request/effective timestamps and gate sequences",
+        "first/last positive send and byte counts",
+        "owner close completion/failure and OS resource observation"
+      ],
+      "preconditions": [
+        "owner_material",
+        "teacher_catalog",
+        "source_review",
+        "scope_version_match",
+        "fixture_credential_binding",
+        "budget_record",
+        "revocation_responsibility",
+        "explicit_exception_permission"
+      ],
+      "offline_tests": [
+        "test_late_response_during_read_cannot_upgrade"
+      ],
+      "evidence_required": [
+        "client_events_manifest_report",
+        "server_connection_summary",
+        "run_fixture_action_connection_binding",
+        "revocation_gate_sequences",
+        "cleanup_observation"
+      ],
+      "cannot_prove_offline": [
+        "real_permission_authenticity",
+        "OS_send_and_close",
+        "cancellation_latency",
+        "actual_target_identity",
+        "durable_dual_source_capture"
+      ],
+      "result": {
+        "executed_at": null,
+        "execution_proof": null,
+        "reviewer_record": null,
+        "verdict": null
+      }
+    },
+    {
+      "case": "AUDIT_FAILURE",
+      "status": "PENDING_AUTHORIZATION",
+      "scope": "Before/after send evidence failure",
+      "required_permissions": {
+        "owner": "original permission/delegation chain and source review",
+        "teacher": "approved target/endpoint/identity/check catalog",
+        "binding": "exact HttpConfig scope digest, versions, fixture and credentials",
+        "exception_scope": "AUDIT_FAILURE"
+      },
+      "criteria": "Stop new dispatch; no confirmation from unpersisted evidence; recover unknown prefix without replay.",
+      "observations": [
+        "both revoke-request/effective timestamps and gate sequences",
+        "first/last positive send and byte counts",
+        "owner close completion/failure and OS resource observation"
+      ],
+      "preconditions": [
+        "owner_material",
+        "teacher_catalog",
+        "source_review",
+        "scope_version_match",
+        "fixture_credential_binding",
+        "budget_record",
+        "revocation_responsibility",
+        "explicit_exception_permission"
+      ],
+      "offline_tests": [
+        "test_audit_failure_cannot_confirm_response"
+      ],
+      "evidence_required": [
+        "client_events_manifest_report",
+        "server_connection_summary",
+        "run_fixture_action_connection_binding",
+        "revocation_gate_sequences",
+        "cleanup_observation"
+      ],
+      "cannot_prove_offline": [
+        "real_permission_authenticity",
+        "OS_send_and_close",
+        "cancellation_latency",
+        "actual_target_identity",
+        "durable_dual_source_capture"
+      ],
+      "result": {
+        "executed_at": null,
+        "execution_proof": null,
+        "reviewer_record": null,
+        "verdict": null
+      }
+    }
+  ]
+}
