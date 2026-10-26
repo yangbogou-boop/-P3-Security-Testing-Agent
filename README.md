@@ -1,6 +1,22 @@
 # P3 面向软件验收阶段的黑盒授权安全测试 Agent
 
-当前 C-3C 候选新增离线 Supervisor、服务端摘要交付、独立证据关联、只读许可预检与 14 项验收管理清单；等待人工代码审核，未执行真实 HTTP。使用说明见 [生命周期设计](design/P3_supervisor_lifecycle.md)，交付与限制见 [C-3C 审核报告](review/P3_c3_supervisor_review.md)。以下历史阶段记录保留；真实集成始终为 PENDING_AUTHORIZATION，ADR-005 仍 Proposed。
+当前本地已提交至 C-3D：`c3ea32018f41e2f02ec3dc7bc417767af39a4840`，包含可信 Python 宿主的离线集成。对应交付记录为 278 项测试、九组内存模拟演示及 12 种重置竞态通过；本轮文档整理没有复跑测试。C-3D 对应 CI 的此前核验结果为 278／OK，2026-10-26 重新查询远程未成功，不能据此确认远程最新状态。14 项真实 HTTP 验收仍为 PENDING_AUTHORIZATION，未派发独立证明仍为 UNAVAILABLE，ADR-005 仍 Proposed。离线成果不构成真实 HTTP 或正式课程验收。
+
+## 项目阶段成果与报告索引
+
+以下按 Git 历史支持的工程成果组织，设计与实现可能交叠；不将 C-1、C-3A～D 自动认定为课程第一、第二、第三阶段。正式课程映射仍待确认。
+
+| 阶段 | 主要目标 | 当前完成状态 | 阶段报告 | 关键验证 |
+| --- | --- | --- | --- | --- |
+| 需求规格与工程治理 | 明确范围、授权、计数及验收责任 | RC2 工程候选；正式审批按事项另行核验 | [需求总结](review/P3_requirements_summary.md) | 版本记录、22 项需求及 GWT |
+| 架构决策与 HTTP 接入设计 | 分离授权与执行，明确接口及竞争边界 | ADR-001～004 Accepted；005 Proposed | [架构总结](review/P3_architecture_summary.md) | 静态契约和设计审核，非 HTTP 验收 |
+| 离线工程实现与可信宿主集成 | 验证组件协作、证据及生命周期 | 已提交至 C-3D；真实集成待授权 | [工程总结](review/P3_offline_engineering_summary.md) | 278 项离线套件；模拟结果与真实结论分列 |
+
+[阶段覆盖表与历史子阶段入口](review/P3_stage_report_coverage.md) 记录课程依据、证据来源和待补项。本轮新增总结尚未提交；历史材料的 Git 状态与新整理文档的发布状态分开。
+
+课程类别映射：brief → `brief/`；design → `design/`；eval → `eval/` 和 `tests/`；evidence → 历史 `evidence/` 与相应 CI 原始日志；release → [docs 运行、重置、已知问题和恢复说明](docs/P3_offline_delivery.md)；review → `review/`。无需为了目录名称迁移材料。Evidence 记录事实，Review 解释事实；开发者报告不能单独充当独立复验。
+
+**历史快照说明：** 下文带日期的开发段落及既有详细报告保持当时表述。49／103／127／158／182／217／227／237／257／258 是各自版本的累计测试数，不相加，也不改写成 278。“待审核”“未提交”“C-2 未开始”等不代表当前状态。`D:\codex\...\outputs` 下日志和演示材料尚非 GitHub 可访问附件，需后续审核归档。C-3D 的模拟 RESPONSE_SENT 不证明真实 OS 发送；14 项真实验收和许可门槛不因离线测试或 CI 通过而解除。
 
 > **课程名称**：专业综合能力提升
 > **项目代号**：P3 - 黑盒授权安全测试 Agent（Planner–Controller 独立授权架构）  
@@ -43,12 +59,12 @@ V1 不支持任意公网扫描、未经批准的写操作；图形界面和真�
 ## 📁 目录结构与资产说明
 * `brief/` - 项目契约、边界定义与威胁建模
 * `design/` - 架构决策记录 (ADR)
-* `eval/` - 待执行的 Given-When-Then 验收定义与需求映射（Markdown，不是自动化测试）
+* `eval/` - GWT 验收定义、需求映射、离线策略结果和真实待验清单；定义与执行结果分别记录
 * `src/p3_core/` - 当前离线核心；其余 `src/` 旧演示源码保留
 * `tests/` - 标准库 unittest 离线自动化测试
 * `examples/offline.json` - 仅供离线控制验证的可信示例配置，不构成网络测试许可
 * `evidence/` - 保留历史演示轨迹、模拟 Token 数据与工程证据
-* `release/` - 规划目录：一键复现与环境部署说明，目前未建立
+* `docs/` - 映射课程 release 类别的运行、重置、已知问题和恢复说明；不要求另建 release 目录
 * `review/` - HTTP 设计审核及无网络核心审核报告；不作为真实 HTTP Evidence
 
 2026-10-14：当前候选升级 RC2，历史 RC1 保留；教师事项只在对应执行／预算／验收／教学／评分阶段生效。NO_NEW_EVIDENCE 仅防无价值循环，不能因一次未发现漏洞跳过有价值的批准检查或必要对照；详见 RC2 与 GWT-A01-a～c。
