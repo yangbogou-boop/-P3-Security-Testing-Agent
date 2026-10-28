@@ -1,6 +1,6 @@
 # P3 面向软件验收阶段的黑盒授权安全测试 Agent
 
-当前本地已提交至 C-3D：`c3ea32018f41e2f02ec3dc7bc417767af39a4840`，包含可信 Python 宿主的离线集成。对应交付记录为 278 项测试、九组内存模拟演示及 12 种重置竞态通过；本轮文档整理没有复跑测试。C-3D 对应 CI 的此前核验结果为 278／OK，2026-10-26 重新查询远程未成功，不能据此确认远程最新状态。14 项真实 HTTP 验收仍为 PENDING_AUTHORIZATION，未派发独立证明仍为 UNAVAILABLE，ADR-005 仍 Proposed。离线成果不构成真实 HTTP 或正式课程验收。
+C-3D 离线工程已提交：`c3ea32018f41e2f02ec3dc7bc417767af39a4840`，包含可信 Python 宿主的离线集成。对应交付记录为 278 项测试、九组内存模拟演示及 12 种重置竞态通过；本轮文档修订没有复跑测试。三份阶段总结及阶段覆盖检查表已通过文档提交 `cc7ab409302f82dedfbd679a9289ff1b46d90814` 纳入 GitHub，未新增软件功能。2026-10-26 核验远程 main 指向该文档提交；对应 [P3 Offline Core Tests（Run 40279651027）](https://github.com/yangbogou-boop/-P3-Security-Testing-Agent/actions/runs/40279651027) 已 completed/success，日志为 278 tests in 1.601s，OK。14 项真实 HTTP 验收仍为 PENDING_AUTHORIZATION，未派发独立证明仍为 UNAVAILABLE，ADR-005 仍 Proposed。离线成果不构成真实 HTTP 或正式课程验收。
 
 ## 项目阶段成果与报告索引
 
@@ -12,7 +12,7 @@
 | 架构决策与 HTTP 接入设计 | 分离授权与执行，明确接口及竞争边界 | ADR-001～004 Accepted；005 Proposed | [架构总结](review/P3_architecture_summary.md) | 静态契约和设计审核，非 HTTP 验收 |
 | 离线工程实现与可信宿主集成 | 验证组件协作、证据及生命周期 | 已提交至 C-3D；真实集成待授权 | [工程总结](review/P3_offline_engineering_summary.md) | 278 项离线套件；模拟结果与真实结论分列 |
 
-[阶段覆盖表与历史子阶段入口](review/P3_stage_report_coverage.md) 记录课程依据、证据来源和待补项。本轮新增总结尚未提交；历史材料的 Git 状态与新整理文档的发布状态分开。
+[阶段覆盖表与历史子阶段入口](review/P3_stage_report_coverage.md) 记录课程依据、证据来源和待补项。阶段总结及覆盖检查表已纳入 GitHub 仓库，历史开发记录保留原始状态和对应版本。
 
 课程类别映射：brief → `brief/`；design → `design/`；eval → `eval/` 和 `tests/`；evidence → 历史 `evidence/` 与相应 CI 原始日志；release → [docs 运行、重置、已知问题和恢复说明](docs/P3_offline_delivery.md)；review → `review/`。无需为了目录名称迁移材料。Evidence 记录事实，Review 解释事实；开发者报告不能单独充当独立复验。
 
