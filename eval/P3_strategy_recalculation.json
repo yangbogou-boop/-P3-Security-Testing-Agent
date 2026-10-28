@@ -1,0 +1,2889 @@
+{
+  "kind": "STATIC_RECALCULATION_OF_EXISTING_RUNS_NOT_A_NEW_EXPERIMENT",
+  "audit_head": "5c16b2bd6d204719692d03a925bd733c9852140a",
+  "source": {
+    "path": "eval/P3_offline_strategy_results.json",
+    "sha256": "b8021775d05cafdb4374acada8335a5f1d9963d53dd2972bcb32beb10fe8e76a",
+    "first_record_commit": "30c98dbd686d0ed9cdef2f501031ddc5dea72158"
+  },
+  "raw_root": "D:\\codex\\2026-10-12\\referenced-chatgpt-conversation-this-is-an\\outputs\\remaining-review\\runs-final",
+  "execution_version": "NOT_FULLY_BOUND",
+  "historical_execution_environment": "NOT_RECORDED_IN_PER_RUN_ARTIFACTS",
+  "unique_runs": 36,
+  "contracts_identical": true,
+  "contract": {
+    "candidates": "six-v1",
+    "matrix": "p3-matrix-v1",
+    "fixture": "synthetic-v1",
+    "budget": {
+      "max_checks": 8,
+      "logical_timeout_seconds": 90,
+      "concurrency": 1
+    },
+    "objective": "all six checks with controls",
+    "reset": "fresh isolated equivalent fixture and synthetic approval per run"
+  },
+  "fixed_then_dynamic_pairs": true,
+  "issues": [],
+  "groups": [
+    {
+      "mode": "good",
+      "fault": null,
+      "strategy": "fixed",
+      "n": 3,
+      "trials": [
+        1,
+        2,
+        3
+      ],
+      "local_seconds": {
+        "mean": 0.0197031,
+        "min": 0.019120599999999988,
+        "max": 0.020849599999999996
+      },
+      "planning_seconds_mean": 5.746666666663532e-05
+    },
+    {
+      "mode": "good",
+      "fault": null,
+      "strategy": "dynamic",
+      "n": 3,
+      "trials": [
+        1,
+        2,
+        3
+      ],
+      "local_seconds": {
+        "mean": 0.020838900000000004,
+        "min": 0.019335200000000025,
+        "max": 0.02226990000000001
+      },
+      "planning_seconds_mean": 5.91333333332944e-05
+    },
+    {
+      "mode": "auth",
+      "fault": null,
+      "strategy": "fixed",
+      "n": 3,
+      "trials": [
+        1,
+        2,
+        3
+      ],
+      "local_seconds": {
+        "mean": 0.02209989999999999,
+        "min": 0.02003330000000003,
+        "max": 0.0257096
+      },
+      "planning_seconds_mean": 5.786666666668383e-05
+    },
+    {
+      "mode": "auth",
+      "fault": null,
+      "strategy": "dynamic",
+      "n": 3,
+      "trials": [
+        1,
+        2,
+        3
+      ],
+      "local_seconds": {
+        "mean": 0.02352623333333333,
+        "min": 0.020631399999999966,
+        "max": 0.02909329999999999
+      },
+      "planning_seconds_mean": 5.980000000022079e-05
+    },
+    {
+      "mode": "bola",
+      "fault": null,
+      "strategy": "fixed",
+      "n": 3,
+      "trials": [
+        1,
+        2,
+        3
+      ],
+      "local_seconds": {
+        "mean": 0.020302033333333396,
+        "min": 0.019853700000000085,
+        "max": 0.020547300000000046
+      },
+      "planning_seconds_mean": 6.270000000000812e-05
+    },
+    {
+      "mode": "bola",
+      "fault": null,
+      "strategy": "dynamic",
+      "n": 3,
+      "trials": [
+        1,
+        2,
+        3
+      ],
+      "local_seconds": {
+        "mean": 0.02147329999999999,
+        "min": 0.020940999999999987,
+        "max": 0.022349900000000034
+      },
+      "planning_seconds_mean": 5.9499999999990116e-05
+    },
+    {
+      "mode": "rbac",
+      "fault": null,
+      "strategy": "fixed",
+      "n": 3,
+      "trials": [
+        1,
+        2,
+        3
+      ],
+      "local_seconds": {
+        "mean": 0.02009233333333338,
+        "min": 0.019924800000000076,
+        "max": 0.020417300000000083
+      },
+      "planning_seconds_mean": 6.613333333342168e-05
+    },
+    {
+      "mode": "rbac",
+      "fault": null,
+      "strategy": "dynamic",
+      "n": 3,
+      "trials": [
+        1,
+        2,
+        3
+      ],
+      "local_seconds": {
+        "mean": 0.020917999999999992,
+        "min": 0.020402400000000043,
+        "max": 0.02150019999999997
+      },
+      "planning_seconds_mean": 5.789999999998111e-05
+    },
+    {
+      "mode": "good",
+      "fault": "malformed",
+      "strategy": "fixed",
+      "n": 3,
+      "trials": [
+        1,
+        2,
+        3
+      ],
+      "local_seconds": {
+        "mean": 0.010429666666666634,
+        "min": 0.009987899999999827,
+        "max": 0.010686699999999938
+      },
+      "planning_seconds_mean": 1.479999999990748e-05
+    },
+    {
+      "mode": "good",
+      "fault": "malformed",
+      "strategy": "dynamic",
+      "n": 3,
+      "trials": [
+        1,
+        2,
+        3
+      ],
+      "local_seconds": {
+        "mean": 0.011152599999999957,
+        "min": 0.009937300000000038,
+        "max": 0.013001599999999947
+      },
+      "planning_seconds_mean": 1.636666666652668e-05
+    },
+    {
+      "mode": "good",
+      "fault": "timeout",
+      "strategy": "fixed",
+      "n": 3,
+      "trials": [
+        1,
+        2,
+        3
+      ],
+      "local_seconds": {
+        "mean": 0.009516733333333397,
+        "min": 0.008933800000000103,
+        "max": 0.010110300000000016
+      },
+      "planning_seconds_mean": 1.6800000000039006e-05
+    },
+    {
+      "mode": "good",
+      "fault": "timeout",
+      "strategy": "dynamic",
+      "n": 3,
+      "trials": [
+        1,
+        2,
+        3
+      ],
+      "local_seconds": {
+        "mean": 0.009432533333333307,
+        "min": 0.009097999999999828,
+        "max": 0.009723700000000113
+      },
+      "planning_seconds_mean": 1.4933333333318663e-05
+    }
+  ],
+  "totals": {
+    "fixed": {
+      "n": 18,
+      "states": {
+        "COMPLETED": 12,
+        "STOPPED": 6
+      },
+      "coverage_numerator": 72,
+      "coverage_denominator": 108,
+      "detected_numerator": 9,
+      "detected_denominator": 9,
+      "inconclusive": 36,
+      "tool_failure_runs": 6,
+      "false_confirmations": 0,
+      "unauthorized_dispatches": 0,
+      "model_requests": 78,
+      "actual_requests": 0,
+      "llm_calls": 0,
+      "local_seconds_sum": 0.3064313000000004,
+      "local_seconds_mean": 0.01702396111111113,
+      "planning_seconds_sum": 0.0008273000000000863,
+      "planning_seconds_mean": 4.59611111111159e-05,
+      "preparation_and_review": "NOT_MEASURED"
+    },
+    "dynamic": {
+      "n": 18,
+      "states": {
+        "COMPLETED": 12,
+        "STOPPED": 6
+      },
+      "coverage_numerator": 72,
+      "coverage_denominator": 108,
+      "detected_numerator": 9,
+      "detected_denominator": 9,
+      "inconclusive": 36,
+      "tool_failure_runs": 6,
+      "false_confirmations": 0,
+      "unauthorized_dispatches": 0,
+      "model_requests": 78,
+      "actual_requests": 0,
+      "llm_calls": 0,
+      "local_seconds_sum": 0.3220246999999997,
+      "local_seconds_mean": 0.017890261111111097,
+      "planning_seconds_sum": 0.0008028999999999953,
+      "planning_seconds_mean": 4.460555555555529e-05,
+      "preparation_and_review": "NOT_MEASURED"
+    }
+  },
+  "runs": [
+    {
+      "source_row_1based": 1,
+      "run_id": "run_56bdf9b0d5094456ab61ab398c6e4ac1",
+      "mode": "good",
+      "fault": null,
+      "strategy": "fixed",
+      "trial": 1,
+      "state": "COMPLETED",
+      "reason": null,
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.020849599999999996,
+          "planning_seconds": 5.789999999994411e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_56bdf9b0d5094456ab61ab398c6e4ac1/report.json",
+          "bytes": 6500,
+          "sha256": "b249bddb7c3538aa0120bffea49ba3e5f04b53ce92ec58808ca1837a3f11f3e6"
+        },
+        "events.jsonl": {
+          "relative_path": "run_56bdf9b0d5094456ab61ab398c6e4ac1/events.jsonl",
+          "bytes": 21752,
+          "sha256": "0fb26d2f14273867bb996d2bf7d6fc390e114a5ce9213f61184e5cb0181fbc32"
+        },
+        "manifest.json": {
+          "relative_path": "run_56bdf9b0d5094456ab61ab398c6e4ac1/manifest.json",
+          "bytes": 564,
+          "sha256": "c5001084e362575e8422230a73d3f5a5d4879cb5ecf92aadf57dfeef52d4e669"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 2,
+      "run_id": "run_24430bac5ed34d23b98985a5eb00c0ac",
+      "mode": "good",
+      "fault": null,
+      "strategy": "dynamic",
+      "trial": 1,
+      "state": "COMPLETED",
+      "reason": null,
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.019335200000000025,
+          "planning_seconds": 5.849999999996136e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_24430bac5ed34d23b98985a5eb00c0ac/report.json",
+          "bytes": 6674,
+          "sha256": "08b6ca62f06c9bf7655407647e97184379d6cb846de59e776aed6d8ca23d2946"
+        },
+        "events.jsonl": {
+          "relative_path": "run_24430bac5ed34d23b98985a5eb00c0ac/events.jsonl",
+          "bytes": 23096,
+          "sha256": "45a2dc975d5667a9a39bb51caa8d93572024045d05e89b1cbc0af6ea6061d8f3"
+        },
+        "manifest.json": {
+          "relative_path": "run_24430bac5ed34d23b98985a5eb00c0ac/manifest.json",
+          "bytes": 564,
+          "sha256": "9c71d9b232c80ed402b213168ddb2b2ce8b7831ff9ee00caadd4febc19389f1e"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 3,
+      "run_id": "run_34e0706acc7c47fe90c1dc37b29714d4",
+      "mode": "good",
+      "fault": null,
+      "strategy": "fixed",
+      "trial": 2,
+      "state": "COMPLETED",
+      "reason": null,
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.019120599999999988,
+          "planning_seconds": 5.500000000002725e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_34e0706acc7c47fe90c1dc37b29714d4/report.json",
+          "bytes": 6500,
+          "sha256": "a942b61d5f0ed691f5119cf35059711f963e1731e3467fd43adf6675ddf7c5b0"
+        },
+        "events.jsonl": {
+          "relative_path": "run_34e0706acc7c47fe90c1dc37b29714d4/events.jsonl",
+          "bytes": 21752,
+          "sha256": "87acce7d5d3dc971340f5ed4fadb2c4a36895a906d69778cfe14117f813d0af3"
+        },
+        "manifest.json": {
+          "relative_path": "run_34e0706acc7c47fe90c1dc37b29714d4/manifest.json",
+          "bytes": 564,
+          "sha256": "187a2c0659ea1f1df01daa541df81cf13cfc5bd9d21d71200ca4d8a8cb7401b3"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 4,
+      "run_id": "run_206487cc3ce64151aba31132903980ed",
+      "mode": "good",
+      "fault": null,
+      "strategy": "dynamic",
+      "trial": 2,
+      "state": "COMPLETED",
+      "reason": null,
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.02226990000000001,
+          "planning_seconds": 5.950000000004563e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_206487cc3ce64151aba31132903980ed/report.json",
+          "bytes": 6674,
+          "sha256": "8b78cec542601497f448cb1b3ca44b8b363fa39311ae3adda5b499fbae8cd6f0"
+        },
+        "events.jsonl": {
+          "relative_path": "run_206487cc3ce64151aba31132903980ed/events.jsonl",
+          "bytes": 23096,
+          "sha256": "9fda66b2852288f9c3a52e3ce662ff01577b562031803047c220e23326ca2b49"
+        },
+        "manifest.json": {
+          "relative_path": "run_206487cc3ce64151aba31132903980ed/manifest.json",
+          "bytes": 564,
+          "sha256": "1f4354c0a5d965f35d344b7f221412665b059c5e1ea73e585229f4ae09fddcf4"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 5,
+      "run_id": "run_467bb41a81f64589a9402a7702c8ba9e",
+      "mode": "good",
+      "fault": null,
+      "strategy": "fixed",
+      "trial": 3,
+      "state": "COMPLETED",
+      "reason": null,
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.01913910000000002,
+          "planning_seconds": 5.9499999999934605e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_467bb41a81f64589a9402a7702c8ba9e/report.json",
+          "bytes": 6501,
+          "sha256": "58c362b579e83228e1ed71309782ce843072128be81faa096a073ed9fcc10c5a"
+        },
+        "events.jsonl": {
+          "relative_path": "run_467bb41a81f64589a9402a7702c8ba9e/events.jsonl",
+          "bytes": 21752,
+          "sha256": "b792a25a405f76b0e8639bf4e7928bab2e702b5da8fc642fd6a7f19c5d5096e6"
+        },
+        "manifest.json": {
+          "relative_path": "run_467bb41a81f64589a9402a7702c8ba9e/manifest.json",
+          "bytes": 564,
+          "sha256": "8546d004f7f70730387969fa627b7e87e30ab605f9d743aa7a37d31148fae76c"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 6,
+      "run_id": "run_b00f54439db94fa8814c1ee5a5bd68f4",
+      "mode": "good",
+      "fault": null,
+      "strategy": "dynamic",
+      "trial": 3,
+      "state": "COMPLETED",
+      "reason": null,
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.020911599999999975,
+          "planning_seconds": 5.939999999987622e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_b00f54439db94fa8814c1ee5a5bd68f4/report.json",
+          "bytes": 6674,
+          "sha256": "cb7f55f29ce17a094ae30ffa8b5f5ab26b0d396d1df5d71016c176a7b6294dcb"
+        },
+        "events.jsonl": {
+          "relative_path": "run_b00f54439db94fa8814c1ee5a5bd68f4/events.jsonl",
+          "bytes": 23096,
+          "sha256": "203895e83e0e183564bfe3d5e88d9b6d37d4a4e928c4cd25049dc35e3eac441a"
+        },
+        "manifest.json": {
+          "relative_path": "run_b00f54439db94fa8814c1ee5a5bd68f4/manifest.json",
+          "bytes": 564,
+          "sha256": "ce32f05cbc97460a98fcb1ea46108009dc9d8f8cf5259c4e2b73f50120df4a82"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 7,
+      "run_id": "run_00b137c3a2fc4bae8eb7ec5749c81efa",
+      "mode": "auth",
+      "fault": null,
+      "strategy": "fixed",
+      "trial": 1,
+      "state": "COMPLETED",
+      "reason": null,
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.0257096,
+          "planning_seconds": 5.7100000000087636e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_00b137c3a2fc4bae8eb7ec5749c81efa/report.json",
+          "bytes": 6501,
+          "sha256": "d75492466f1d2fb716a363215dfe1a80b99920c5a98aebc1ee3d657615270852"
+        },
+        "events.jsonl": {
+          "relative_path": "run_00b137c3a2fc4bae8eb7ec5749c81efa/events.jsonl",
+          "bytes": 21796,
+          "sha256": "1a03637c641920034af009e67d1ba11db529b1bc18342aa7cb3ab00ba58d7fd8"
+        },
+        "manifest.json": {
+          "relative_path": "run_00b137c3a2fc4bae8eb7ec5749c81efa/manifest.json",
+          "bytes": 564,
+          "sha256": "37dd5fa5666e3d2587d1d33e398ea37c5da250d2f527f3824e278451f36972c6"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 8,
+      "run_id": "run_6c049a68ed5640479bd9a4e4a949bbca",
+      "mode": "auth",
+      "fault": null,
+      "strategy": "dynamic",
+      "trial": 1,
+      "state": "COMPLETED",
+      "reason": null,
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.020631399999999966,
+          "planning_seconds": 5.830000000001112e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_6c049a68ed5640479bd9a4e4a949bbca/report.json",
+          "bytes": 6620,
+          "sha256": "f81888b9d358495113432535f9f6cf8a022666ec421a04e722a2d27983fd0729"
+        },
+        "events.jsonl": {
+          "relative_path": "run_6c049a68ed5640479bd9a4e4a949bbca/events.jsonl",
+          "bytes": 22692,
+          "sha256": "3a440d89b98833be09d94eed9fd61e1569194ea598b36c9bc2e97cacc5d55d0c"
+        },
+        "manifest.json": {
+          "relative_path": "run_6c049a68ed5640479bd9a4e4a949bbca/manifest.json",
+          "bytes": 564,
+          "sha256": "5916bd1476e8311a0a66dea85949d9488ad65641025126b5c0f4da3641a408f8"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 9,
+      "run_id": "run_8c96ebffc6964c21b027d71fd679e1bb",
+      "mode": "auth",
+      "fault": null,
+      "strategy": "fixed",
+      "trial": 2,
+      "state": "COMPLETED",
+      "reason": null,
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.02055679999999993,
+          "planning_seconds": 5.88000000000255e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_8c96ebffc6964c21b027d71fd679e1bb/report.json",
+          "bytes": 6499,
+          "sha256": "6001d67b7d9ede7bf94790f11432fc7a8971483c504047999e5b0ae3855e8dea"
+        },
+        "events.jsonl": {
+          "relative_path": "run_8c96ebffc6964c21b027d71fd679e1bb/events.jsonl",
+          "bytes": 21796,
+          "sha256": "a35bfcdc8098e942f9a29c8af6526b795468cc222b1aa2ace808defc280377ce"
+        },
+        "manifest.json": {
+          "relative_path": "run_8c96ebffc6964c21b027d71fd679e1bb/manifest.json",
+          "bytes": 564,
+          "sha256": "2edf93d674ab5884fa8d45d26271f31caf9b4c55efda7b8bfd966a7199f63b95"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 10,
+      "run_id": "run_e3ccf1b67e274505a7ea0524614e89ae",
+      "mode": "auth",
+      "fault": null,
+      "strategy": "dynamic",
+      "trial": 2,
+      "state": "COMPLETED",
+      "reason": null,
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.02085400000000004,
+          "planning_seconds": 5.9000000000364317e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_e3ccf1b67e274505a7ea0524614e89ae/report.json",
+          "bytes": 6621,
+          "sha256": "367baef6786876cc9cd5102ef1d19f7b9ccf621b28f7988da2e9b64fd40b72f4"
+        },
+        "events.jsonl": {
+          "relative_path": "run_e3ccf1b67e274505a7ea0524614e89ae/events.jsonl",
+          "bytes": 22692,
+          "sha256": "20833e1f2f8923b250d32f2022eb363663407b2aa502101847611e5494920408"
+        },
+        "manifest.json": {
+          "relative_path": "run_e3ccf1b67e274505a7ea0524614e89ae/manifest.json",
+          "bytes": 564,
+          "sha256": "b9eb6429fa010073ba2842bfa30bba6fe4cac5dcb5ecd7f99c7eccddf578266e"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 11,
+      "run_id": "run_7c4c6e9df65f4a9fa7ce9a7684bc34a1",
+      "mode": "auth",
+      "fault": null,
+      "strategy": "fixed",
+      "trial": 3,
+      "state": "COMPLETED",
+      "reason": null,
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.02003330000000003,
+          "planning_seconds": 5.7699999999938356e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_7c4c6e9df65f4a9fa7ce9a7684bc34a1/report.json",
+          "bytes": 6501,
+          "sha256": "1d37b79633b98bf364b02d173fd5ae3c74bef680b83390beafb000fadc542032"
+        },
+        "events.jsonl": {
+          "relative_path": "run_7c4c6e9df65f4a9fa7ce9a7684bc34a1/events.jsonl",
+          "bytes": 21796,
+          "sha256": "19699771937cfd6e5595f285f82cfb39e19256366ec4588e6e4441b83b8287b0"
+        },
+        "manifest.json": {
+          "relative_path": "run_7c4c6e9df65f4a9fa7ce9a7684bc34a1/manifest.json",
+          "bytes": 564,
+          "sha256": "b38c7a3c4f76858f3704c8809ca102df50e71327165c8f798518285a59db184f"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 12,
+      "run_id": "run_fcf7bc74a30a4a3db091a0c834958fc4",
+      "mode": "auth",
+      "fault": null,
+      "strategy": "dynamic",
+      "trial": 3,
+      "state": "COMPLETED",
+      "reason": null,
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.02909329999999999,
+          "planning_seconds": 6.210000000028693e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_fcf7bc74a30a4a3db091a0c834958fc4/report.json",
+          "bytes": 6620,
+          "sha256": "0b3a004c895bd534f41ccde314bbe6a84fbbe5b0b1c062a10d8ffa1afaf0e284"
+        },
+        "events.jsonl": {
+          "relative_path": "run_fcf7bc74a30a4a3db091a0c834958fc4/events.jsonl",
+          "bytes": 22692,
+          "sha256": "fd65565f45bfb18c34d1f5b2221931d8eb9021981a2f3ad58da80210f276bfcd"
+        },
+        "manifest.json": {
+          "relative_path": "run_fcf7bc74a30a4a3db091a0c834958fc4/manifest.json",
+          "bytes": 564,
+          "sha256": "1fa14fc7c79efac7d4593f65de7bc7097a1b5f58826d4c9000bfcb85373a6482"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 13,
+      "run_id": "run_bb544fda8972472da14b4134268c5580",
+      "mode": "bola",
+      "fault": null,
+      "strategy": "fixed",
+      "trial": 1,
+      "state": "COMPLETED",
+      "reason": null,
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.019853700000000085,
+          "planning_seconds": 6.180000000011177e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_bb544fda8972472da14b4134268c5580/report.json",
+          "bytes": 6500,
+          "sha256": "233b9d7616bfaf4381b7c6b891580df5270eeeb852900b7138d73b7bc1dbba71"
+        },
+        "events.jsonl": {
+          "relative_path": "run_bb544fda8972472da14b4134268c5580/events.jsonl",
+          "bytes": 21806,
+          "sha256": "2cf7e5d942b1ba5c823a204c1a8859ad76d5166e77361ca32d55970a0f8d6750"
+        },
+        "manifest.json": {
+          "relative_path": "run_bb544fda8972472da14b4134268c5580/manifest.json",
+          "bytes": 564,
+          "sha256": "c0226e16353e01b1eba54045893b39b10a01c6621c9df81811fccb62e1120d47"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 14,
+      "run_id": "run_304cf47e8fdd4b8dad773fb87ebbe59a",
+      "mode": "bola",
+      "fault": null,
+      "strategy": "dynamic",
+      "trial": 1,
+      "state": "COMPLETED",
+      "reason": null,
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.022349900000000034,
+          "planning_seconds": 6.010000000011839e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_304cf47e8fdd4b8dad773fb87ebbe59a/report.json",
+          "bytes": 6620,
+          "sha256": "14e7d52c1d4974d562c62e37d5c37e93f90e548e3cce7d300f3173c487e990e1"
+        },
+        "events.jsonl": {
+          "relative_path": "run_304cf47e8fdd4b8dad773fb87ebbe59a/events.jsonl",
+          "bytes": 22702,
+          "sha256": "b4d7b9df5ad4bcd4272242eb3df6c56afa5430a2fdec98d07f975858c079f191"
+        },
+        "manifest.json": {
+          "relative_path": "run_304cf47e8fdd4b8dad773fb87ebbe59a/manifest.json",
+          "bytes": 564,
+          "sha256": "1c77085f4b8bc9e497642515d94da290e7d2baf807094e0922f7bb35a4584af3"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 15,
+      "run_id": "run_69c7d96c861a4972a2242627956f3bc6",
+      "mode": "bola",
+      "fault": null,
+      "strategy": "fixed",
+      "trial": 2,
+      "state": "COMPLETED",
+      "reason": null,
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.020547300000000046,
+          "planning_seconds": 6.569999999994636e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_69c7d96c861a4972a2242627956f3bc6/report.json",
+          "bytes": 6500,
+          "sha256": "8472b20db378c3799fcc05091ee9ce4cd4dedea6fbd908e28825850ba6722878"
+        },
+        "events.jsonl": {
+          "relative_path": "run_69c7d96c861a4972a2242627956f3bc6/events.jsonl",
+          "bytes": 21806,
+          "sha256": "ede55f89a615ab2348f3b1914775df9302a5665138304178ec84204c52808485"
+        },
+        "manifest.json": {
+          "relative_path": "run_69c7d96c861a4972a2242627956f3bc6/manifest.json",
+          "bytes": 564,
+          "sha256": "e321818275c18469468530b4e88e462ac24e7ec31024f99b0f7b88b540627cc1"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 16,
+      "run_id": "run_ea440b064ba34fd7ad6bb3e2152445a5",
+      "mode": "bola",
+      "fault": null,
+      "strategy": "dynamic",
+      "trial": 2,
+      "state": "COMPLETED",
+      "reason": null,
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.021128999999999953,
+          "planning_seconds": 5.7699999999938356e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_ea440b064ba34fd7ad6bb3e2152445a5/report.json",
+          "bytes": 6621,
+          "sha256": "349b0e77186507561777efea75e65f9f7324a0fcdf755a6eddb8aa38bd85eee8"
+        },
+        "events.jsonl": {
+          "relative_path": "run_ea440b064ba34fd7ad6bb3e2152445a5/events.jsonl",
+          "bytes": 22702,
+          "sha256": "6d26e9b00807e5eb90a1bbc97e8f43b3d2d1f5e38594f4a4d6dd07d515236cbe"
+        },
+        "manifest.json": {
+          "relative_path": "run_ea440b064ba34fd7ad6bb3e2152445a5/manifest.json",
+          "bytes": 564,
+          "sha256": "674d2dfc99a984a854c9f0a5e738d1ebb5e72fab7cf8e2f326c18a9eeddb5c49"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 17,
+      "run_id": "run_72b19b5b05da4b84bd65c786338bbd70",
+      "mode": "bola",
+      "fault": null,
+      "strategy": "fixed",
+      "trial": 3,
+      "state": "COMPLETED",
+      "reason": null,
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.020505100000000054,
+          "planning_seconds": 6.0599999999966236e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_72b19b5b05da4b84bd65c786338bbd70/report.json",
+          "bytes": 6501,
+          "sha256": "2dd95dc24458972b8dc70f8d4df138f0094fc4548fab65aa6cc78651dbb34f4b"
+        },
+        "events.jsonl": {
+          "relative_path": "run_72b19b5b05da4b84bd65c786338bbd70/events.jsonl",
+          "bytes": 21806,
+          "sha256": "11e26d65997b5c010ba5427a07e32057a8e22abe4a4eed41188b4e2f48d83e10"
+        },
+        "manifest.json": {
+          "relative_path": "run_72b19b5b05da4b84bd65c786338bbd70/manifest.json",
+          "bytes": 564,
+          "sha256": "d19721cbf2ed35b619aa73213b34aaed03fdfaf565001db5bcb128cf8c83ab59"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 18,
+      "run_id": "run_d240249623704329a44abf8e01d908b4",
+      "mode": "bola",
+      "fault": null,
+      "strategy": "dynamic",
+      "trial": 3,
+      "state": "COMPLETED",
+      "reason": null,
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.020940999999999987,
+          "planning_seconds": 6.06999999999136e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_d240249623704329a44abf8e01d908b4/report.json",
+          "bytes": 6619,
+          "sha256": "475f1ea6fd6ea2fc5e019874282c184c2e6b94b36702a20bc9fb0df3d21b19d7"
+        },
+        "events.jsonl": {
+          "relative_path": "run_d240249623704329a44abf8e01d908b4/events.jsonl",
+          "bytes": 22702,
+          "sha256": "ff875103671fdfbb5802b2290b5ca35d752593f589bb223f1bd3c6b175fd0e42"
+        },
+        "manifest.json": {
+          "relative_path": "run_d240249623704329a44abf8e01d908b4/manifest.json",
+          "bytes": 564,
+          "sha256": "ad7c722e099abafad8dcf9f12e8606569fbe2386713641f624225815772d6d41"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 19,
+      "run_id": "run_fa5fb72110ef4e6699547adb9de8f158",
+      "mode": "rbac",
+      "fault": null,
+      "strategy": "fixed",
+      "trial": 1,
+      "state": "COMPLETED",
+      "reason": null,
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.020417300000000083,
+          "planning_seconds": 7.490000000009989e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_fa5fb72110ef4e6699547adb9de8f158/report.json",
+          "bytes": 6500,
+          "sha256": "43aee2f895a2ab89c369100a978ef007df82fac2a2fa6cd12e39a3e8f46ad2c8"
+        },
+        "events.jsonl": {
+          "relative_path": "run_fa5fb72110ef4e6699547adb9de8f158/events.jsonl",
+          "bytes": 21805,
+          "sha256": "b7c29bba1d1756b7aeef7fb3d747f1740380e25f8c3808b0d0e92a75584f0a5c"
+        },
+        "manifest.json": {
+          "relative_path": "run_fa5fb72110ef4e6699547adb9de8f158/manifest.json",
+          "bytes": 564,
+          "sha256": "9e4525f6324cf484870688f76ec51118a8f140af824d83753c263fe796acfe99"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 20,
+      "run_id": "run_a55a9c1f911f4606b6f27ec5a731ab8e",
+      "mode": "rbac",
+      "fault": null,
+      "strategy": "dynamic",
+      "trial": 1,
+      "state": "COMPLETED",
+      "reason": null,
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.02150019999999997,
+          "planning_seconds": 5.699999999997374e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_a55a9c1f911f4606b6f27ec5a731ab8e/report.json",
+          "bytes": 6620,
+          "sha256": "e798ae217c8f6ba2ebc4ed45e5f4bc73956f5c852866a5141971154ae34e1ca7"
+        },
+        "events.jsonl": {
+          "relative_path": "run_a55a9c1f911f4606b6f27ec5a731ab8e/events.jsonl",
+          "bytes": 22701,
+          "sha256": "d455613849d6b49106236abc6b98d9db8ee180bd5c7e06660bf817ca33da1ca3"
+        },
+        "manifest.json": {
+          "relative_path": "run_a55a9c1f911f4606b6f27ec5a731ab8e/manifest.json",
+          "bytes": 564,
+          "sha256": "52c3321dbe3ead8f5e2311e9685ca940d4b80839b63e8e6f3dcfdaba77e0d68e"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 21,
+      "run_id": "run_72617c888ef9494388cec933a42a548e",
+      "mode": "rbac",
+      "fault": null,
+      "strategy": "fixed",
+      "trial": 2,
+      "state": "COMPLETED",
+      "reason": null,
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.019924800000000076,
+          "planning_seconds": 5.680000000007901e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_72617c888ef9494388cec933a42a548e/report.json",
+          "bytes": 6500,
+          "sha256": "6c470dfcb25d2b660509becabdf1f86d8ef85ca992ed5e6066e2d3b392a872d2"
+        },
+        "events.jsonl": {
+          "relative_path": "run_72617c888ef9494388cec933a42a548e/events.jsonl",
+          "bytes": 21805,
+          "sha256": "ec61eac32bde4ddbae7acc30c4caf81168a4775379c04d57ee73f9f283e1a749"
+        },
+        "manifest.json": {
+          "relative_path": "run_72617c888ef9494388cec933a42a548e/manifest.json",
+          "bytes": 564,
+          "sha256": "66477614dd93476cf6dc252f5acfec579f5761e70517d49466cb70b0b6745525"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 22,
+      "run_id": "run_c97a95ae2a074c10a17788883cfa8cb2",
+      "mode": "rbac",
+      "fault": null,
+      "strategy": "dynamic",
+      "trial": 2,
+      "state": "COMPLETED",
+      "reason": null,
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.020851399999999964,
+          "planning_seconds": 5.840000000012502e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_c97a95ae2a074c10a17788883cfa8cb2/report.json",
+          "bytes": 6620,
+          "sha256": "2c95616744630965495d5c3327d9bc2730f2f416252a9371655a1461cf35848b"
+        },
+        "events.jsonl": {
+          "relative_path": "run_c97a95ae2a074c10a17788883cfa8cb2/events.jsonl",
+          "bytes": 22701,
+          "sha256": "10e17ed06099708e1016aa1a947ed6b435a6504e08ba3b58c845004caaea8c4b"
+        },
+        "manifest.json": {
+          "relative_path": "run_c97a95ae2a074c10a17788883cfa8cb2/manifest.json",
+          "bytes": 564,
+          "sha256": "45320146f92f30314c8063d05e2acd0ce1c841829805366b8e5eb7177b968dbd"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 23,
+      "run_id": "run_a123447caae44ed1b61cc8985afc9c57",
+      "mode": "rbac",
+      "fault": null,
+      "strategy": "fixed",
+      "trial": 3,
+      "state": "COMPLETED",
+      "reason": null,
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.019934899999999978,
+          "planning_seconds": 6.670000000008613e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_a123447caae44ed1b61cc8985afc9c57/report.json",
+          "bytes": 6500,
+          "sha256": "124504b65b02c4d1c70c55372b59038a3cb82126926fb0f87d252bf5b940d492"
+        },
+        "events.jsonl": {
+          "relative_path": "run_a123447caae44ed1b61cc8985afc9c57/events.jsonl",
+          "bytes": 21805,
+          "sha256": "ecd1c62276379fa9903b1806a5f5eb1208050ef5dd0fb92973480dcf484f6a78"
+        },
+        "manifest.json": {
+          "relative_path": "run_a123447caae44ed1b61cc8985afc9c57/manifest.json",
+          "bytes": 564,
+          "sha256": "814e8ea6cf33f942dcfedd13137171f3bee1abce065e341d1c21d4135307a84f"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 24,
+      "run_id": "run_86dbabd19e6d48638987767e3d421945",
+      "mode": "rbac",
+      "fault": null,
+      "strategy": "dynamic",
+      "trial": 3,
+      "state": "COMPLETED",
+      "reason": null,
+      "metrics": {
+        "coverage": {
+          "numerator": 6,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 1,
+          "denominator": 1,
+          "applicable": true
+        },
+        "false_confirmations": 0,
+        "inconclusive": 0,
+        "tool_failures": 0,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 6,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 6,
+          "local_elapsed_seconds": 0.020402400000000043,
+          "planning_seconds": 5.829999999984459e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_86dbabd19e6d48638987767e3d421945/report.json",
+          "bytes": 6620,
+          "sha256": "15b19f5ad158a20bdba284db5f1d6343fff48b283e8b8540e2e6b7076a32de97"
+        },
+        "events.jsonl": {
+          "relative_path": "run_86dbabd19e6d48638987767e3d421945/events.jsonl",
+          "bytes": 22701,
+          "sha256": "ed6c3f7e3c71603d92308da3ddc6efe875765f6b94e0e80cc94abe3cec26869e"
+        },
+        "manifest.json": {
+          "relative_path": "run_86dbabd19e6d48638987767e3d421945/manifest.json",
+          "bytes": 564,
+          "sha256": "28a075403c24cfe81e6f0e0100b68eed9796f362661f944d951cc2c5650ca1b5"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 25,
+      "run_id": "run_4ee0c2dd06134eccbf133f2e60b969e9",
+      "mode": "good",
+      "fault": "malformed",
+      "strategy": "fixed",
+      "trial": 1,
+      "state": "STOPPED",
+      "reason": "RESPONSE_ERROR",
+      "metrics": {
+        "coverage": {
+          "numerator": 0,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 6,
+        "tool_failures": 1,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 1,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 1,
+          "local_elapsed_seconds": 0.009987899999999827,
+          "planning_seconds": 1.4499999999806334e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_4ee0c2dd06134eccbf133f2e60b969e9/report.json",
+          "bytes": 4680,
+          "sha256": "8a5b65b783ae56995e113e0e6dc7b9dfbbea1419e5a82e3e6cf40ebd87c496bd"
+        },
+        "events.jsonl": {
+          "relative_path": "run_4ee0c2dd06134eccbf133f2e60b969e9/events.jsonl",
+          "bytes": 3939,
+          "sha256": "15808c8a951814bf4f6c2a0e01b077e1879507a1fc85658792978eaa6d7acdf6"
+        },
+        "manifest.json": {
+          "relative_path": "run_4ee0c2dd06134eccbf133f2e60b969e9/manifest.json",
+          "bytes": 563,
+          "sha256": "382f9689b876038ad72b599a8218558b127013ef624f44a6ef04884aee46ae18"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 26,
+      "run_id": "run_40aae9b803534ae3b5875287ab715ec7",
+      "mode": "good",
+      "fault": "malformed",
+      "strategy": "dynamic",
+      "trial": 1,
+      "state": "STOPPED",
+      "reason": "RESPONSE_ERROR",
+      "metrics": {
+        "coverage": {
+          "numerator": 0,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 6,
+        "tool_failures": 1,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 1,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 1,
+          "local_elapsed_seconds": 0.013001599999999947,
+          "planning_seconds": 1.4499999999806334e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_40aae9b803534ae3b5875287ab715ec7/report.json",
+          "bytes": 4692,
+          "sha256": "ed6fea68b254817cdc693753e112198048082a22c4e813943f72ca71dfca36be"
+        },
+        "events.jsonl": {
+          "relative_path": "run_40aae9b803534ae3b5875287ab715ec7/events.jsonl",
+          "bytes": 3939,
+          "sha256": "d21b12c7164a1f05ca205d1f573d2759066c0d75087c553f9060052510fe96de"
+        },
+        "manifest.json": {
+          "relative_path": "run_40aae9b803534ae3b5875287ab715ec7/manifest.json",
+          "bytes": 563,
+          "sha256": "a856904d9c3a364902b1f9d5b5f26e3a8d032b08bcee5313b4ab3bc8bdabd2ce"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 27,
+      "run_id": "run_53b531666c54438fb3c9e5ebc5a58805",
+      "mode": "good",
+      "fault": "malformed",
+      "strategy": "fixed",
+      "trial": 2,
+      "state": "STOPPED",
+      "reason": "RESPONSE_ERROR",
+      "metrics": {
+        "coverage": {
+          "numerator": 0,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 6,
+        "tool_failures": 1,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 1,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 1,
+          "local_elapsed_seconds": 0.010686699999999938,
+          "planning_seconds": 1.4399999999969992e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_53b531666c54438fb3c9e5ebc5a58805/report.json",
+          "bytes": 4680,
+          "sha256": "1779eaffc1e0cd84f1b2d4b4c17aeea1ec6ef6a6deeb5f2f5c4fd84cc9ad4842"
+        },
+        "events.jsonl": {
+          "relative_path": "run_53b531666c54438fb3c9e5ebc5a58805/events.jsonl",
+          "bytes": 3939,
+          "sha256": "a5837ded8b7729da878f64bd5dd7a80bc635693b1d17c41955b4d74af1ac8d9e"
+        },
+        "manifest.json": {
+          "relative_path": "run_53b531666c54438fb3c9e5ebc5a58805/manifest.json",
+          "bytes": 563,
+          "sha256": "f7050fbb96c954ffbf545aca266447b12f99c86f24ae1406996cdb878e0047ac"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 28,
+      "run_id": "run_5c6daf4e1111439e98f1642e28a47249",
+      "mode": "good",
+      "fault": "malformed",
+      "strategy": "dynamic",
+      "trial": 2,
+      "state": "STOPPED",
+      "reason": "RESPONSE_ERROR",
+      "metrics": {
+        "coverage": {
+          "numerator": 0,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 6,
+        "tool_failures": 1,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 1,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 1,
+          "local_elapsed_seconds": 0.010518899999999887,
+          "planning_seconds": 1.5899999999957615e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_5c6daf4e1111439e98f1642e28a47249/report.json",
+          "bytes": 4692,
+          "sha256": "f6e0740b917c99ebb65437ecde80b15f279cd21612c14ff6f2094148f52c0d99"
+        },
+        "events.jsonl": {
+          "relative_path": "run_5c6daf4e1111439e98f1642e28a47249/events.jsonl",
+          "bytes": 3939,
+          "sha256": "f1a4430412a4fa59074074129341651cf86366f60608e21b96591a12cb9a0ad4"
+        },
+        "manifest.json": {
+          "relative_path": "run_5c6daf4e1111439e98f1642e28a47249/manifest.json",
+          "bytes": 563,
+          "sha256": "7edb8b45beda1d3ea99b369376c81752c9400f4a71afcd02ae70be8954223247"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 29,
+      "run_id": "run_77e53fe86ce946ab8a8c0a58813f6222",
+      "mode": "good",
+      "fault": "malformed",
+      "strategy": "fixed",
+      "trial": 3,
+      "state": "STOPPED",
+      "reason": "RESPONSE_ERROR",
+      "metrics": {
+        "coverage": {
+          "numerator": 0,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 6,
+        "tool_failures": 1,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 1,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 1,
+          "local_elapsed_seconds": 0.010614400000000135,
+          "planning_seconds": 1.5499999999946112e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_77e53fe86ce946ab8a8c0a58813f6222/report.json",
+          "bytes": 4680,
+          "sha256": "530d1c71af8dccbb6eeebd4d9bbf8332ff0b5c145fd161770102fe2fb19d81a8"
+        },
+        "events.jsonl": {
+          "relative_path": "run_77e53fe86ce946ab8a8c0a58813f6222/events.jsonl",
+          "bytes": 3939,
+          "sha256": "6e1023f062e9d1d501b58a1a0883f3c63c0db45e7df76e353236a78a337d6385"
+        },
+        "manifest.json": {
+          "relative_path": "run_77e53fe86ce946ab8a8c0a58813f6222/manifest.json",
+          "bytes": 563,
+          "sha256": "e674cb963ee5c94f5400d7911c1f85862a5cea652fc008250111831c9c658957"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 30,
+      "run_id": "run_a0384cb1ce2149cdbcf07196cf5d325e",
+      "mode": "good",
+      "fault": "malformed",
+      "strategy": "dynamic",
+      "trial": 3,
+      "state": "STOPPED",
+      "reason": "RESPONSE_ERROR",
+      "metrics": {
+        "coverage": {
+          "numerator": 0,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 6,
+        "tool_failures": 1,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 1,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 1,
+          "local_elapsed_seconds": 0.009937300000000038,
+          "planning_seconds": 1.8699999999816086e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_a0384cb1ce2149cdbcf07196cf5d325e/report.json",
+          "bytes": 4692,
+          "sha256": "06346b5a296db0e9fb15e99cdc9297d88b29b1239baf16195c7cd3fc46189fda"
+        },
+        "events.jsonl": {
+          "relative_path": "run_a0384cb1ce2149cdbcf07196cf5d325e/events.jsonl",
+          "bytes": 3939,
+          "sha256": "8257a42e12ef9575bb68090af721a70fcd0a1bdc5cf796239b2defdf8a47b89e"
+        },
+        "manifest.json": {
+          "relative_path": "run_a0384cb1ce2149cdbcf07196cf5d325e/manifest.json",
+          "bytes": 563,
+          "sha256": "414afac8a49f521226bf6f6405020e2d2203987d97a5b03e159a85bffcb3372c"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 31,
+      "run_id": "run_da3aead35c4c40968219b066247093db",
+      "mode": "good",
+      "fault": "timeout",
+      "strategy": "fixed",
+      "trial": 1,
+      "state": "STOPPED",
+      "reason": "TIMEOUT",
+      "metrics": {
+        "coverage": {
+          "numerator": 0,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 6,
+        "tool_failures": 1,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 1,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 1,
+          "local_elapsed_seconds": 0.008933800000000103,
+          "planning_seconds": 1.5499999999946112e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_da3aead35c4c40968219b066247093db/report.json",
+          "bytes": 4524,
+          "sha256": "36eb9071b2039cdc6a59245db5acfa45f92a482d1f4ec2e6586e6b02042e5505"
+        },
+        "events.jsonl": {
+          "relative_path": "run_da3aead35c4c40968219b066247093db/events.jsonl",
+          "bytes": 2555,
+          "sha256": "ad2270c2969f83ac969f0e468243ccd0b8bc88f3c0a82534319c436b3bda65f6"
+        },
+        "manifest.json": {
+          "relative_path": "run_da3aead35c4c40968219b066247093db/manifest.json",
+          "bytes": 563,
+          "sha256": "96ed47a1e9bf7ad6871d99884c0f6ab699315146ce93e1fc151aa177b0429fd8"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 32,
+      "run_id": "run_16adc59609604cfb9d158050b674d2be",
+      "mode": "good",
+      "fault": "timeout",
+      "strategy": "dynamic",
+      "trial": 1,
+      "state": "STOPPED",
+      "reason": "TIMEOUT",
+      "metrics": {
+        "coverage": {
+          "numerator": 0,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 6,
+        "tool_failures": 1,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 1,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 1,
+          "local_elapsed_seconds": 0.009097999999999828,
+          "planning_seconds": 1.4499999999806334e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_16adc59609604cfb9d158050b674d2be/report.json",
+          "bytes": 4536,
+          "sha256": "d0528d661b2defa301e3c01712ffc400de4f2b948a3cd5aede556ee997e46c06"
+        },
+        "events.jsonl": {
+          "relative_path": "run_16adc59609604cfb9d158050b674d2be/events.jsonl",
+          "bytes": 2555,
+          "sha256": "cd297cc76c9254a53675dfd827e280e4a196a7a75819adc4c27460d248b2ad53"
+        },
+        "manifest.json": {
+          "relative_path": "run_16adc59609604cfb9d158050b674d2be/manifest.json",
+          "bytes": 563,
+          "sha256": "7560db7c76a267ed562e0e68dd1e5497562684769314810e8fd14a3e3128fa3f"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 33,
+      "run_id": "run_dc108b54824f4e86aebbf6c3dfb78f27",
+      "mode": "good",
+      "fault": "timeout",
+      "strategy": "fixed",
+      "trial": 2,
+      "state": "STOPPED",
+      "reason": "TIMEOUT",
+      "metrics": {
+        "coverage": {
+          "numerator": 0,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 6,
+        "tool_failures": 1,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 1,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 1,
+          "local_elapsed_seconds": 0.009506100000000073,
+          "planning_seconds": 1.5800000000121273e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_dc108b54824f4e86aebbf6c3dfb78f27/report.json",
+          "bytes": 4524,
+          "sha256": "7fcec52b80d36f29b1727646e967300ff60399ac42e48293bd0e33b486302c0a"
+        },
+        "events.jsonl": {
+          "relative_path": "run_dc108b54824f4e86aebbf6c3dfb78f27/events.jsonl",
+          "bytes": 2555,
+          "sha256": "896cb970e0f1208b4d755e77168f70989891d844d44e2e6e64b73c787d1b4851"
+        },
+        "manifest.json": {
+          "relative_path": "run_dc108b54824f4e86aebbf6c3dfb78f27/manifest.json",
+          "bytes": 563,
+          "sha256": "3e4080135741de1d51f4f256d3e93ceee59493576ddc955bd60a4df61c25258a"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 34,
+      "run_id": "run_e5f6b38d188d481a97bed5f88a94d0a8",
+      "mode": "good",
+      "fault": "timeout",
+      "strategy": "dynamic",
+      "trial": 2,
+      "state": "STOPPED",
+      "reason": "TIMEOUT",
+      "metrics": {
+        "coverage": {
+          "numerator": 0,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 6,
+        "tool_failures": 1,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 1,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 1,
+          "local_elapsed_seconds": 0.009723700000000113,
+          "planning_seconds": 1.4299999999911606e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_e5f6b38d188d481a97bed5f88a94d0a8/report.json",
+          "bytes": 4536,
+          "sha256": "4882d0f214cc42fd3b59b367db20586986375627855eef03f7fd92791f8b118e"
+        },
+        "events.jsonl": {
+          "relative_path": "run_e5f6b38d188d481a97bed5f88a94d0a8/events.jsonl",
+          "bytes": 2555,
+          "sha256": "fbe8116b43b12c56bce7df777217bec492f5beccbb2f0fe2ddc9dcaaa3ffd9f0"
+        },
+        "manifest.json": {
+          "relative_path": "run_e5f6b38d188d481a97bed5f88a94d0a8/manifest.json",
+          "bytes": 563,
+          "sha256": "30d6f5fc20e3d91693b2b9fc0ed9c923e5309505020ab36d559c5fa5eb21ba61"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 35,
+      "run_id": "run_73b67e59bcb34096a74db6b1a312fb91",
+      "mode": "good",
+      "fault": "timeout",
+      "strategy": "fixed",
+      "trial": 3,
+      "state": "STOPPED",
+      "reason": "TIMEOUT",
+      "metrics": {
+        "coverage": {
+          "numerator": 0,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 6,
+        "tool_failures": 1,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 1,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 1,
+          "local_elapsed_seconds": 0.010110300000000016,
+          "planning_seconds": 1.9100000000049633e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_73b67e59bcb34096a74db6b1a312fb91/report.json",
+          "bytes": 4524,
+          "sha256": "8f1a80b349f9fbc7e6ce11f6fa6b141b927bd85ce2341c1569b66edb4bfb10ee"
+        },
+        "events.jsonl": {
+          "relative_path": "run_73b67e59bcb34096a74db6b1a312fb91/events.jsonl",
+          "bytes": 2555,
+          "sha256": "869767ffd4bb5f828c7431432a9556bcffb0a0192bddcf1020c6fdd80fdcdb98"
+        },
+        "manifest.json": {
+          "relative_path": "run_73b67e59bcb34096a74db6b1a312fb91/manifest.json",
+          "bytes": 563,
+          "sha256": "47866945fcae6b436c9ba48da4e80e7e677dc5c2edf611b0a7a1c3da828a3e37"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    },
+    {
+      "source_row_1based": 36,
+      "run_id": "run_2a6dd0c5f1754402b158c7167f98c6e2",
+      "mode": "good",
+      "fault": "timeout",
+      "strategy": "dynamic",
+      "trial": 3,
+      "state": "STOPPED",
+      "reason": "TIMEOUT",
+      "metrics": {
+        "coverage": {
+          "numerator": 0,
+          "denominator": 6
+        },
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "applicable": false
+        },
+        "false_confirmations": 0,
+        "inconclusive": 6,
+        "tool_failures": 1,
+        "unauthorized_dispatches": 0,
+        "actual_unauthorized_dispatches": 0,
+        "blocked_intents": 0,
+        "observed_model_dispatches": 1,
+        "cost": {
+          "actual_requests": 0,
+          "model_requests": 1,
+          "local_elapsed_seconds": 0.009475899999999982,
+          "planning_seconds": 1.6000000000238046e-05,
+          "llm_calls": 0,
+          "preparation_and_review_seconds": null
+        }
+      },
+      "raw_files": {
+        "report.json": {
+          "relative_path": "run_2a6dd0c5f1754402b158c7167f98c6e2/report.json",
+          "bytes": 4536,
+          "sha256": "b6ae7d84b9979389021b5551b59cbb820faee5c5bd934f95677f33eafa3e6d19"
+        },
+        "events.jsonl": {
+          "relative_path": "run_2a6dd0c5f1754402b158c7167f98c6e2/events.jsonl",
+          "bytes": 2555,
+          "sha256": "b9d57b839bb7a5c84ec53a095b9642b38ca7430d8f14d4d23d0cfb4af664a809"
+        },
+        "manifest.json": {
+          "relative_path": "run_2a6dd0c5f1754402b158c7167f98c6e2/manifest.json",
+          "bytes": 563,
+          "sha256": "81b596d57da6da7f08beaf671072fd51e983054ae9250ed038dc865355e9da71"
+        }
+      },
+      "static_checks": {
+        "metrics_equal": true,
+        "run_and_counts_equal": true,
+        "status_equal": true,
+        "unperformed_equal": true,
+        "event_bytes_equal": true,
+        "events_hash_equal": true,
+        "report_hash_equal": true,
+        "no_audit_gap": true,
+        "sequence_contiguous": true,
+        "event_identity": true,
+        "cost_counts_equal": true,
+        "planning_equal": true,
+        "model_only": true
+      }
+    }
+  ],
+  "formulas": "See P3_engineering_experiment.md. Raw hashes use original bytes; report canonical hash uses json.dumps(sort_keys=True,ensure_ascii=False,allow_nan=False), default separators. Unauthorized modeled action check joins positive-send model_io action IDs to ALLOW report rows; not independent replay of authorization. local elapsed and llm_calls are recorded values, not recomputed timers or billing.",
+  "protected_tracked_sha256": {
+    ".gitattributes": "8d624d63f14b7b7afe7798683d43387e7c0ace18dc8dcefdaa97e1f0e60bba5f",
+    ".github/workflows/ci_runner.yml": "5a42504af8b28a4d177d7694b8739cb804d284001209d34f5a4db3253a6c1875",
+    ".gitignore": "6fd71ccf0550299202692bd67d90003c517349e553cae201251d6682e46b6fd4",
+    "README.md": "73b6e80d389ba251b147fc4485d4f897190c0b49fd9368cd4397b0c8c92c53b1",
+    "brief/P3_authorization_boundary.md": "87c0f4d7ac53f839edfcd6e485024186507967eac86230a733684838055317e9",
+    "brief/P3_decision_governance.md": "de4e004b54320743d2b0429574c2df66321aada3504f272462322fd3615c54d6",
+    "brief/P3_http_contract_draft.md": "fb8340343dbe9df35fbadeb25a24ad16c918f1d12a7b6bb0d205af0b91f85a9e",
+    "brief/P3_problem_frame.md": "670431256e0c29a91a69ca3b82cc03b5fec280a9014af6c709bba5580a630766",
+    "brief/P3_specification_v1.0-rc1.md": "e3cec25af32ee5f8efc53d13833a354792137527e012511d3a4a572d1083e418",
+    "brief/P3_specification_v1.0-rc2.md": "3bb20d53f2261aa6a06b4c0750c293fbda75d9bf707c6cb34aa7cc820af92da1",
+    "design/ADR_001_controller_split.md": "742486d5f518860e71cfea95892b5270b7cc16b1a436b174ba3fc7cfbcb0ff40",
+    "design/ADR_002_black_box_api_scope.md": "b5d3aa80276ec73a41189b5b2f327338f6fc4d50549dca73e5ced784ad950ff5",
+    "design/ADR_003_local_execution_and_evidence.md": "92b58bbcdafd39517bc4abac3e72e94e98b564fe96f7ea25a784c317ad08bdae",
+    "design/ADR_004_http_dispatch_and_cancellation.md": "c61fbd5359fe9fc2d24e2acb4ecbc526caa85fc1ea387e238eac663d871c9953",
+    "design/ADR_005_deterministic_strategy_comparison.md": "afde011935dc44338da94f028f1bbca0238e2dd5647c70b6a832777441779d7a",
+    "design/P3_c3d_trusted_host_integration.md": "b3097aee11f5b8afc58cd6131368436478d2f2569c90c37a2bb85facd7ef82e9",
+    "design/P3_http_integration_design.md": "0575cf5228be878d1ee48d4e98e5e33e78e7a9d68e67508ddc3cf58eb515a069",
+    "design/P3_supervisor_lifecycle.md": "e98f8b6de477778777edcdc8c6977bcff7251ffd67ff7ad159f17244f73d9664",
+    "docs/P3_offline_delivery.md": "186a07ae4d7ccee83c591b066fb66480b41c25228cf72705de25a38913929f42",
+    "docs/P3_project_harness.md": "92dc64654ca401ff1e989b9b9b1a8f321bfebc752e17194c133466a0670fc92c",
+    "eval/P3_GWT_scenarios.md": "05623c660a44c35f37bfe7e6eb2de7b6eebc75ceb8ec0089d137cdb0d0aaa043",
+    "eval/P3_c3_acceptance_manifest.json": "161e91ddac83c99b660e3cd82e2ea8ea0acd30057c3e5db62d8e0a84ac21deaf",
+    "eval/P3_c3_authorization_checklist.md": "6dd6157a7743d3341c492e69681f0ce643884a0093b834540a0ad3dba7b20847",
+    "eval/P3_c3d_offline_demo_plan.md": "f3cce3e9b2f53533bc10b19fe100ff119f4fec7765e6251dda24366b45123982",
+    "eval/P3_evaluation_observability_card.md": "3b38796ecfe94c352dd08b53783166252d8c02074d956eb6352b22d55a8d2bf7",
+    "eval/P3_http_acceptance_plan.md": "b8f3a2bd8f6fab42ce9c361832312e54fa5e5fc688457707397572fed69030c6",
+    "eval/P3_http_integration_status.json": "4c95d17bc031702eeec96cc968d19097a654a3e4a1b299a08496e06a1cd39821",
+    "eval/P3_offline_core_validation.md": "23fa15e3b98ae3ab635f78f75818d3e97f48a65e52839a95349f7aa1dd19a870",
+    "eval/P3_offline_strategy_results.json": "b8021775d05cafdb4374acada8335a5f1d9963d53dd2972bcb32beb10fe8e76a",
+    "eval/P3_requirement_traceability.md": "b33b875fe6ea5f47c952ffae9b33c33292a9e6f66d5cbfbcc59f1763ec11339a",
+    "evidence/course_ch03/eval_20261028_01/artifacts/coordination_181a71f55a434f3181b3d107f27fe9b9/events.jsonl": "501d12ee765d4c04cd1b0e1085e4e306aa48cba7cd967235377e0c24b424c517",
+    "evidence/course_ch03/eval_20261028_01/artifacts/coordination_181a71f55a434f3181b3d107f27fe9b9/manifest.json": "26e34b41cba0bcc8663c08e92ac473d06bd7091cf84cd8fbce731fbbebc90939",
+    "evidence/course_ch03/eval_20261028_01/artifacts/coordination_181a71f55a434f3181b3d107f27fe9b9/report.json": "acb2c61faaa2c575dfe72b15d77c7ef9901d3d438b96660774762dae1dafdd4a",
+    "evidence/course_ch03/eval_20261028_01/artifacts/lifecycle_c0b8a4cc19f343bda3515c700eba173f/events.jsonl": "0821cfc9fa764611545570545adbe7729b29337a228577a6484a44e48026eea5",
+    "evidence/course_ch03/eval_20261028_01/artifacts/lifecycle_c0b8a4cc19f343bda3515c700eba173f/manifest.json": "494cdffd23dd429f31adea94064968af965952fdf98b16903af540843c59dc47",
+    "evidence/course_ch03/eval_20261028_01/artifacts/lifecycle_c0b8a4cc19f343bda3515c700eba173f/report.json": "188b8510497425f0da55a7e04eab3301aabc3f73a7857455d8128d2dab2c1ef3",
+    "evidence/course_ch03/eval_20261028_01/artifacts/run_e2b938e432d044e69427e50f2b1a9aaf/events.jsonl": "9b927ffffced03e8c2fd42bf3e6d697271678ef8628be0a0a62f127796e9c68b",
+    "evidence/course_ch03/eval_20261028_01/artifacts/run_e2b938e432d044e69427e50f2b1a9aaf/manifest.json": "2b1ab15f15e922ef8f6526b1e27916d95ce7b9b191eea8d97989f62a9d9744db",
+    "evidence/course_ch03/eval_20261028_01/artifacts/run_e2b938e432d044e69427e50f2b1a9aaf/report.json": "25bd1c156b05e4199ad8c43c761880195cf0e7208794c26f1b3a68871b7876f2",
+    "evidence/course_ch03/eval_20261028_01/diagnosis.json": "ea55ff36260dc1bbd5dfe60b6f55bd1f309bfe915c89d82deaeef92725674ff9",
+    "evidence/course_ch03/eval_20261028_01/evaluation_agreement.md": "afd7e7935d12326c19ab550e3b40a77b780ab48fc6a383a3315049ef50c99765",
+    "evidence/course_ch03/eval_20261028_01/execution_command.txt": "babe3bc0afa1788c9ffb4bac15f0d16b8cf08f55a0c4bf97658bae0b75193b9e",
+    "evidence/course_ch03/eval_20261028_01/execution_context.json": "aa4cb42a92670a23e98309af9af151efc91ea1ed88d45951665b1aa6c0e556ea",
+    "evidence/course_ch03/eval_20261028_01/execution_finished.json": "27e57b1fbc51521552fe2dbe2547858c1e3c748e3e2d0ab8626ee6b6a4668786",
+    "evidence/course_ch03/eval_20261028_01/execution_started.json": "cee20e55160d054946b05e0078379c76b5ef08535bf50376277b93e9115353e8",
+    "evidence/course_ch03/eval_20261028_01/file_inventory.json": "7574c13c79845078190736d80f9ed7cc81073a9ef4ec6775029eee35dfd60051",
+    "evidence/course_ch03/eval_20261028_01/host_result.json": "188b8510497425f0da55a7e04eab3301aabc3f73a7857455d8128d2dab2c1ef3",
+    "evidence/course_ch03/eval_20261028_01/input.json": "cc9f168014fffd1016cc71ad425314dd3b0a017732658d133a8a63bcaae6727c",
+    "evidence/course_ch03/eval_20261028_01/unittest_output.txt": "e779f40e1b9997e15675f0cac44beb7eefbe00cc5fef104aeb31eea10dd1ae8c",
+    "evidence/course_ch03/eval_20261028_01/unittest_result.json": "dff835fe9ccdd565b7ec69b658a6ed1cf99127f968d4a4dfc48bd6ed7469bfe3",
+    "evidence/course_ch03/eval_20261028_01/verification.json": "12d910bd654113f54246112c5b104f806ab06c5676fddb05d6a637a1d017c89b",
+    "evidence/course_ch03/eval_20261028_02/artifacts/coordination_2755214502624b948d86e55abd8d17d4/events.jsonl": "66b5eefcb64d445805661fbf595465323cd96a568252e11b9fc409048c3551f7",
+    "evidence/course_ch03/eval_20261028_02/artifacts/coordination_2755214502624b948d86e55abd8d17d4/manifest.json": "ac30a5b0817da77b5fb23b554ca987c717741938cbc7cd9b8aa7f95fa3ffc5c3",
+    "evidence/course_ch03/eval_20261028_02/artifacts/coordination_2755214502624b948d86e55abd8d17d4/report.json": "443b328b29f00955990a56e3a4811efc6189c57c6b719ed92b9534263c84d307",
+    "evidence/course_ch03/eval_20261028_02/artifacts/lifecycle_ad185eacdd204d0f87cfef531e89c14e/events.jsonl": "ced32ff3e44896b72ff34b505ff07d62d2ab887b3356da008c952755d59b313e",
+    "evidence/course_ch03/eval_20261028_02/artifacts/lifecycle_ad185eacdd204d0f87cfef531e89c14e/manifest.json": "49b0f6b1f147e7e19680a0513cf2352eb6bb6a703d6204ce2be9e67b7246bea2",
+    "evidence/course_ch03/eval_20261028_02/artifacts/lifecycle_ad185eacdd204d0f87cfef531e89c14e/report.json": "3a81bf91ab0819526400911b69c6db57b7771302a4850ad6cb0a30fdda16e5be",
+    "evidence/course_ch03/eval_20261028_02/artifacts/run_ce4b0027ae024f05a72d81173c9f05e2/events.jsonl": "a99b2ec71b534f4602bf59b7b7dc07387b078c1e0ee81fb7214e46217963791d",
+    "evidence/course_ch03/eval_20261028_02/artifacts/run_ce4b0027ae024f05a72d81173c9f05e2/manifest.json": "17fe533cfc7b81a87555cf4b19e57ed5d792ba85ffc5e7137ca1aba724326ac4",
+    "evidence/course_ch03/eval_20261028_02/artifacts/run_ce4b0027ae024f05a72d81173c9f05e2/report.json": "bd41995bb5a384b754b15bcfa1747378c6e2ede3c15ac513b48c027ce02d86a2",
+    "evidence/course_ch03/eval_20261028_02/baseline.json": "b9953da5956d13bd09fcbc2c20b202a402f36993635f2aadbef1ff660ffeec1c",
+    "evidence/course_ch03/eval_20261028_02/before_fix_command.txt": "09c1aa343eca55875f76779895978309893b37a09c9e7f59bbe5ef9746e01582",
+    "evidence/course_ch03/eval_20261028_02/before_fix_context.json": "d94c8538111bb2b56430f95c6bb27c49519b5d68e51ce28bd026f49b99738818",
+    "evidence/course_ch03/eval_20261028_02/before_fix_output.txt": "1d7353b80f443bf5f4674f035b0f05385b0ec1d00c814fbf30c4a930513620dd",
+    "evidence/course_ch03/eval_20261028_02/before_fix_result.json": "76ddcb00b10da12c9417512e4f1fc8f3419b4537dc2fdd4f0bdfe25a6d3ca996",
+    "evidence/course_ch03/eval_20261028_02/evaluation_agreement.md": "bc8f210e78efa1f319b1cb68fcd89a3451ff82d2cb697949304f88848331cb45",
+    "evidence/course_ch03/eval_20261028_02/execution_code_diff.patch": "5cc94ace06e6d6500294e4a23deb65343c61033c10c34c19b94cf32f2b9ec3b7",
+    "evidence/course_ch03/eval_20261028_02/execution_command.txt": "9ce64ee0262ca179210ac71401561e57f13324305ab19645400d4b799b0096a4",
+    "evidence/course_ch03/eval_20261028_02/execution_context.json": "b1336461d6b5b8089bda251bb48a9bef0c31cd021dece2245b541646d36f2d31",
+    "evidence/course_ch03/eval_20261028_02/execution_finished.json": "7e4376ce95ab475c8184e74f8ce5d8f91ce839cc1e560da92797aba2e2ca80c1",
+    "evidence/course_ch03/eval_20261028_02/execution_started.json": "4729377e89aefd8614cb5e21f561128fad201bb29f1d38b4402faf28ed0e074a",
+    "evidence/course_ch03/eval_20261028_02/file_inventory.json": "b3b28bdd08a1889f9e65636cd297c91729edba8bfcba78bf13eb0098a55945c6",
+    "evidence/course_ch03/eval_20261028_02/final_checks.json": "f77f3b04249fdd2ddeac4ac4dfb3b6d93b78e31e634d94d4f7f3c1f8309766de",
+    "evidence/course_ch03/eval_20261028_02/full_suite_command.txt": "d0c8291b577902ed6eef6dde0a1da8fac54a29784d48f2cb2a55b48a0fe7edb6",
+    "evidence/course_ch03/eval_20261028_02/full_suite_context.json": "cd2457125e4c927f43c9e10e8207ba938c1d53ed6f0166e8b4002c8b43e9865b",
+    "evidence/course_ch03/eval_20261028_02/full_suite_output.txt": "cd1a819633afd9cf2b98d0fdaaf92ea748697c9db44f788680d5aef04e36e60d",
+    "evidence/course_ch03/eval_20261028_02/full_suite_result.json": "28539632241e93a8cf72b15de09551194d42e2346539429db4c58ec22ea2093c",
+    "evidence/course_ch03/eval_20261028_02/host_result.json": "3a81bf91ab0819526400911b69c6db57b7771302a4850ad6cb0a30fdda16e5be",
+    "evidence/course_ch03/eval_20261028_02/input.json": "938d90082cd3b63844417f9d6b44150fbc062c832b96561b6db309780016e5ab",
+    "evidence/course_ch03/eval_20261028_02/targeted_command.txt": "32c9590aefbdbcb29026ad3013258dcd316926ce58bc18035c187bcd817f6058",
+    "evidence/course_ch03/eval_20261028_02/targeted_context.json": "47051f8bae337ab34bac57cda993f68e5428213d00a3ba2f0fa758881904c242",
+    "evidence/course_ch03/eval_20261028_02/targeted_output.txt": "cdca4717a30d7e5f33ae199baaca621128e7286524a8551ce068a173158a7737",
+    "evidence/course_ch03/eval_20261028_02/targeted_result.json": "66e2e72e741b295e3226f941f9b2477e8fe1b14c2412a5440e1f22b885eeb338",
+    "evidence/course_ch03/eval_20261028_02/unittest_output.txt": "677e8fbf3bf2cd1730a403bbd23a6391dd5efb10fb88061966d3622905f23356",
+    "evidence/course_ch03/eval_20261028_02/unittest_result.json": "dff835fe9ccdd565b7ec69b658a6ed1cf99127f968d4a4dfc48bd6ed7469bfe3",
+    "evidence/course_ch03/eval_20261028_02/verification.json": "8937aa4828aefccb70798ccd9170b5579dec83412b64561b46f7994c644e5d54",
+    "evidence/traces/RUN_1790744309.json": "613e8e3fe228d5a0ab25e35d13263476b15ac5cf62c53e04d350d08df98b5d3f",
+    "evidence/traces/RUN_1791796067.json": "1d08456c731ae08375a48748a835c8a566d9639347967d89aa59ef98a9d6071c",
+    "evidence/traces/RUN_1791802200.json": "91581f0530264ac00ea85a9adfd2882ff471318c49a8b30c7b7ebce3d6476ffa",
+    "evidence/traces/RUN_1791954509.json": "2034f6f4ac77f3e6babf3b432b1056431783cb7b40302a1d994863a30294f22f",
+    "evidence/traces/RUN_DEMO_001.json": "d985c213b739d4e94a3f78b1d55f91d0d3342a951ba36457b351ff4a1d14e5d6",
+    "evidence/traces/RUN_INVALID_1790744309_planner.json": "8cf545496a9a3f2fe03ddaa249d209526e3c9196d8752a63f9b9494689ec77b8",
+    "evidence/traces/RUN_INVALID_1791796067_planner.json": "ecc1f59c21fc62fd7469790bda25cdd2147dc874a916647c5f10bcdf6aee32a2",
+    "evidence/traces/RUN_INVALID_1791802200_planner.json": "2f2ca392e7df5fd2351645100043fa5e41d8e19ff3e5fe84dd22653c3c01c73f",
+    "evidence/traces/RUN_INVALID_1791954509_planner.json": "39b02a541524ad05c7822a191f8b892b0d9805496e9a5f9def039eded3ce7df2",
+    "evidence/traces/RUN_VALID_1790744308_planner.json": "63df664963c214e67c470093487422e4f21986c57e394c9ce125409907e362d5",
+    "evidence/traces/RUN_VALID_1791796067_planner.json": "78014baa444b3368828504ab26bb81f8fe4a565176d18f37950e6bb83db12552",
+    "evidence/traces/RUN_VALID_1791802200_planner.json": "79021b7261298805d5698b9787e43f96a335dfc286dcb52d19145e3720a4e4f8",
+    "evidence/traces/RUN_VALID_1791954508_planner.json": "e7993e05933cd15d659503a92277e6d9cfd7c840d4c8a12b074cb20bf626367d",
+    "examples/offline.json": "36fe40b014c98e773b574ab1e7334590941ba4e01a37034e5dd558fddd99522b",
+    "review/P3_ai_usage_and_responsibility.md": "40e5aabccfaec6281ff7af6e331f811bc68bc8287586384b60a4552927ebacac",
+    "review/P3_architecture_summary.md": "782f20a63df1b2c59dd7420dae88f716a264e5207e970d0e1d90d4b1cc8a2acd",
+    "review/P3_c3_preflight_review.md": "a35852750865da2095cf4a0b8abb626c3b1a421aae378274dd4b1845b6a2ab7e",
+    "review/P3_c3_supervisor_review.md": "a1f9b1252f2d96ff4496bf54bf3b11b9781a4cbc497bb8b4eef981b123046375",
+    "review/P3_c3d_implementation_review.md": "4e5062df48db388431199576897258f49329b2dcd85fa84961e7d7e0812182a4",
+    "review/P3_development_task_cards.md": "6ed680109a986206fd9eb34aa86a4be1d54458d29b7b75d12d9ceb7b738c0589",
+    "review/P3_http_design_review.md": "142a93b6724ccb8923d8d8ba05f26b5ccd59b7a27c2d59335c001c194bdb8e38",
+    "review/P3_http_offline_core_review.md": "9c01b056c28719312f654e595e56232de74125af22b03dcaf1b55f7d6aab4037",
+    "review/P3_mock_api_c1_review.md": "414b53849774834b5f51d2ba7423b40db3ce8fff62dd4307ff2474f6b8a09704",
+    "review/P3_offline_engineering_summary.md": "14ed4dd256b5dc94bada76b54d1555a9394b2915831c8064e62dd66ba33ade00",
+    "review/P3_remaining_development_review.md": "f334904a2d8f258fcc4937a05aadf82d0877d1938a36e54680de791dff25d09f",
+    "review/P3_requirements_summary.md": "047680bd893a966824620f1f9d9cf930d26dd8c47f895a8fab0c0f594a0d04e7",
+    "review/P3_spec_harness_pack_index.md": "727ce3f9cf32a5231cd2a17874d21116cccd8185d55fb8a160742d83cebf0954",
+    "review/P3_stage_report_coverage.md": "753a75acac8a536d976d475e13e894c789e1579dd4751c0f55d0ed0b55177b18",
+    "src/controller/gateway.py": "0bd5caa35a06afa0818e3535a20159a7226d457416a0f19fa7025af0263194d7",
+    "src/main.py": "ea293e78da181c76349c758fa1f110c0635a044153d8989ad1e5470451445005",
+    "src/p3_core/__init__.py": "408ca80970b97f9c802fe290f3bd126ffb95e41fe00d3c64136f5c770dd09db9",
+    "src/p3_core/__main__.py": "cc2e0cfc9b0a9efe4d0bf53b38884f298b802bc49129d343cac37dc1720223a7",
+    "src/p3_core/acceptance.py": "c2027b67f5989fcd18a5cce7937987dee36403c2fc149795d78be5089bb11d49",
+    "src/p3_core/controller.py": "329126ec7a581a11095755fff63137f8c3abfc064a1be83ea27fa4e341e88dd0",
+    "src/p3_core/coordination.py": "68fa55cd3c2fa5aaf6670d26c7886bf62fde481a5f0858ca474dda5185d5c98a",
+    "src/p3_core/delivery.py": "1683f3a85ea5bee7d9e6700f3e39feda59bad6d978824c8dbfbbd4c11a62784e",
+    "src/p3_core/dispatch.py": "76878312a72eeadcf0b6ca53d01df687ac78cf6eecf342b50ea642c2bef490dc",
+    "src/p3_core/evidence.py": "c73094fb21a727bfa6464ba8d3e47efbd1787a6c1be01cc941cc444346682de4",
+    "src/p3_core/experiments.py": "89e6cfd34157daa484efc8260b03d0e8dc444c073e22dbd84f059951671cfb19",
+    "src/p3_core/http/__init__.py": "408089507b3256a244b64d38be75709d28267cbf17f70f4457dad60aeda06efc",
+    "src/p3_core/http/audit.py": "fd6899259932dad90eaa07b506e4f8697136be21642651a3c0b0f822689267c9",
+    "src/p3_core/http/authorization.py": "d5f0fdd10d7d081e994bc6048b546f757b9886c048316cdabc3d3add2c8fa5cf",
+    "src/p3_core/http/contract.py": "9eeb98d034bd0d6cc55a00d2d6f506acd90d50c3251547093229a634963aac27",
+    "src/p3_core/http/live.py": "368b6e84f4ab77d57c1a12af321320c47745647b75f3ecdcf67a023a0d86bbb8",
+    "src/p3_core/http/machine.py": "8f71a09a9d76399bad6d0111060de5633ffb373b8b4e6acd612b40f511d3677b",
+    "src/p3_core/http/protocol.py": "4df07eab72ea9bee0d4346ea76ed7debc92bb9c62361323d50d9e5643d6ea3ba",
+    "src/p3_core/http/recovery.py": "f2ab6d4f74cf3c40b5c9ff87d6f8db6a40612cb8380deeefcb577498d4ecc110",
+    "src/p3_core/http/strategies.py": "c711a44caafc465290d4bd358bf4d79d85ef51fbba9c14265d1199dee45ce25b",
+    "src/p3_core/http/transport.py": "e881b083b56c6c82e06246896a91102c1f47be73c6e0e773df408d4be77b11ed",
+    "src/p3_core/mock_api/__init__.py": "4d4e2eded081cfd3ae11d14d5b027fb3af68065afa470c0672bb3d5e93342358",
+    "src/p3_core/mock_api/adapter.py": "ce2e23bbd2ce6f3d71b630eb39fd06341e3dd909d9fd5cb3f32368916faf4997",
+    "src/p3_core/mock_api/core.py": "1ff3d4ca1ad1414fb4eba7441e96110eb790cf37fd7d56b9a40c85bac0f2dcd6",
+    "src/p3_core/mock_api/service.py": "fb77ce33fbb76d7866a3d01e53b9f0c987272d40ae0f4e04055cca26ebad6384",
+    "src/p3_core/models.py": "425a05cc54ea1545b17bc2ba9595ea757134425c283e98fa6f2296470c2671ea",
+    "src/p3_core/planner.py": "8bc68dfbe0f295dce66ee2239f7ceb27cfbf4f8146b72a8dee29b36cbf3aead5",
+    "src/p3_core/preflight.py": "d9572e1d642961acae94bb1022b5ff3ee037072198269ac5f5ff9e9d49e5dba2",
+    "src/p3_core/supervision.py": "e26b5ed85eafd440ca1d2e50bd9d1fb9eba45fa53d7d37d7f2062690cc885c5c",
+    "src/p3_core/trusted_host.py": "050795f90ebaa2e3b5aa2a417620115ad942b7ab46cde20a6c96c48cd49508f5",
+    "src/planner/agent_planner.py": "20ffbafacf42a0f076d3ca9fdb12bd050c253d5e03634852a4a4f82015e409fc",
+    "tests/test_c3_preflight.py": "db754d4a9d865276b0409cc6505416f309fbd200a48382bf771ec03dbe6f1484",
+    "tests/test_c3_registration.py": "5a7b8b57c99e6180e8dcaeb3937446bb67dc8ab88ccb3d8483164aa06f1786a2",
+    "tests/test_c3_supervisor.py": "ff09456c4533583f1656367b5f04922511e552e60c16f1c410f30d90b0e60679",
+    "tests/test_c3d_host.py": "fbd73a0e48a1efd6541fed156c43bca3c032b03fc484d3346087a6c5588b2c41",
+    "tests/test_core.py": "fc60af431210f0621d1916b61d75c7d171b19f3595ea0a6c925151bfb270cb69",
+    "tests/test_host_evidence_contract.py": "5165af4a28a40d537364e81b4eb656eb30fcc3714cac7cdc9c0d3680c6f148f5",
+    "tests/test_http_core.py": "90b36c2cf41c0b01af98b1813d6047d465088cb20b0677e305197f80db764138",
+    "tests/test_mock_api.py": "7c4e7709af888c65ff3431fee1f1a364af1b86b1337a6c52f08adda3de22742a",
+    "tests/test_remaining.py": "931041dfa4faa767c87b8e7e95d7efdd91f17c9f506fdff77068821d8e1e906e"
+  }
+}
