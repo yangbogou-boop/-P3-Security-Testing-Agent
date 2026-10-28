@@ -1,0 +1,25 @@
+@'
+import sys
+blocked=[]
+def guard(event,args):
+    if event.startswith("socket.") or event in ("subprocess.Popen","os.system","os.exec","os.posix_spawn","ctypes.dlopen"):
+        blocked.append(event)
+        raise RuntimeError("NETWORK_OR_EXTERNAL_EXECUTION_FORBIDDEN")
+sys.addaudithook(guard)
+import unittest,json,hashlib,datetime,contextlib
+from pathlib import Path
+root=Path.cwd();out=root/"evidence/course_ch03/eval_20261028_02"
+sys.path.insert(0,str(root/"src"))
+def save(name,obj):
+    with (out/name).open("x",encoding="utf-8") as f:json.dump(obj,f,indent=2);f.write("\n")
+save("targeted_context.json",dict(started_at=datetime.datetime.now(datetime.timezone.utc).isoformat(),head="67242ba5e0d71e6d2cfd3911ec758085760d1e79",guard_before_discovery=True,python=sys.version,source_sha256={p.relative_to(root).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for folder in ("src","tests") for p in (root/folder).rglob("*.py")}))
+loader=unittest.TestLoader()
+
+with (out/"targeted_output.txt").open("x",encoding="utf-8") as log,contextlib.redirect_stdout(log),contextlib.redirect_stderr(log):
+    suite=loader.discover(str(root/"tests"),pattern="test_host_evidence_contract.py")
+    result=unittest.TextTestRunner(stream=log,verbosity=2).run(suite)
+summary=dict(tests_run=result.testsRun,failures=len(result.failures),errors=len(result.errors),skipped=len(result.skipped),expected_failures=len(result.expectedFailures),unexpected_successes=len(result.unexpectedSuccesses),successful=result.wasSuccessful(),blocked_audit_events=blocked,ended_at=datetime.datetime.now(datetime.timezone.utc).isoformat())
+save("targeted_result.json",summary)
+print(json.dumps(summary))
+sys.exit(0 if result.wasSuccessful() and not blocked else 1)
+'@ | python -I -S -B -

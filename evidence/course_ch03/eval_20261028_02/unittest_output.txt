@@ -1,0 +1,6 @@
+test_controller_denies_unapproved_candidate (test_c3d_host.HostTests) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.065s
+
+OK

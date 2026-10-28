@@ -1,0 +1,19 @@
+test_normal_client_manifest_contract (test_host_evidence_contract.HostEvidenceContractTests) ... FAIL
+
+======================================================================
+FAIL: test_normal_client_manifest_contract (test_host_evidence_contract.HostEvidenceContractTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\project\-P3-Security-Testing-Agent\tests\test_host_evidence_contract.py", line 50, in test_normal_client_manifest_contract
+    report, _ = self.assert_client(host)
+  File "D:\project\-P3-Security-Testing-Agent\tests\test_host_evidence_contract.py", line 34, in assert_client
+    self.assertEqual(verify_run(directory)['integrity'], 'VERIFIED')
+AssertionError: 'INCOMPLETE_OR_INVALID' != 'VERIFIED'
+- INCOMPLETE_OR_INVALID
++ VERIFIED
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.095s
+
+FAILED (failures=1)

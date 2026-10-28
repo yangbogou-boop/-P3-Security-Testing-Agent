@@ -1,0 +1,6 @@
+{
+  "finished_at": "2026-10-28T07:23:26.548064+00:00",
+  "evaluation_status": "PASS",
+  "blocked_audit_events": [],
+  "guard_scope": "CPython process from before project import and discovery; not OS isolation"
+}

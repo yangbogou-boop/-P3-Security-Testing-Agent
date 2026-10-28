@@ -1,0 +1,96 @@
+{
+  "record_type": "observed_input_before_execute",
+  "mode": "good",
+  "fault": "deny",
+  "proposal": {
+    "check_id": "unapproved",
+    "endpoint_id": "profile_read",
+    "method": "GET",
+    "identity_ref": "user_alice",
+    "path_params": {},
+    "query": {},
+    "expected": "ALLOW",
+    "control_id": null
+  },
+  "approved_candidates": [
+    {
+      "check_id": "HTTP-C-AUTH",
+      "endpoint_id": "profile_read",
+      "method": "GET",
+      "identity_ref": "user_alice",
+      "path_params": {},
+      "query": {},
+      "expected": "ALLOW",
+      "control_id": null
+    },
+    {
+      "check_id": "HTTP-N-AUTH",
+      "endpoint_id": "profile_read",
+      "method": "GET",
+      "identity_ref": "anonymous",
+      "path_params": {},
+      "query": {},
+      "expected": "DENY",
+      "control_id": "HTTP-C-AUTH"
+    },
+    {
+      "check_id": "HTTP-C-BOLA",
+      "endpoint_id": "object_read",
+      "method": "GET",
+      "identity_ref": "user_bob",
+      "path_params": {
+        "object_id": "obj-b"
+      },
+      "query": {},
+      "expected": "ALLOW",
+      "control_id": null
+    },
+    {
+      "check_id": "HTTP-N-BOLA",
+      "endpoint_id": "object_read",
+      "method": "GET",
+      "identity_ref": "user_alice",
+      "path_params": {
+        "object_id": "obj-b"
+      },
+      "query": {},
+      "expected": "DENY",
+      "control_id": "HTTP-C-BOLA"
+    },
+    {
+      "check_id": "HTTP-C-RBAC",
+      "endpoint_id": "admin_report",
+      "method": "GET",
+      "identity_ref": "admin_carol",
+      "path_params": {},
+      "query": {
+        "period": "demo"
+      },
+      "expected": "ALLOW",
+      "control_id": null
+    },
+    {
+      "check_id": "HTTP-N-RBAC",
+      "endpoint_id": "admin_report",
+      "method": "GET",
+      "identity_ref": "user_alice",
+      "path_params": {},
+      "query": {
+        "period": "demo"
+      },
+      "expected": "DENY",
+      "control_id": "HTTP-C-RBAC"
+    }
+  ],
+  "binding": {
+    "run_id": "run_ce4b0027ae024f05a72d81173c9f05e2",
+    "fixture_instance_id": "fixture_c41c66e1bcc94a84b7656dd574c2ee06",
+    "scope_digest": "cfc45f4ddb04a701800cfb69ed9770e5bb3c659fc213ba0aedf39b667209cffa",
+    "authorization_version": "v1",
+    "generation": 0
+  },
+  "candidate_version": "six-v1",
+  "fixture_version": "synthetic-v1",
+  "contract_version": "p3-http-v1",
+  "permission": "SYNTHETIC_OFFLINE_ONLY"
+}

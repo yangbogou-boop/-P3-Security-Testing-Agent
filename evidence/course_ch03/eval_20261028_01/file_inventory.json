@@ -1,0 +1,113 @@
+{
+  "kind": "post_run_share_inventory_not_original_manifest_or_source_authentication",
+  "files": [
+    {
+      "path": "evidence/course_ch03/eval_20261028_01/artifacts/coordination_181a71f55a434f3181b3d107f27fe9b9/events.jsonl",
+      "bytes": 5358,
+      "sha256": "501d12ee765d4c04cd1b0e1085e4e306aa48cba7cd967235377e0c24b424c517"
+    },
+    {
+      "path": "evidence/course_ch03/eval_20261028_01/artifacts/coordination_181a71f55a434f3181b3d107f27fe9b9/manifest.json",
+      "bytes": 716,
+      "sha256": "26e34b41cba0bcc8663c08e92ac473d06bd7091cf84cd8fbce731fbbebc90939"
+    },
+    {
+      "path": "evidence/course_ch03/eval_20261028_01/artifacts/coordination_181a71f55a434f3181b3d107f27fe9b9/report.json",
+      "bytes": 3867,
+      "sha256": "acb2c61faaa2c575dfe72b15d77c7ef9901d3d438b96660774762dae1dafdd4a"
+    },
+    {
+      "path": "evidence/course_ch03/eval_20261028_01/artifacts/lifecycle_c0b8a4cc19f343bda3515c700eba173f/events.jsonl",
+      "bytes": 1176,
+      "sha256": "0821cfc9fa764611545570545adbe7729b29337a228577a6484a44e48026eea5"
+    },
+    {
+      "path": "evidence/course_ch03/eval_20261028_01/artifacts/lifecycle_c0b8a4cc19f343bda3515c700eba173f/manifest.json",
+      "bytes": 299,
+      "sha256": "494cdffd23dd429f31adea94064968af965952fdf98b16903af540843c59dc47"
+    },
+    {
+      "path": "evidence/course_ch03/eval_20261028_01/artifacts/lifecycle_c0b8a4cc19f343bda3515c700eba173f/report.json",
+      "bytes": 12801,
+      "sha256": "188b8510497425f0da55a7e04eab3301aabc3f73a7857455d8128d2dab2c1ef3"
+    },
+    {
+      "path": "evidence/course_ch03/eval_20261028_01/artifacts/run_e2b938e432d044e69427e50f2b1a9aaf/events.jsonl",
+      "bytes": 22736,
+      "sha256": "9b927ffffced03e8c2fd42bf3e6d697271678ef8628be0a0a62f127796e9c68b"
+    },
+    {
+      "path": "evidence/course_ch03/eval_20261028_01/artifacts/run_e2b938e432d044e69427e50f2b1a9aaf/manifest.json",
+      "bytes": 443,
+      "sha256": "2b1ab15f15e922ef8f6526b1e27916d95ce7b9b191eea8d97989f62a9d9744db"
+    },
+    {
+      "path": "evidence/course_ch03/eval_20261028_01/artifacts/run_e2b938e432d044e69427e50f2b1a9aaf/report.json",
+      "bytes": 7099,
+      "sha256": "25bd1c156b05e4199ad8c43c761880195cf0e7208794c26f1b3a68871b7876f2"
+    },
+    {
+      "path": "evidence/course_ch03/eval_20261028_01/diagnosis.json",
+      "bytes": 2615,
+      "sha256": "ea55ff36260dc1bbd5dfe60b6f55bd1f309bfe915c89d82deaeef92725674ff9"
+    },
+    {
+      "path": "evidence/course_ch03/eval_20261028_01/evaluation_agreement.md",
+      "bytes": 3045,
+      "sha256": "afd7e7935d12326c19ab550e3b40a77b780ab48fc6a383a3315049ef50c99765"
+    },
+    {
+      "path": "evidence/course_ch03/eval_20261028_01/execution_command.txt",
+      "bytes": 5690,
+      "sha256": "babe3bc0afa1788c9ffb4bac15f0d16b8cf08f55a0c4bf97658bae0b75193b9e"
+    },
+    {
+      "path": "evidence/course_ch03/eval_20261028_01/execution_context.json",
+      "bytes": 12406,
+      "sha256": "aa4cb42a92670a23e98309af9af151efc91ea1ed88d45951665b1aa6c0e556ea"
+    },
+    {
+      "path": "evidence/course_ch03/eval_20261028_01/execution_finished.json",
+      "bytes": 218,
+      "sha256": "27e57b1fbc51521552fe2dbe2547858c1e3c748e3e2d0ab8626ee6b6a4668786"
+    },
+    {
+      "path": "evidence/course_ch03/eval_20261028_01/execution_started.json",
+      "bytes": 521,
+      "sha256": "cee20e55160d054946b05e0078379c76b5ef08535bf50376277b93e9115353e8"
+    },
+    {
+      "path": "evidence/course_ch03/eval_20261028_01/host_result.json",
+      "bytes": 12801,
+      "sha256": "188b8510497425f0da55a7e04eab3301aabc3f73a7857455d8128d2dab2c1ef3"
+    },
+    {
+      "path": "evidence/course_ch03/eval_20261028_01/input.json",
+      "bytes": 2466,
+      "sha256": "cc9f168014fffd1016cc71ad425314dd3b0a017732658d133a8a63bcaae6727c"
+    },
+    {
+      "path": "evidence/course_ch03/eval_20261028_01/unittest_output.txt",
+      "bytes": 180,
+      "sha256": "e779f40e1b9997e15675f0cac44beb7eefbe00cc5fef104aeb31eea10dd1ae8c"
+    },
+    {
+      "path": "evidence/course_ch03/eval_20261028_01/unittest_result.json",
+      "bytes": 155,
+      "sha256": "dff835fe9ccdd565b7ec69b658a6ed1cf99127f968d4a4dfc48bd6ed7469bfe3"
+    },
+    {
+      "path": "evidence/course_ch03/eval_20261028_01/verification.json",
+      "bytes": 2411,
+      "sha256": "12d910bd654113f54246112c5b104f806ab06c5676fddb05d6a637a1d017c89b"
+    }
+  ],
+  "evaluation_card_sha256": "7a596242c260e66cbf03d90e62df11ed168531cc98318efeeaeff57219d5790c",
+  "tracked_files_checked": 95,
+  "tracked_files_changed": [],
+  "old_evidence_files_checked": 13,
+  "old_evidence_changed": [],
+  "relative_links_checked": 21,
+  "broken_links": [],
+  "raw_records_modified_after_execution": false
+}

@@ -1,0 +1,7 @@
+{
+  "run_id": "lifecycle_ad185eacdd204d0f87cfef531e89c14e",
+  "provenance": "OFFLINE_SIMULATION",
+  "events_sha256": "ced32ff3e44896b72ff34b505ff07d62d2ab887b3356da008c952755d59b313e",
+  "events_bytes": 1176,
+  "hash_scope": "first events_bytes bytes; later terminal rejections may append"
+}

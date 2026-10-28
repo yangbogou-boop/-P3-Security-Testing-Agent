@@ -1,0 +1,2 @@
+# Preserve raw course evidence bytes; recognize CRLF without disabling whitespace checks.
+/evidence/course_ch03/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

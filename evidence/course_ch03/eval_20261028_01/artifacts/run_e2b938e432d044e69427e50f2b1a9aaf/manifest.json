@@ -1,0 +1,14 @@
+{
+  "run_id": "run_e2b938e432d044e69427e50f2b1a9aaf",
+  "provenance": "NO_NETWORK_SIMULATION",
+  "counts": {
+    "plan_count": 7,
+    "attempt_count": 7,
+    "request_count": 0,
+    "model_request_count": 6
+  },
+  "audit_gap": false,
+  "events_sha256": "9b927ffffced03e8c2fd42bf3e6d697271678ef8628be0a0a62f127796e9c68b",
+  "events_bytes": 22736,
+  "hash_scope": "first events_bytes bytes; later terminal rejections may append"
+}

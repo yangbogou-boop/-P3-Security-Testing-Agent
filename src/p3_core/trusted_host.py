@@ -7,6 +7,7 @@ from threading import Lock
 from .coordination import EvidenceCoordinator
 from .evidence import JsonlEvidence, unique_id
 from .experiments import configuration, synthetic_registry, MODES
+from .http.audit import BoundedEvidence
 from .http.machine import SimulationRun
 from .http.transport import MemoryTransport
 from .mock_api import FixtureManager
@@ -118,7 +119,8 @@ class OfflineHost:
         raw = configuration(self.fixture)
         self.client_sink = JsonlEvidence(output)
         self.run = SimulationRun(raw, synthetic_registry(raw),
-                                 credentials=self.fixture.credential_bindings(), evidence=self.client_sink)
+                                 credentials=self.fixture.credential_bindings(),
+                                 evidence=BoundedEvidence(self.client_sink))
         self.run.start()
         if self.run.state!='RUNNING': raise InvalidInput('OFFLINE_PREFLIGHT_FAILED')
         cfg = self.run.config

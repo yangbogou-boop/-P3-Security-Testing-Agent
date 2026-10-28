@@ -1,0 +1,15 @@
+{
+  "run_id": "coordination_2755214502624b948d86e55abd8d17d4",
+  "provenance": "NO_NETWORK_SIMULATION",
+  "audit_gap": false,
+  "linked_run_id": "run_ce4b0027ae024f05a72d81173c9f05e2",
+  "fixture_instance_id": "fixture_c41c66e1bcc94a84b7656dd574c2ee06",
+  "generation": 0,
+  "scope_digest": "cfc45f4ddb04a701800cfb69ed9770e5bb3c659fc213ba0aedf39b667209cffa",
+  "authorization_version": "v1",
+  "completion": "COMPLETE",
+  "report_sha256": "25e8dc6f5b33f07cc9d43b9674edd45a2732e09abb2409805b2e4aeca662f453",
+  "events_sha256": "66b5eefcb64d445805661fbf595465323cd96a568252e11b9fc409048c3551f7",
+  "events_bytes": 5358,
+  "hash_scope": "first events_bytes bytes; later terminal rejections may append"
+}

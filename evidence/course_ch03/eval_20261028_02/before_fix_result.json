@@ -1,0 +1,11 @@
+{
+  "tests_run": 1,
+  "failures": 1,
+  "errors": 0,
+  "skipped": 0,
+  "expected_failures": 0,
+  "unexpected_successes": 0,
+  "successful": false,
+  "blocked_audit_events": [],
+  "ended_at": "2026-10-28T07:22:12.106382+00:00"
+}

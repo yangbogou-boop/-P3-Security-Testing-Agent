@@ -1,0 +1,12 @@
+test_capacity_failure_cannot_verify (test_host_evidence_contract.HostEvidenceContractTests) ... ok
+test_denied_candidate_has_linked_audit_but_no_dispatch (test_host_evidence_contract.HostEvidenceContractTests) ... ok
+test_event_write_failure_cannot_verify (test_host_evidence_contract.HostEvidenceContractTests) ... ok
+test_manifest_write_failure_cannot_verify (test_host_evidence_contract.HostEvidenceContractTests) ... ok
+test_normal_client_manifest_contract (test_host_evidence_contract.HostEvidenceContractTests) ... ok
+test_sidecar_and_lifecycle_keep_separate_contracts (test_host_evidence_contract.HostEvidenceContractTests) ... ok
+test_temporary_corruption_is_rejected (test_host_evidence_contract.HostEvidenceContractTests) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.700s
+
+OK

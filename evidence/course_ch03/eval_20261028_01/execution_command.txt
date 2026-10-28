@@ -1,0 +1,74 @@
+@'
+import sys
+blocked=[]
+def guard(event,args):
+    if event.startswith("socket.") or event in ("subprocess.Popen","os.system","os.exec","os.posix_spawn","ctypes.dlopen"):
+        blocked.append(event)
+        raise RuntimeError("NETWORK_OR_EXTERNAL_EXECUTION_FORBIDDEN")
+sys.addaudithook(guard)
+import json, hashlib, datetime, io, contextlib, unittest
+from pathlib import Path
+root=Path.cwd()
+out=root/"evidence/course_ch03/eval_20261028_01"
+def write(name,value):
+    with (out/name).open("x",encoding="utf-8") as f:
+        json.dump(value,f,ensure_ascii=True,indent=2);f.write("\n")
+def now(): return datetime.datetime.now(datetime.timezone.utc).isoformat()
+meta=json.loads((out/"execution_context.json").read_text(encoding="utf-8"))
+assert all(hashlib.sha256((root/p).read_bytes()).hexdigest()==h for p,h in meta["tracked_sha256"].items())
+write("execution_started.json",dict(started_at=now(),head=meta["head"],argv=sys.argv,flags=str(sys.flags),guard_installed_before_discovery=True,agreement_sha256=hashlib.sha256((out/"evaluation_agreement.md").read_bytes()).hexdigest()))
+sys.path.insert(0,str(root/"src"))
+status="ERROR"
+try:
+    loader=unittest.TestLoader()
+    loader.testNamePatterns=["*test_controller_denies_unapproved_candidate"]
+    with (out/"unittest_output.txt").open("x",encoding="utf-8") as log,contextlib.redirect_stdout(log),contextlib.redirect_stderr(log):
+        suite=loader.discover(str(root/"tests"),pattern="test_c3d_host.py")
+        assert suite.countTestCases()==1
+        result=unittest.TextTestRunner(stream=log,verbosity=2).run(suite)
+    write("unittest_result.json",dict(tests_run=result.testsRun,failures=len(result.failures),errors=len(result.errors),skipped=len(result.skipped),expected_failures=len(result.expectedFailures),unexpected_successes=len(result.unexpectedSuccesses),successful=result.wasSuccessful()))
+    if not result.wasSuccessful(): raise RuntimeError("FOCUSED_TEST_FAILED")
+    from p3_core.trusted_host import OfflineHost
+    from p3_core.http.audit import verify_run
+    from p3_core.coordination import check_sidecar
+    host=OfflineHost(out/"artifacts",mode="good")
+    proposal=host.run.config.candidates[0].to_dict()
+    proposal["check_id"]="unapproved"
+    secrets=list(host.fixture.credential_bindings().values())
+    write("input.json",dict(record_type="observed_input_before_execute",mode="good",fault="deny",proposal=proposal,approved_candidates=[c.to_dict() for c in host.run.config.candidates],binding=host.binding.__dict__,candidate_version="six-v1",fixture_version="synthetic-v1",contract_version="p3-http-v1",permission="SYNTHETIC_OFFLINE_ONLY"))
+    raw=host.execute(fault="deny")
+    write("host_result.json",raw)
+    directory=host.client_sink.directory
+    report=json.loads((directory/"report.json").read_text())
+    events=[json.loads(line) for line in (directory/"events.jsonl").read_text().splitlines()]
+    denied=[row for row in report["checks"] if row["authorization"]=="DENY"]
+    row=denied[0] if len(denied)==1 else {}
+    auth=[e for e in events if e.get("kind")=="authorization" and e.get("slot_id")==row.get("slot_id")]
+    matching_io=[e for e in events if e.get("kind") in ("prepared","model_io") and e.get("slot_id")==row.get("slot_id")]
+    prepared=[e for e in events if e.get("kind")=="prepared"]
+    allowed={r["action_id"] for r in report["checks"] if r["authorization"]=="ALLOW"}
+    io_actions={e.get("action_id") for e in events if e.get("kind")=="model_io"}
+    checks=dict(exactly_one_deny=len(denied)==1,not_executed=row.get("execution")=="NOT_EXECUTED",
+       inconclusive=row.get("conclusion")=="INCONCLUSIVE",no_action=row.get("action_id") is None,
+       fixed_reason=row.get("assertion")=="NOT_APPROVED_CANDIDATE",
+       linked_denial=len(auth)==1 and all(auth[0].get(k)==row.get(k) and row.get(k) is not None for k in ("slot_id","proposal_id","attempt_id")) and auth[0].get("decision")=="DENY",
+       denied_slot_has_no_prepared_or_io=len(matching_io)==0,
+       prepared_only_allowed=len(prepared)==6 and {e.get("action_id") for e in prepared}==allowed and len(allowed)==6,
+       model_io_only_allowed=bool(io_actions) and io_actions<=allowed,
+       counts=report["counts"]==dict(plan_count=7,attempt_count=7,request_count=0,model_request_count=6),
+       no_audit_gap=report["audit_gap"] is False,
+       simulation=report["provenance"]=="NO_NETWORK_SIMULATION",
+       no_network_guard_events=not blocked)
+    client_integrity=verify_run(directory)
+    checks["client_integrity"]=client_integrity["integrity"]=="VERIFIED"
+    rawbytes=b"".join(p.read_bytes() for p in out.rglob("*") if p.is_file())
+    checks["no_raw_fixture_credentials"]=not any(s.encode() in rawbytes for s in secrets)
+    checks["no_authorization_header"]=b"Authorization: Bearer" not in rawbytes
+    write("verification.json",dict(record_type="derived_post_run_checks_not_original_events",checked_at=now(),checks=checks,denied_row=row,denial_events=auth,client_integrity=client_integrity,sidecar_file_only=check_sidecar(host.coordinator.sink.directory),sidecar_runtime_completion=raw["sidecar"]["completion"],source_limit="Hashes and local Controller snapshot do not prove external authenticity or real permission."))
+    status="PASS" if all(checks.values()) else "FAIL"
+except Exception as exc:
+    write("execution_error.json",dict(error_type=type(exc).__name__,message="Execution incomplete; inspect preserved records. No retry performed."))
+finally:
+    write("execution_finished.json",dict(finished_at=now(),evaluation_status=status,blocked_audit_events=blocked,guard_scope="CPython process from before project import and discovery; not OS isolation"))
+print(status)
+'@ | python -I -S -B -

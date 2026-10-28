@@ -1,0 +1,75 @@
+{
+  "record_type": "derived_post_run_checks_not_original_events",
+  "checked_at": "2026-10-28T07:23:26.545812+00:00",
+  "checks": {
+    "exactly_one_deny": true,
+    "not_executed": true,
+    "inconclusive": true,
+    "no_action": true,
+    "fixed_reason": true,
+    "linked_denial": true,
+    "denied_slot_has_no_prepared_or_io": true,
+    "prepared_only_allowed": true,
+    "model_io_only_allowed": true,
+    "counts": true,
+    "no_audit_gap": true,
+    "simulation": true,
+    "no_network_guard_events": true,
+    "client_integrity": true,
+    "no_raw_fixture_credentials": true,
+    "no_authorization_header": true
+  },
+  "denied_row": {
+    "slot_id": "slot_d5b04c2f2865488498f6e54dc6476992",
+    "proposal_id": "proposal_a64686ebbe1e4a1b99ef8e7523ae00e4",
+    "check_id": null,
+    "attempt_id": "attempt_b4b968e33e7c499ca64729f1bbed46b2",
+    "action_id": null,
+    "processed": true,
+    "authorization": "DENY",
+    "execution": "NOT_EXECUTED",
+    "conclusion": "INCONCLUSIVE",
+    "simulated_conclusion": "INCONCLUSIVE",
+    "assertion": "NOT_APPROVED_CANDIDATE",
+    "status": null,
+    "headers_received": false,
+    "transport_issue": null,
+    "evidence_ids": []
+  },
+  "denial_events": [
+    {
+      "mode": "http-local-simulation",
+      "provenance": "NO_NETWORK_SIMULATION",
+      "run_id": "run_ce4b0027ae024f05a72d81173c9f05e2",
+      "evidence_id": "evidence_0fa0c617e69e4054b1dd1013c625eac4",
+      "sequence": 46,
+      "kind": "authorization",
+      "counts": {
+        "plan_count": 7,
+        "attempt_count": 7,
+        "request_count": 0,
+        "model_request_count": 6
+      },
+      "slot_id": "slot_d5b04c2f2865488498f6e54dc6476992",
+      "proposal_id": "proposal_a64686ebbe1e4a1b99ef8e7523ae00e4",
+      "attempt_id": "attempt_b4b968e33e7c499ca64729f1bbed46b2",
+      "decision": "DENY",
+      "reason": "NOT_APPROVED_CANDIDATE"
+    }
+  ],
+  "client_integrity": {
+    "integrity": "VERIFIED",
+    "run_id": "run_ce4b0027ae024f05a72d81173c9f05e2",
+    "provenance": "NO_NETWORK_SIMULATION",
+    "approval_verified": false,
+    "appended_bytes": 0
+  },
+  "sidecar_file_only": {
+    "integrity": "CONSISTENT_OFFLINE_SIDECAR",
+    "registration_status": "SOURCE_UNVERIFIED",
+    "source_verified": false,
+    "api_conclusion": "INCONCLUSIVE"
+  },
+  "sidecar_runtime_completion": "OFFLINE_VERIFIED",
+  "source_limit": "Hashes and local Controller snapshot do not prove external authenticity or real permission."
+}

@@ -1,0 +1,10 @@
+{
+  "started_at": "2026-10-28T07:23:26.177813+00:00",
+  "head": "67242ba5e0d71e6d2cfd3911ec758085760d1e79",
+  "argv": [
+    "-"
+  ],
+  "flags": "sys.flags(debug=0, inspect=0, interactive=0, optimize=0, dont_write_bytecode=1, no_user_site=1, no_site=1, ignore_environment=1, verbose=0, bytes_warning=0, quiet=0, hash_randomization=1, isolated=1, dev_mode=False, utf8_mode=0)",
+  "guard_installed_before_discovery": true,
+  "agreement_sha256": "bc8f210e78efa1f319b1cb68fcd89a3451ff82d2cb697949304f88848331cb45"
+}

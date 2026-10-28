@@ -1,0 +1,19 @@
+{
+  "changed_existing_files": [
+    "src/p3_core/trusted_host.py",
+    "eval/P3_evaluation_observability_card.md"
+  ],
+  "allowed_existing_changes_only": true,
+  "first_card_preserved_as_prefix": true,
+  "previous_evidence_all_unchanged": true,
+  "executed_code_hashes_still_match": true,
+  "relative_links_checked": 37,
+  "broken_links": [],
+  "new_file_whitespace_issues_recognizing_crlf": [],
+  "network_cases": 14,
+  "network_statuses": [
+    "PENDING_AUTHORIZATION"
+  ],
+  "syntax_parse": "PASS",
+  "git_attributes_changed": false
+}
