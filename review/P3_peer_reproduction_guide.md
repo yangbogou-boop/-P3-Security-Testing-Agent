@@ -8,6 +8,10 @@
 
 最小对象：**BOLA 模式的一次 fixed 和一次 dynamic**。相同六候选、矩阵、预算；每次独立 Fixture，合成凭据。比较两策略的覆盖／检出及模型请求数，不新建服务器，不需要 API Key，不调用真实 LLM。原组同条件各三次见[实验报告](../eval/P3_engineering_experiment.md)和[原JSON](../eval/P3_offline_strategy_results.json)；伙伴两次新结果单独保存，不替代原36次，不用于统计优越性。
 
+## 仓库内原组证据（第二轮归档更新）
+
+原组36次历史运行的108个原始文件已按原字节归档，见[逐次索引](../evidence/course_ch04/strategy_history_36/README.md)、[归档清单](../evidence/course_ch04/strategy_history_36/archive_manifest.json)及[派生统计](../eval/P3_strategy_recalculation.json)。无需个人磁盘路径。代码复现版本仍为上述5c16b2b；材料第一轮由9754048纳入，本轮归档待审核提交，负责人应提供包含本归档的实际交付提交号，不能指定尚未生成的SHA。代码与材料版本各自记录；历史执行SHA仍NOT_FULLY_BOUND。
+
 ## 执行前确认
 
 伙伴和负责人确认此次离线复现范围，审查现有 [CLI](../src/p3_core/delivery.py)、[模拟入口](../src/p3_core/experiments.py)及下方命令；不运行不明脚本，不启用 live/service。授权仅限内存模拟，不能把 synthetic_registry 当作真实许可。所有来源文件和旧证据只读。

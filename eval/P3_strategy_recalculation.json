@@ -4,9 +4,16 @@
   "source": {
     "path": "eval/P3_offline_strategy_results.json",
     "sha256": "b8021775d05cafdb4374acada8335a5f1d9963d53dd2972bcb32beb10fe8e76a",
-    "first_record_commit": "30c98dbd686d0ed9cdef2f501031ddc5dea72158"
+    "first_record_commit": "30c98dbd686d0ed9cdef2f501031ddc5dea72158",
+    "sha256_scope": "2026-10-28 Windows worktree bytes (CRLF); historical observation, not the Git blob hash",
+    "git_blob": {
+      "base_commit": "9754048acd6d23a31fe5c7f5ac105b67960f4bf1",
+      "object_id": "9eff84f4215891ff37b4a4bc6a295dafe8a933ed",
+      "bytes": 73276,
+      "sha256": "29047ac71335d838497d0e34c0749fe2aadb60b0010239f578e80c5aee998e6e"
+    }
   },
-  "raw_root": "D:\\codex\\2026-10-12\\referenced-chatgpt-conversation-this-is-an\\outputs\\remaining-review\\runs-final",
+  "raw_root": "evidence/course_ch04/strategy_history_36/runs",
   "execution_version": "NOT_FULLY_BOUND",
   "historical_execution_environment": "NOT_RECORDED_IN_PER_RUN_ARTIFACTS",
   "unique_runs": 36,
@@ -2730,6 +2737,7 @@
     }
   ],
   "formulas": "See P3_engineering_experiment.md. Raw hashes use original bytes; report canonical hash uses json.dumps(sort_keys=True,ensure_ascii=False,allow_nan=False), default separators. Unauthorized modeled action check joins positive-send model_io action IDs to ALLOW report rows; not independent replay of authorization. local elapsed and llm_calls are recorded values, not recomputed timers or billing.",
+  "protected_tracked_sha256_scope": "2026-10-28 audit worktree bytes, before the Chapter 4 archive attribute rule; historical snapshot, not portable checkout or Git blob hashes",
   "protected_tracked_sha256": {
     ".gitattributes": "8d624d63f14b7b7afe7798683d43387e7c0ace18dc8dcefdaa97e1f0e60bba5f",
     ".github/workflows/ci_runner.yml": "5a42504af8b28a4d177d7694b8739cb804d284001209d34f5a4db3253a6c1875",
@@ -2885,5 +2893,13 @@
     "tests/test_http_core.py": "90b36c2cf41c0b01af98b1813d6047d465088cb20b0677e305197f80db764138",
     "tests/test_mock_api.py": "7c4e7709af888c65ff3431fee1f1a364af1b86b1337a6c52f08adda3de22742a",
     "tests/test_remaining.py": "931041dfa4faa767c87b8e7e95d7efdd91f17c9f506fdff77068821d8e1e906e"
+  },
+  "historical_source_root": "D:\\codex\\2026-10-12\\referenced-chatgpt-conversation-this-is-an\\outputs\\remaining-review\\runs-final",
+  "archive": {
+    "base_head": "9754048acd6d23a31fe5c7f5ac105b67960f4bf1",
+    "manifest": "evidence/course_ch04/strategy_history_36/archive_manifest.json",
+    "index": "evidence/course_ch04/strategy_history_36/README.md",
+    "preserves_original_bytes": true,
+    "historical_execution_version": "NOT_FULLY_BOUND"
   }
 }

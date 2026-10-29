@@ -1,0 +1,16 @@
+{
+  "run_id": "run_77e53fe86ce946ab8a8c0a58813f6222",
+  "provenance": "NO_NETWORK_SIMULATION",
+  "counts": {
+    "plan_count": 6,
+    "attempt_count": 1,
+    "request_count": 0,
+    "model_request_count": 1
+  },
+  "audit_gap": false,
+  "audit_limit_bytes": 1048576,
+  "report_sha256": "7d0ba2c7f07973b61bd79c519c1ef37aec8d89a8d6c106f8c93ed6c364ce4eaf",
+  "events_sha256": "6e1023f062e9d1d501b58a1a0883f3c63c0db45e7df76e353236a78a337d6385",
+  "events_bytes": 3939,
+  "hash_scope": "first events_bytes bytes; later terminal rejections may append"
+}
