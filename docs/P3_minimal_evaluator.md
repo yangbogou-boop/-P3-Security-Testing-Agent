@@ -62,3 +62,19 @@ python -m unittest discover -s tests -v
 新测试还覆盖缺失／损坏／篡改、重算哈希后的关联错误、事件追加、错误类型、读取期间变化、路径和大小边界、敏感异常不回显、原始文件不变以及不调用产品运行模块。测试用例内阻断 socket 和 DNS；交付验证另在测试发现前安装 Python 审计钩子，阻断 socket 事件及外部程序启动，并保留完整日志。
 
 本轮不重新执行第三章实验，不开展伙伴复现。14 项真实 HTTP 验收仍为 `PENDING_AUTHORIZATION`；OS 层未派发的独立证明仍为 `UNAVAILABLE`。离线评价不替代真实目标许可、教师审批、独立来源认证或正式课程评分。
+
+## 第二条规则：P3-EVAL-BUDGET-001
+
+对应 P3-REQ-010 / GWT-N04 的累计计数子场景。选择此 rule 即选择评价器内固定基准 `p3-eval-trial-eight-v1`（最多 8 项），不是从报告读取或让 Planner 指定上限。结果明确标记 `benchmark_binding=RULE_SELECTION_ONLY`、`runtime_budget_verified=false`。scope_digest 只能关联已记录范围，不能从摘要反推出真实配置；没有独立预算快照，不能声称核验了实际运行预算。缺少有效范围标识返回证据不足。
+
+独立的 inspect_budget 保留 STOPPED 和未处理项的合法表示，不调用或放宽 DENY 的 inspect。共享本地路径、有界读取、严格 JSON、ID、计数类型、verify_run、复读检查与结果封装。预算专属逻辑核对三文件哈希、全事件覆盖、连续序号、唯一 Evidence ID、登记与尝试关联、首次正字节模拟发送累计计数。登记不能回收，重复提案拒绝不能添加名额，重复发送观察不能再次增加首次请求计数。model_request_count 始终与实际 request_count 分开。
+
+PASS 仅表示完整完成态记录支持固定评价基准内的计数断言；FAIL 要求完整、关联一致的记录确实登记第 9 项。矛盾、缺失、尾部未覆盖返回 INSUFFICIENT_EVIDENCE。NOT_APPLICABLE 没有自动豁免入口。所有结果保留来源／批准 false、human_signoff=pending、score=null。
+
+STOPPED/BUDGET_EXHAUSTED 要求已登记 8 项、可关联的 proposal_rejected 和一致报告；未处理项必须无 attempt/action，不能虚构执行。即使这些事实成立，当前持久化格式缺少停止生效边界，仍返回 `STOP_EFFECTIVE_BOUNDARY_UNAVAILABLE`，不宣称停止后无派发。本版不评价 90 秒时间、真实并发、取消延迟、撤权竞态、实际网络未发送或来源真实性，不能替代完整 REQ-010、GWT-N04/N05 验收。
+
+```powershell
+python -m p3_core.evaluator --run <existing-client-run-directory> --rule P3-EVAL-BUDGET-001
+```
+
+校准在测试临时目录独立生成并标记 SYNTHETIC_CALIBRATION：K1 登记并拒绝 8 项仍累计占满预算；K2 第 9 项登记且完整性先通过，预算评价 FAIL；K3 缺 Manifest，证据不足。历史第三章第二次记录也可用于有限计数评价，不更改原件。新增测试还覆盖 STOPPED 未处理项、缺拒绝事件、重复项、回收名额、重复发送计数、布尔计数、错配 ID、截断、追加尾部、只读 CLI。原 39 项 DENY 测试保持。

@@ -12,6 +12,8 @@ import sys
 from .http.audit import verify_run
 
 RULE_ID = 'P3-EVAL-DENY-001'
+BUDGET_RULE_ID = 'P3-EVAL-BUDGET-001'
+BUDGET_BASIS = 'p3-eval-trial-eight-v1'
 STATUSES = ('PASS', 'FAIL', 'INSUFFICIENT_EVIDENCE', 'NOT_APPLICABLE')
 MAX_FILE = 1048576
 MAX_EVENTS = 512
@@ -344,10 +346,134 @@ def inspect(blobs, result):
     return 'FAIL' if violation else 'PASS'
 
 
+def inspect_budget(blobs, result):
+    """Separate count rubric. Does not relax or invoke DENY-specific assertions."""
+    m, r = (strict_json(blobs[n]) for n in NAMES[:2])
+    require(type(m) is dict and type(r) is dict)
+    require(MANIFEST_FIELDS <= set(m) <= MANIFEST_FIELDS | {'evaluation_origin'})
+    require(REPORT_FIELDS <= set(r) <= REPORT_FIELDS | {'evaluation_origin'})
+    identifier(r['run_id'], 'run')
+    identifier(r['snapshot_id'], 'snapshot')
+    require(type(r['scope_digest']) is str and re.fullmatch(r'[0-9a-f]{64}', r['scope_digest']),
+            'MISSING_SCOPE_BINDING')
+    require(r['mode'] == 'http-local-simulation' and r['provenance'] == m['provenance'] == 'NO_NETWORK_SIMULATION')
+    require(m['run_id'] == r['run_id'] and m['counts'] == r['counts'])
+    require(m['audit_gap'] is False and r['audit_gap'] is False, 'AUDIT_GAP')
+    origin = r.get('evaluation_origin')
+    require(origin == m.get('evaluation_origin') and origin in (None, 'SYNTHETIC_CALIBRATION'))
+    result.update(subject_run_id=r['run_id'], provenance=origin or r['provenance'])
+    counts(r['counts']); counts(m['counts'])
+    require(type(m['events_bytes']) is int and m['events_bytes'] == len(blobs['events.jsonl']), 'EVENT_COVERAGE_INCOMPLETE')
+    require(m['events_sha256'] == hashlib.sha256(blobs['events.jsonl']).hexdigest(), 'EVENT_HASH_MISMATCH')
+    require(m['report_sha256'] == hashlib.sha256(json.dumps(r, sort_keys=True, ensure_ascii=False,
+            allow_nan=False).encode('utf-8')).hexdigest(), 'REPORT_HASH_MISMATCH')
+    lines = blobs['events.jsonl'].splitlines()
+    require(0 < len(lines) <= MAX_EVENTS and all(0 < len(x) <= 65536 for x in lines))
+    events = [strict_json(x) for x in lines]
+    rows = r['checks']
+    require(type(rows) is list and len(rows) <= 256)
+    slots = {}; proposals = set(); attempts = set(); actions = set()
+    for row in rows:
+        require(type(row) is dict and set(row) == ROW_FIELDS)
+        for key, prefix in [('slot_id','slot'),('proposal_id','proposal')]: identifier(row[key],prefix)
+        require(row['slot_id'] not in slots and row['proposal_id'] not in proposals)
+        slots[row['slot_id']] = row; proposals.add(row['proposal_id'])
+        require(type(row['processed']) is bool and type(row['evidence_ids']) is list)
+        require(row['authorization'] in ('ALLOW','DENY','NOT_EVALUATED'))
+        require(row['execution'] == 'NOT_EXECUTED', 'OFFLINE_EXECUTION_CONTRADICTION')
+        for key, prefix, seen in [('attempt_id','attempt',attempts),('action_id','action',actions)]:
+            if row[key] is not None:
+                identifier(row[key],prefix); require(row[key] not in seen); seen.add(row[key])
+        for eid in row['evidence_ids']: identifier(eid,'evidence')
+    event_fields = dict(EVENT_FIELDS, proposal_rejected=None)
+    previous = dict.fromkeys(COUNTS,0)
+    registered = set(); authorized = set(); prepared = {}; sent = set(); ids = set(); rejected = set()
+    refs = []; initial = None; budget_rejections = []; completed = False
+    for seq,e in enumerate(events,1):
+        require(type(e) is dict and e.get('kind') in event_fields)
+        kind = e['kind']
+        fields = event_fields[kind]
+        if kind == 'proposal_rejected':
+            fields = {'proposal_id','reason'} | ({'slot_id'} if 'slot_id' in e else set())
+        require(set(e) == COMMON | fields)
+        require(type(e['sequence']) is int and e['sequence'] == seq, 'EVENT_SEQUENCE_GAP')
+        require(e['run_id'] == r['run_id'] and e['mode'] == r['mode'] and e['provenance'] == r['provenance'])
+        identifier(e['evidence_id'],'evidence'); require(e['evidence_id'] not in ids); ids.add(e['evidence_id'])
+        counts(e['counts']); require(not completed, 'EVENT_AFTER_COMPLETION')
+        for key in ('slot_id','proposal_id','attempt_id','action_id'):
+            if key in e: identifier(e[key],key[:-3])
+        expected = dict(previous)
+        if kind == 'started':
+            require(seq == 1 and e['snapshot_id'] == r['snapshot_id'])
+        elif kind == 'plan_registered':
+            require(seq == 2 and initial is None)
+            initial = e['counts']['plan_count']; expected['plan_count'] = initial
+        else:
+            require(initial is not None, 'MISSING_PLAN_REGISTRATION')
+        if kind == 'proposal_registered':
+            s=e['slot_id']; require(s in slots and s not in registered and s not in authorized)
+            require(e['proposal_id'] == slots[s]['proposal_id'])
+            registered.add(s); expected['plan_count'] += 1
+        elif kind == 'authorization':
+            s=e['slot_id']; require(s in slots and s not in authorized)
+            row=slots[s]
+            require(e['proposal_id']==row['proposal_id'] and e['attempt_id']==row['attempt_id'])
+            require(e['decision']==row['authorization'] and e['decision'] in ('ALLOW','DENY'))
+            require(e['reason']==('APPROVED' if e['decision']=='ALLOW' else row['assertion']))
+            authorized.add(s); expected['attempt_count'] += 1
+        elif kind == 'prepared':
+            s=e['slot_id']; a=e['action_id']
+            require(s in authorized and slots[s]['authorization']=='ALLOW' and slots[s]['action_id']==a and a not in prepared)
+            prepared[a]=s
+        elif 'action_id' in e:
+            require(e['action_id'] in prepared, 'UNASSOCIATED_ACTION_EVENT')
+            if kind == 'model_io':
+                require(type(e['sent_bytes']) is int and 0 <= e['sent_bytes'] <= MAX_FILE)
+                require(type(e['dispatch_started']) is bool and e['dispatch_started']==(e['sent_bytes']>0))
+                require(type(e['gate_sequence']) is int and e['gate_sequence']>0)
+                require(e['phase'] in ('CONNECT','WRITE') and (e['phase']=='WRITE' or e['sent_bytes']==0))
+                if e['dispatch_started'] and e['action_id'] not in sent:
+                    sent.add(e['action_id']); expected['model_request_count'] += 1
+        if kind == 'proposal_rejected':
+            require(e['proposal_id'] not in proposals | rejected)
+            rejected.add(e['proposal_id'])
+            if e['reason']=='REGISTERED_CHECK_IMMUTABLE': require(e.get('slot_id') in slots)
+            elif e['reason']=='BUDGET_EXHAUSTED':
+                require('slot_id' not in e and previous['plan_count']==8, 'BUDGET_REJECTION_CONTRADICTION')
+                budget_rejections.append(e)
+            else: raise MissingEvidence('UNSUPPORTED_REJECTION_BOUNDARY')
+        if kind == 'completion_ready': completed=True
+        require(e['counts']==expected, 'EVENT_COUNT_TRANSITION_MISMATCH')
+        previous=expected
+        if kind in ('plan_registered','proposal_registered','proposal_rejected','authorization','model_io'):
+            refs.append(dict(artifact='events.jsonl',line=seq,evidence_id=e['evidence_id'],kind=kind))
+    require(previous == r['counts'] and len(rows)==previous['plan_count'] and initial is not None)
+    require(len(rows)-len(registered)==initial and set(prepared)==actions)
+    for s,row in slots.items():
+        require((s in authorized)==(row['attempt_id'] is not None))
+        if s not in authorized:
+            require(row['authorization']=='NOT_EVALUATED' and row['processed'] is False and row['action_id'] is None)
+        if row['authorization']=='DENY': require(row['processed'] is True and row['action_id'] is None)
+        for eid in row['evidence_ids']:
+            require(any(e['evidence_id']==eid and e.get('action_id')==row['action_id'] and row['action_id'] is not None for e in events))
+    require(r['state'] in ('COMPLETED','STOPPED'))
+    if r['state']=='COMPLETED':
+        require(completed and all(row['processed'] for row in rows) and not budget_rejections
+                and r['reason'] is None and r['stop_conditions']==[], 'TERMINAL_CONTRADICTION')
+    else:
+        require(r['reason']=='BUDGET_EXHAUSTED' and r['stop_conditions']==['BUDGET_EXHAUSTED']
+                and budget_rejections and not completed, 'STOP_EVIDENCE_MISSING')
+        raise MissingEvidence('STOP_EFFECTIVE_BOUNDARY_UNAVAILABLE')
+    result['observed_facts']=dict(counts=previous,benchmark_version=BUDGET_BASIS,max_checks=8,
+        benchmark_binding='RULE_SELECTION_ONLY',runtime_budget_verified=False,scope_digest=r['scope_digest'])
+    result['evidence_references']=refs
+    return 'FAIL' if previous['plan_count']>8 else 'PASS'
+
+
 def evaluate(directory, rule_id=RULE_ID):
-    if rule_id != RULE_ID: raise EvaluationInputError('UNSUPPORTED_RULE')
+    if rule_id not in (RULE_ID,BUDGET_RULE_ID): raise EvaluationInputError('UNSUPPORTED_RULE')
     directory = local_directory(directory)
-    result = dict(schema_version='p3-evaluation-v1', evaluator_version='1.0', rule_id=RULE_ID,
+    result = dict(schema_version='p3-evaluation-v1', evaluator_version='1.0', rule_id=rule_id,
         status='INSUFFICIENT_EVIDENCE', evidence_directory=str(directory), subject_run_id=None,
         provenance='UNVERIFIED_INPUT', evidence_level='LOCAL_OFFLINE_RECORD_INTERNAL_CONSISTENCY',
         checked_artifacts=[], observed_facts={}, evidence_references=[],
@@ -357,11 +483,14 @@ def evaluate(directory, rule_id=RULE_ID):
                      'No real API verdict, formal course grade or peer reproduction.'],
         missing_evidence=[], suggested_next_check=[], human_signoff='pending', score=None,
         approval_verified=False, source_authenticated=False)
+    if rule_id == BUDGET_RULE_ID:
+        result['limitations'][0] = 'Fixed evaluation benchmark p3-eval-trial-eight-v1: at most 8; actual runtime budget configuration is NOT independently bound.'
+        result['limitations'].append('No independent 90-second, concurrency, cancellation, or stop-effective ordering proof; not full REQ-010/GWT-N04/N05 acceptance.')
     try:
         blobs = read_snapshot(directory)
         result['checked_artifacts'] = [dict(name=n, bytes=len(b), sha256=hashlib.sha256(b).hexdigest())
                                        for n, b in blobs.items()]
-        verdict = inspect(blobs, result)
+        verdict = inspect(blobs, result) if rule_id == RULE_ID else inspect_budget(blobs,result)
         checked = verify_run(directory)
         require(checked.get('integrity') == 'VERIFIED' and checked.get('approval_verified') is False
                 and checked.get('appended_bytes') == 0, 'VERIFY_RUN_INCOMPLETE')
@@ -388,7 +517,7 @@ def main(argv=None):
     try:
         parser = Parser(description=__doc__)
         parser.add_argument('--run', required=True)
-        parser.add_argument('--rule', required=True, choices=[RULE_ID])
+        parser.add_argument('--rule', required=True, choices=[RULE_ID,BUDGET_RULE_ID])
         args = parser.parse_args(argv)
         result = evaluate(args.run, args.rule)
     except EvaluationInputError as exc:

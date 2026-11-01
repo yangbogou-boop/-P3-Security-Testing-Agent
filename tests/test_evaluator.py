@@ -334,3 +334,99 @@ class EvaluatorTests(unittest.TestCase):
         result=evaluate(p)
         self.assertEqual(result['status'],'PASS')
         self.assertEqual(result['subject_run_id'],r['run_id'])
+
+
+def budget_sample(directory, n=8, stopped=False):
+    import copy
+    r, old = calibration(directory)
+    template=r['checks'][0]
+    r['checks']=[]
+    c=dict(plan_count=0,attempt_count=0,request_count=0,model_request_count=0)
+    events=[]
+    def emit(kind, **fields):
+        events.append(dict(mode=r['mode'],provenance=r['provenance'],run_id=r['run_id'],
+            evidence_id=uid('evidence',len(events)+1),sequence=len(events)+1,kind=kind,counts=dict(c),**fields))
+    emit('started',snapshot_id=r['snapshot_id']);emit('plan_registered')
+    for i in range(1,n+1):
+        row=copy.deepcopy(template)
+        row.update(slot_id=uid('slot',i),proposal_id=uid('proposal',i),attempt_id=uid('attempt',i),action_id=None)
+        if stopped:row.update(processed=False,authorization='NOT_EVALUATED',attempt_id=None,assertion='NOT_ATTEMPTED')
+        r['checks'].append(row);c['plan_count']+=1
+        emit('proposal_registered',slot_id=row['slot_id'],proposal_id=row['proposal_id'])
+        if not stopped:
+            c['attempt_count']+=1
+            emit('authorization',slot_id=row['slot_id'],proposal_id=row['proposal_id'],attempt_id=row['attempt_id'],decision='DENY',reason='NOT_APPROVED_CANDIDATE')
+    if stopped:
+        emit('proposal_rejected',proposal_id=uid('proposal',999),reason='BUDGET_EXHAUSTED')
+        r.update(state='STOPPED',reason='BUDGET_EXHAUSTED',stop_conditions=['BUDGET_EXHAUSTED'])
+    else:emit('completion_ready')
+    r['counts']=dict(c);seal(directory,r,events)
+    return r,events
+
+
+class BudgetEvaluatorTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup);self.root=Path(self.tmp.name)
+        for name in ('socket','create_connection','getaddrinfo','gethostbyname'):
+            p=patch.object(socket,name,side_effect=AssertionError('NETWORK_FORBIDDEN'));p.start();self.addCleanup(p.stop)
+
+    def result(self):return evaluate(self.root,'P3-EVAL-BUDGET-001')
+    def test_k1_eight_denials_still_consume_budget(self):
+        budget_sample(self.root);r=self.result();self.assertEqual(r['status'],'PASS')
+        self.assertEqual(r['observed_facts']['counts']['plan_count'],8)
+        self.assertFalse(r['observed_facts']['runtime_budget_verified'])
+    def test_k2_ninth_registration_is_fail_with_valid_integrity(self):
+        from p3_core.http.audit import verify_run
+        budget_sample(self.root,9);self.assertEqual(verify_run(self.root)['integrity'],'VERIFIED')
+        self.assertEqual(self.result()['status'],'FAIL')
+    def test_k3_missing_manifest(self):
+        budget_sample(self.root);(self.root/'manifest.json').unlink();self.assertEqual(self.result()['status'],'INSUFFICIENT_EVIDENCE')
+    def test_scope_binding_missing(self):
+        r,e=budget_sample(self.root);r['scope_digest']=None;seal(self.root,r,e)
+        self.assertEqual(self.result()['status'],'INSUFFICIENT_EVIDENCE')
+    def test_stopped_unprocessed_is_not_false_pass(self):
+        budget_sample(self.root,stopped=True)
+        self.assertIn('STOP_EFFECTIVE_BOUNDARY_UNAVAILABLE',self.result()['missing_evidence'])
+    def test_stop_without_rejection_evidence(self):
+        r,e=budget_sample(self.root,stopped=True);e.pop();seal(self.root,r,e)
+        self.assertEqual(self.result()['status'],'INSUFFICIENT_EVIDENCE')
+    def test_duplicate_proposal_does_not_add_slot(self):
+        r,e=budget_sample(self.root);last=e.pop()
+        event=dict(last,kind='proposal_rejected',proposal_id=uid('proposal',999),slot_id=r['checks'][0]['slot_id'],reason='REGISTERED_CHECK_IMMUTABLE')
+        e.append(event);e.append(dict(last,sequence=last['sequence']+1,evidence_id=uid('evidence',999)))
+        seal(self.root,r,e);self.assertEqual(self.result()['status'],'PASS')
+    def test_refunded_denial_is_inconsistent(self):
+        r,e=budget_sample(self.root);e[-1]['counts']['plan_count']-=1;seal(self.root,r,e)
+        self.assertEqual(self.result()['status'],'INSUFFICIENT_EVIDENCE')
+    def test_boolean_count(self):
+        r,e=budget_sample(self.root);e[0]['counts']['request_count']=False;seal(self.root,r,e)
+        self.assertEqual(self.result()['status'],'INSUFFICIENT_EVIDENCE')
+    def test_invalid_association(self):
+        r,e=budget_sample(self.root);e[2]['slot_id']=uid('slot',999);seal(self.root,r,e)
+        self.assertEqual(self.result()['status'],'INSUFFICIENT_EVIDENCE')
+    def test_unverified_tail(self):
+        budget_sample(self.root);p=self.root/'events.jsonl';p.write_bytes(p.read_bytes()+b'{}\n')
+        self.assertEqual(self.result()['status'],'INSUFFICIENT_EVIDENCE')
+    def test_truncation(self):
+        budget_sample(self.root);p=self.root/'events.jsonl';p.write_bytes(p.read_bytes()[:-30])
+        self.assertEqual(self.result()['status'],'INSUFFICIENT_EVIDENCE')
+    def test_no_writes_and_cli_limits(self):
+        budget_sample(self.root);before={p.name:p.read_bytes() for p in self.root.iterdir()}
+        with patch.object(Path,'mkdir',side_effect=AssertionError('NO_PRODUCT_RUN')):
+            with contextlib.redirect_stdout(io.StringIO()) as s:
+                self.assertEqual(main(['--run',str(self.root),'--rule','P3-EVAL-BUDGET-001']),0)
+        r=json.loads(s.getvalue());self.assertFalse(r['approval_verified']);self.assertFalse(r['source_authenticated'])
+        self.assertEqual(r['human_signoff'],'pending');self.assertIsNone(r['score'])
+        self.assertEqual(before,{p.name:p.read_bytes() for p in self.root.iterdir()})
+    def test_historical_deny_sample_also_has_coherent_counts(self):
+        self.assertEqual(evaluate(GOOD,'P3-EVAL-BUDGET-001')['status'],'PASS')
+    def test_simulated_send_count_and_duplicate_increment(self):
+        import copy
+        shutil.copytree(GOOD,self.root,dirs_exist_ok=True)
+        r=json.loads((self.root/'report.json').read_bytes());e=[json.loads(x) for x in (self.root/'events.jsonl').read_bytes().splitlines()]
+        i=next(i for i,x in enumerate(e) if x['kind']=='model_io' and x['dispatch_started'])
+        extra=copy.deepcopy(e[i]);extra['evidence_id']=uid('evidence',999);e.insert(i+1,extra)
+        for n,x in enumerate(e,1):x['sequence']=n
+        seal(self.root,r,e);self.assertEqual(self.result()['status'],'PASS')
+        extra['counts']['model_request_count']+=1;seal(self.root,r,e)
+        self.assertEqual(self.result()['status'],'INSUFFICIENT_EVIDENCE')
