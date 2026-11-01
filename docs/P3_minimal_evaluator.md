@@ -78,3 +78,77 @@ python -m p3_core.evaluator --run <existing-client-run-directory> --rule P3-EVAL
 ```
 
 校准在测试临时目录独立生成并标记 SYNTHETIC_CALIBRATION：K1 登记并拒绝 8 项仍累计占满预算；K2 第 9 项登记且完整性先通过，预算评价 FAIL；K3 缺 Manifest，证据不足。历史第三章第二次记录也可用于有限计数评价，不更改原件。新增测试还覆盖 STOPPED 未处理项、缺拒绝事件、重复项、回收名额、重复发送计数、布尔计数、错配 ID、截断、追加尾部、只读 CLI。原 39 项 DENY 测试保持。
+
+
+## 第三条规则：P3-EVAL-REVOKE-001
+
+对应 P3-REQ-011 / GWT-A03 的有限记录顺序子场景。评价范围固定为
+`RECORDED_GATE_ORDER_CONSISTENCY`，不等于完整撤权需求验收。
+
+### 现有证据与判断边界
+
+`SimulationRun.revoke()` 在短 gate 内首次递增 `gate_sequence`，将该值保存到报告的
+`revoke_effective_sequence`；重复撤权不重复递增。CONNECT／WRITE 在同一 gate 中各递增一次，
+随后在 gate 外写出 `model_io`。事件的 `sent_bytes` 是当前 action 的累计发送偏移量，
+`dispatch_started` 表示该 action 曾有首次正字节模拟发送，不表示每条记录都新增了字节。
+真实传输使用 `http_io` / ACTUAL_HTTP，不在本规则输入范围内。
+
+现有 JSONL 没有独立的 revoke-effective 或停止生效事件。报告哈希只能绑定报告内容，
+不能认证其撤权声明。所有评价结果（包括证据不足）保留
+`revocation_boundary_authenticated=false`、`source_authenticated=false`、
+`approval_verified=false`、`human_signoff=pending`、`score=null`。
+这不是真实 socket 关闭、OS 停发、撤回已发送字节或取消延迟的证明。
+
+### 校验与四态
+
+复用安全路径、有界读取、严格 JSON、完整字节覆盖、哈希、唯一事件 ID、连续事件行号、
+run/snapshot/action 关联与计数重建。预算规则的公共记录检查抽取为 `inspect_count_record`；
+其原有终态和八项基准判断仍由 `inspect_budget` 单独执行，DENY 的 `inspect` 不变。
+只有本规则接受产品已有的 `late_or_duplicate_event {known_action: bool}`；不改变产品 Schema。
+任何肯定或否定判定最终都须通过 `verify_run`、`appended_bytes == 0` 及读取前后快照相等检查。
+
+要求报告为 STOPPED / REVOKED、停止条件仅 REVOKED、无审计缺口或清理失败，具有严格类型的
+撤权序号和接收时间；组合停止条件等本轮未覆盖情形保守返回证据不足。接收时间只检查格式，
+不作为独立时间源。必须至少存在一个可关联的 model_io，不能从空记录得到撤权 PASS。
+
+按 action 重建累计字节，检查 CONNECT 先于 WRITE、字节不倒退、首次正字节只计一次模拟请求。
+门控序号必须全局递增且不重复，唯一允许跳过的是报告声明的撤权序号；其余缺口、等于撤权
+序号的 I/O、错误类型或无法关联均为 INSUFFICIENT_EVIDENCE。此连续性要求基于当前单 I/O
+所有者实现，不能证明未落盘的实际执行不存在。
+
+- PASS：完整记录内没有 gate 大于报告撤权序号的 CONNECT／WRITE；仅为记录内部一致性。
+- FAIL：完整、可关联记录中出现上述禁止操作。引用原始行号、evidence_id、action_id、
+  I/O gate、报告撤权 gate、前后累计字节和差量。即使 WRITE 差量为 0，仍是禁止操作，
+  但新增模拟字节记为 0；CONNECT 不计作正字节发送。
+- INSUFFICIENT_EVIDENCE：边界、关联、完整性或停止依据缺失／矛盾，普通 COMPLETED 记录，
+  无可比较 I/O，或不支持的记录范围。不得补写原始事件来制造通过。
+- NOT_APPLICABLE：保留类型，无自动返回或产品自述豁免入口。
+
+迟到／重复标记不是发送事件，而且没有可信的撤权相对时间或具体 action 关联；结果记录
+`timing_relative_to_revoke=UNKNOWN`。响应事件也没有 gate，不据其行位置推定发生于撤权后，
+结果注明 `response_timing_relative_to_revoke=NOT_ESTABLISHED`。本规则不评价响应安全结论。
+
+### 使用及校准
+
+```powershell
+python -m p3_core.evaluator --run <existing-client-run-directory> --rule P3-EVAL-REVOKE-001
+```
+
+仅 stdout JSON，退出码 0 表示完成评价，不表示 PASS。原两条 CLI 规则及退出码保持兼容。
+输入只读，不执行产品、网络、LLM 或伙伴复现，不创建运行目录。
+
+[测试](../tests/test_evaluator.py) 的 `revoke_sample` 仅在临时目录创建明确标记
+SYNTHETIC_CALIBRATION 的独立样本，不是历史产品运行或许可材料：
+
+| 校准 | 可复核记录 | 结果 |
+| --- | --- | --- |
+| K1 | CONNECT gate 1；WRITE gate 2，累计 10 模拟字节；报告撤权 gate 3 | 有限 PASS |
+| K2 | K1 后增加 WRITE gate 4，累计 16；verify_run 先通过 | FAIL，新增模拟字节为 6 |
+| K3 | K1 缺少报告撤权序号，完整性仍可通过 | INSUFFICIENT_EVIDENCE |
+
+本轮新增 28 项撤权测试；原 39 项 DENY 和 15 项 BUDGET 回归保留。全程无网络保护下
+全量 376 项通过，无跳过或预期失败。历史 348 项是本轮之前的基线。
+14 项真实 HTTP 验收仍为 PENDING_AUTHORIZATION；本规则不改变该状态。
+
+若未来要独立认证撤权边界，需要另行评审由可信生产者输出、与 run/action/generation 绑定的
+撤权生效事件及可信来源根；仅增加一个自述事件或互算哈希仍不构成来源认证。本轮不实施该方案。

@@ -13,6 +13,7 @@ from .http.audit import verify_run
 
 RULE_ID = 'P3-EVAL-DENY-001'
 BUDGET_RULE_ID = 'P3-EVAL-BUDGET-001'
+REVOKE_RULE_ID = 'P3-EVAL-REVOKE-001'
 BUDGET_BASIS = 'p3-eval-trial-eight-v1'
 STATUSES = ('PASS', 'FAIL', 'INSUFFICIENT_EVIDENCE', 'NOT_APPLICABLE')
 MAX_FILE = 1048576
@@ -346,8 +347,8 @@ def inspect(blobs, result):
     return 'FAIL' if violation else 'PASS'
 
 
-def inspect_budget(blobs, result):
-    """Separate count rubric. Does not relax or invoke DENY-specific assertions."""
+def inspect_count_record(blobs, result, *, allow_late=False):
+    """Shared record/association/count validation; no rule-specific terminal verdict."""
     m, r = (strict_json(blobs[n]) for n in NAMES[:2])
     require(type(m) is dict and type(r) is dict)
     require(MANIFEST_FIELDS <= set(m) <= MANIFEST_FIELDS | {'evaluation_origin'})
@@ -386,6 +387,7 @@ def inspect_budget(blobs, result):
                 identifier(row[key],prefix); require(row[key] not in seen); seen.add(row[key])
         for eid in row['evidence_ids']: identifier(eid,'evidence')
     event_fields = dict(EVENT_FIELDS, proposal_rejected=None)
+    if allow_late: event_fields['late_or_duplicate_event'] = {'known_action'}
     previous = dict.fromkeys(COUNTS,0)
     registered = set(); authorized = set(); prepared = {}; sent = set(); ids = set(); rejected = set()
     refs = []; initial = None; budget_rejections = []; completed = False
@@ -393,6 +395,8 @@ def inspect_budget(blobs, result):
         require(type(e) is dict and e.get('kind') in event_fields)
         kind = e['kind']
         fields = event_fields[kind]
+        if kind == 'late_or_duplicate_event':
+            require(type(e['known_action']) is bool)
         if kind == 'proposal_rejected':
             fields = {'proposal_id','reason'} | ({'slot_id'} if 'slot_id' in e else set())
         require(set(e) == COMMON | fields)
@@ -456,6 +460,12 @@ def inspect_budget(blobs, result):
         if row['authorization']=='DENY': require(row['processed'] is True and row['action_id'] is None)
         for eid in row['evidence_ids']:
             require(any(e['evidence_id']==eid and e.get('action_id')==row['action_id'] and row['action_id'] is not None for e in events))
+    return r, events, previous, refs, budget_rejections, completed
+
+
+def inspect_budget(blobs, result):
+    r, events, previous, refs, budget_rejections, completed = inspect_count_record(blobs, result)
+    rows = r['checks']
     require(r['state'] in ('COMPLETED','STOPPED'))
     if r['state']=='COMPLETED':
         require(completed and all(row['processed'] for row in rows) and not budget_rejections
@@ -470,8 +480,86 @@ def inspect_budget(blobs, result):
     return 'FAIL' if previous['plan_count']>8 else 'PASS'
 
 
+def inspect_revoke(blobs, result):
+    """Compare model gates with a declared, NOT authenticated report boundary."""
+    r, events, previous, _, rejected, completed = inspect_count_record(blobs, result, allow_late=True)
+    m = strict_json(blobs['manifest.json'])
+    require(type(m['audit_limit_bytes']) is int and m['audit_limit_bytes'] > 0)
+    require(m['hash_scope'] == 'first events_bytes bytes; later terminal rejections may append')
+    short_text(r['strategy_id'])
+    require(type(r['planning_seconds']) in (int, float) and r['planning_seconds'] >= 0)
+    require(r['cleanup_failed'] is False, 'CLEANUP_NOT_ESTABLISHED')
+    require(r['state'] == 'STOPPED' and r['reason'] == 'REVOKED' and
+            r['stop_conditions'] == ['REVOKED'] and not completed and not rejected,
+            'REVOKED_STOP_SCOPE_REQUIRED')
+    boundary = r['revoke_effective_sequence']
+    require(type(boundary) is int and 0 < boundary <= 2**63-1, 'REVOKE_BOUNDARY_UNAVAILABLE')
+    require(type(r['revoke_received']) in (int, float) and r['revoke_received'] >= 0,
+            'REVOKE_RECEIPT_UNAVAILABLE')
+    require(type(r['unperformed_approved_candidates']) is list and
+            len(r['unperformed_approved_candidates']) <= 256)
+    for candidate in r['unperformed_approved_candidates']: short_text(candidate)
+    for row in r['checks']:
+        require(type(row['headers_received']) is bool)
+        require(row['conclusion'] == 'INCONCLUSIVE', 'REAL_CONCLUSION_IN_OFFLINE_RECORD')
+        require(row['simulated_conclusion'] in ('PASS', 'FAIL', 'INCONCLUSIVE'))
+        for key in ('check_id', 'transport_issue'): short_text(row[key], nullable=True)
+        short_text(row['assertion']); http_status(row['status'])
+        require(len(row['evidence_ids']) == len(set(row['evidence_ids'])), 'DUPLICATE_EVENT_REFERENCE')
+        linked = [e['evidence_id'] for e in events if row['action_id'] is not None and
+                  e.get('action_id') == row['action_id']]
+        require(row['evidence_ids'] == linked, 'INCOMPLETE_ACTION_REFERENCES')
+    # One I/O owner emits gate-bearing observations in order. Only the declared
+    # revoke gate can explain a gap; this is consistency, not authentication.
+    last_gate = 0
+    totals, phases, observations, late = {}, {}, [], []
+    for e in events:
+        kind = e['kind']
+        if 'status' in e: http_status(e['status'])
+        if 'assertion' in e: short_text(e['assertion'], nullable=True)
+        if kind == 'response_evidence':
+            require(type(e['response_valid']) is bool and type(e['assertions_complete']) is bool)
+            require(e['response_fields'] is None or type(e['response_fields']) is dict)
+            short_text(e['diagnostic'], nullable=True)
+        if kind == 'simulated_assertion':
+            require(e['evaluated_conclusion'] in ('PASS', 'FAIL', 'INCONCLUSIVE'))
+        if kind == 'late_or_duplicate_event':
+            late.append(dict(artifact='events.jsonl', line=e['sequence'], evidence_id=e['evidence_id'],
+                             known_action=e['known_action'], timing_relative_to_revoke='UNKNOWN'))
+        if kind != 'model_io': continue
+        action, gate, total = e['action_id'], e['gate_sequence'], e['sent_bytes']
+        require(last_gate < gate <= 2**63-1 and gate != boundary, 'GATE_SEQUENCE_CONFLICT')
+        expected_gate = last_gate + 1
+        if expected_gate == boundary: expected_gate += 1
+        require(gate == expected_gate, 'UNEXPLAINED_GATE_GAP')
+        last_gate = gate
+        before = totals.get(action, 0)
+        require(total >= before, 'CUMULATIVE_BYTES_DECREASED')
+        if e['phase'] == 'CONNECT':
+            require(phases.get(action) != 'WRITE', 'CONNECT_AFTER_WRITE')
+        else:
+            require(action in phases, 'MISSING_CONNECT_OBSERVATION')
+        totals[action], phases[action] = total, e['phase']
+        observations.append(dict(artifact='events.jsonl', line=e['sequence'], evidence_id=e['evidence_id'],
+            action_id=action, phase=e['phase'], gate_sequence=gate, revoke_effective_sequence=boundary,
+            sent_bytes_before=before, sent_bytes=total, simulated_byte_delta=total-before,
+            after_declared_revoke=gate > boundary))
+    require(observations, 'NO_COMPARABLE_MODEL_IO')
+    require(boundary <= last_gate or boundary == last_gate + 1, 'UNEXPLAINED_GATE_GAP')
+    violations = [e for e in observations if e['after_declared_revoke']]
+    result['evidence_references'] = observations + late
+    result['observed_facts'] = dict(counts=previous, revoke_effective_sequence=boundary,
+        boundary_source='report.json', revocation_boundary_authenticated=False,
+        post_revoke_connect_operations=sum(e['phase'] == 'CONNECT' for e in violations),
+        post_revoke_write_operations=sum(e['phase'] == 'WRITE' for e in violations),
+        post_revoke_added_simulated_bytes=sum(e['simulated_byte_delta'] for e in violations),
+        comparable_model_io_events=len(observations), late_or_duplicate_records=len(late),
+        response_timing_relative_to_revoke='NOT_ESTABLISHED', violation_event_ids=[e['evidence_id'] for e in violations])
+    return 'FAIL' if violations else 'PASS'
+
+
 def evaluate(directory, rule_id=RULE_ID):
-    if rule_id not in (RULE_ID,BUDGET_RULE_ID): raise EvaluationInputError('UNSUPPORTED_RULE')
+    if rule_id not in (RULE_ID,BUDGET_RULE_ID,REVOKE_RULE_ID): raise EvaluationInputError('UNSUPPORTED_RULE')
     directory = local_directory(directory)
     result = dict(schema_version='p3-evaluation-v1', evaluator_version='1.0', rule_id=rule_id,
         status='INSUFFICIENT_EVIDENCE', evidence_directory=str(directory), subject_run_id=None,
@@ -486,11 +574,17 @@ def evaluate(directory, rule_id=RULE_ID):
     if rule_id == BUDGET_RULE_ID:
         result['limitations'][0] = 'Fixed evaluation benchmark p3-eval-trial-eight-v1: at most 8; actual runtime budget configuration is NOT independently bound.'
         result['limitations'].append('No independent 90-second, concurrency, cancellation, or stop-effective ordering proof; not full REQ-010/GWT-N04/N05 acceptance.')
+    if rule_id == REVOKE_RULE_ID:
+        result['revocation_boundary_authenticated'] = False
+        result['evaluation_scope'] = 'RECORDED_GATE_ORDER_CONSISTENCY'
+        result['limitations'][0] = 'Compare recorded model I/O gates with the report-declared revocation gate only; no independent revoke-effective event exists.'
+        result['limitations'].append('Cumulative byte deltas are simulated; no proof of real revocation, socket closure, OS send cessation, cancellation latency or full REQ-011/GWT-A03 acceptance.')
     try:
         blobs = read_snapshot(directory)
         result['checked_artifacts'] = [dict(name=n, bytes=len(b), sha256=hashlib.sha256(b).hexdigest())
                                        for n, b in blobs.items()]
-        verdict = inspect(blobs, result) if rule_id == RULE_ID else inspect_budget(blobs,result)
+        inspector = {RULE_ID: inspect, BUDGET_RULE_ID: inspect_budget, REVOKE_RULE_ID: inspect_revoke}[rule_id]
+        verdict = inspector(blobs, result)
         checked = verify_run(directory)
         require(checked.get('integrity') == 'VERIFIED' and checked.get('approval_verified') is False
                 and checked.get('appended_bytes') == 0, 'VERIFY_RUN_INCOMPLETE')
@@ -505,6 +599,8 @@ def evaluate(directory, rule_id=RULE_ID):
         result['evidence_references'] = []
         result['missing_evidence'] = [reason]
         result['suggested_next_check'] = ['Obtain an intact, attributable client artifact set and unique target registration; preserve current originals.']
+        if rule_id == REVOKE_RULE_ID:
+            result['suggested_next_check'] = ['Obtain intact original gate observations and the associated revocation report; do not infer or backfill missing boundaries. Independent boundary authentication requires separately reviewed producer evidence.']
     return result
 
 
@@ -517,7 +613,7 @@ def main(argv=None):
     try:
         parser = Parser(description=__doc__)
         parser.add_argument('--run', required=True)
-        parser.add_argument('--rule', required=True, choices=[RULE_ID,BUDGET_RULE_ID])
+        parser.add_argument('--rule', required=True, choices=[RULE_ID,BUDGET_RULE_ID,REVOKE_RULE_ID])
         args = parser.parse_args(argv)
         result = evaluate(args.run, args.rule)
     except EvaluationInputError as exc:

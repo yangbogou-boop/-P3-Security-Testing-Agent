@@ -430,3 +430,211 @@ class BudgetEvaluatorTests(unittest.TestCase):
         seal(self.root,r,e);self.assertEqual(self.result()['status'],'PASS')
         extra['counts']['model_request_count']+=1;seal(self.root,r,e)
         self.assertEqual(self.result()['status'],'INSUFFICIENT_EVIDENCE')
+
+
+REVOKE_RULE = 'P3-EVAL-REVOKE-001'
+
+
+def revoke_sample(directory, variant='K1'):
+    """Independent synthetic gate trace; never a product execution or permission."""
+    import copy
+    r, original = calibration(directory)
+    r.update(state='STOPPED', reason='REVOKED', stop_conditions=['REVOKED'],
+             revoke_received=1.0, revoke_effective_sequence=3)
+    row = r['checks'][0]
+    row.update(authorization='ALLOW', processed=False, assertion='NOT_ATTEMPTED', transport_issue='REVOKED')
+    events = copy.deepcopy(original[:5])
+    events[3].update(decision='ALLOW', reason='APPROVED')
+    def emit(phase, gate, total):
+        c = dict(events[-1]['counts'], model_request_count=int(total > 0))
+        events.append(dict(mode=r['mode'], provenance=r['provenance'], run_id=r['run_id'],
+            evidence_id=uid('evidence',len(events)+1), sequence=len(events)+1, kind='model_io', counts=c,
+            action_id=row['action_id'], phase=phase, gate_sequence=gate, sent_bytes=total, dispatch_started=total>0))
+    emit('CONNECT',1,0); emit('WRITE',2,10)
+    if variant == 'K2': emit('WRITE',4,16)
+    if variant == 'K3': r['revoke_effective_sequence']=None
+    r['counts']=dict(events[-1]['counts'])
+    row['evidence_ids']=[e['evidence_id'] for e in events if e.get('action_id')==row['action_id']]
+    seal(directory,r,events)
+    return r,events
+
+
+class RevokeEvaluatorTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup);self.root=Path(self.tmp.name)
+        for name in ('socket','create_connection','getaddrinfo','gethostbyname','gethostbyname_ex'):
+            p=patch.object(socket,name,side_effect=AssertionError('NETWORK_FORBIDDEN'));p.start();self.addCleanup(p.stop)
+
+    def result(self): return evaluate(self.root,REVOKE_RULE)
+
+    def insufficient(self):
+        r=self.result();self.assertEqual(r['status'],'INSUFFICIENT_EVIDENCE');return r
+
+    def save(self,r,e):
+        for row in r['checks']:
+            row['evidence_ids']=[x['evidence_id'] for x in e if row['action_id'] and x.get('action_id')==row['action_id']]
+        seal(self.root,r,e)
+
+    def test_k1_first_send_before_declared_boundary(self):
+        revoke_sample(self.root);r=self.result();self.assertEqual(r['status'],'PASS')
+        self.assertEqual(r['evaluation_scope'],'RECORDED_GATE_ORDER_CONSISTENCY')
+        self.assertFalse(r['revocation_boundary_authenticated'])
+        self.assertEqual(r['observed_facts']['post_revoke_added_simulated_bytes'],0)
+
+    def test_k2_valid_integrity_then_behavior_fail(self):
+        from p3_core.http.audit import verify_run
+        r,e=revoke_sample(self.root,'K2')
+        self.assertEqual(verify_run(self.root)['integrity'],'VERIFIED')
+        self.assertEqual(verify_run(self.root)['appended_bytes'],0)
+        result=self.result();self.assertEqual(result['status'],'FAIL')
+        self.assertEqual(result['observed_facts']['post_revoke_added_simulated_bytes'],6)
+        ref=result['evidence_references'][-1]
+        self.assertEqual(e[ref['line']-1]['evidence_id'],ref['evidence_id'])
+        self.assertEqual(ref['gate_sequence'],4);self.assertEqual(ref['revoke_effective_sequence'],3)
+
+    def test_k3_missing_boundary(self):
+        revoke_sample(self.root,'K3');self.assertIn('REVOKE_BOUNDARY_UNAVAILABLE',self.insufficient()['missing_evidence'])
+
+    def test_partial_sends_before_revoke_count_once(self):
+        r,e=revoke_sample(self.root,'K2');r['revoke_effective_sequence']=4;e[-1]['gate_sequence']=3
+        self.save(r,e);result=self.result();self.assertEqual(result['status'],'PASS')
+        self.assertEqual(result['observed_facts']['counts']['model_request_count'],1)
+        self.assertEqual([x['simulated_byte_delta'] for x in result['evidence_references']],[0,10,6])
+
+    def test_post_revoke_write_without_byte_growth_is_operation_not_send(self):
+        r,e=revoke_sample(self.root,'K2');e[-1]['sent_bytes']=10;self.save(r,e)
+        result=self.result();self.assertEqual(result['status'],'FAIL')
+        self.assertEqual(result['observed_facts']['post_revoke_write_operations'],1)
+        self.assertEqual(result['observed_facts']['post_revoke_added_simulated_bytes'],0)
+
+    def test_post_revoke_connect_is_not_positive_send(self):
+        r,e=revoke_sample(self.root);e.pop();r['revoke_effective_sequence']=1;e[-1]['gate_sequence']=2
+        r['counts']=dict(e[-1]['counts']);self.save(r,e)
+        result=self.result();self.assertEqual(result['status'],'FAIL')
+        self.assertEqual(result['observed_facts']['post_revoke_connect_operations'],1)
+        self.assertEqual(result['observed_facts']['post_revoke_added_simulated_bytes'],0)
+        self.assertEqual(result['observed_facts']['counts']['model_request_count'],0)
+
+    def test_late_marker_not_mistaken_for_write(self):
+        r,e=revoke_sample(self.root)
+        e.append(dict(mode=r['mode'],provenance=r['provenance'],run_id=r['run_id'],
+            evidence_id=uid('evidence',99),sequence=len(e)+1,kind='late_or_duplicate_event',
+            counts=dict(r['counts']),known_action=True))
+        self.save(r,e);result=self.result();self.assertEqual(result['status'],'PASS')
+        self.assertEqual(result['observed_facts']['late_or_duplicate_records'],1)
+        self.assertEqual(result['evidence_references'][-1]['timing_relative_to_revoke'],'UNKNOWN')
+
+    def test_duplicate_decreasing_equal_boundary_or_invalid_gate(self):
+        for value in (1,3,True,None,0,'4',2**64):
+            with self.subTest(value=value):
+                r,e=revoke_sample(self.root);e[-1]['gate_sequence']=value;self.save(r,e);self.insufficient()
+
+    def test_missing_gate(self):
+        r,e=revoke_sample(self.root);del e[-1]['gate_sequence'];self.save(r,e);self.insufficient()
+
+    def test_invalid_boundary_types(self):
+        for value in (True,0,-1,'3',2**64):
+            with self.subTest(value=value):
+                r,e=revoke_sample(self.root);r['revoke_effective_sequence']=value;self.save(r,e);self.insufficient()
+
+    def test_cumulative_bytes_cannot_decrease(self):
+        r,e=revoke_sample(self.root,'K2');e[-1]['sent_bytes']=9;self.save(r,e);self.insufficient()
+
+    def test_write_requires_connect_observation(self):
+        r,e=revoke_sample(self.root);e[-2].update(phase='WRITE');self.save(r,e);self.insufficient()
+
+    def test_connect_cannot_follow_write(self):
+        r,e=revoke_sample(self.root,'K2');e[-1].update(phase='CONNECT',sent_bytes=0,dispatch_started=False)
+        self.save(r,e);self.insufficient()
+
+    def test_cross_run_action_or_report_association(self):
+        for key,value in (('run_id',uid('run',999)),('action_id',uid('action',999))):
+            with self.subTest(key=key):
+                r,e=revoke_sample(self.root);e[-1][key]=value;self.save(r,e);self.insufficient()
+        r,e=revoke_sample(self.root);r['checks'][0]['attempt_id']=uid('attempt',999)
+        self.save(r,e);self.insufficient()
+
+    def test_duplicate_evidence_and_sequence_gap(self):
+        for key,value in (('evidence_id',uid('evidence',1)),('sequence',99)):
+            with self.subTest(key=key):
+                r,e=revoke_sample(self.root);e[-1][key]=value;self.save(r,e);self.insufficient()
+
+    def test_unverified_tail(self):
+        from p3_core.http.audit import verify_run
+        revoke_sample(self.root);p=self.root/'events.jsonl';p.write_bytes(p.read_bytes()+b'{}\n')
+        self.assertEqual(verify_run(self.root)['appended_bytes'],3);self.insufficient()
+
+    def test_missing_manifest_and_bad_hash(self):
+        revoke_sample(self.root);(self.root/'manifest.json').unlink();self.insufficient()
+        revoke_sample(self.root);p=self.root/'report.json';p.write_bytes(p.read_bytes()+b'BROKEN');self.insufficient()
+
+    def test_truncated_events(self):
+        revoke_sample(self.root);p=self.root/'events.jsonl';p.write_bytes(p.read_bytes()[:-5]);self.insufficient()
+
+    def test_stopped_text_alone_or_completed_is_not_revoke_pass(self):
+        for updates in (dict(revoke_effective_sequence=None),dict(state='COMPLETED'),dict(reason='TIMEOUT'),dict(revoke_received=None)):
+            with self.subTest(updates=updates):
+                r,e=revoke_sample(self.root);r.update(updates);self.save(r,e);self.insufficient()
+        self.assertEqual(evaluate(GOOD,REVOKE_RULE)['status'],'INSUFFICIENT_EVIDENCE')
+
+    def test_unprocessed_stopped_row_supported_without_vacuous_pass(self):
+        r,e=revoke_sample(self.root);self.assertFalse(r['checks'][0]['processed'])
+        self.assertEqual(self.result()['status'],'PASS')
+        e=e[:3];row=r['checks'][0]
+        row.update(authorization='NOT_EVALUATED',attempt_id=None,action_id=None,evidence_ids=[])
+        r['counts']=dict(e[-1]['counts']);self.save(r,e);self.insufficient()
+
+    def test_counts_rebuilt_and_boolean_rejected(self):
+        for value in (True,0):
+            r,e=revoke_sample(self.root);e[-1]['counts']['model_request_count']=value
+            self.save(r,e);self.insufficient()
+
+    def test_audit_gap_cleanup_failure_and_bad_response_types(self):
+        for key in ('audit_gap','cleanup_failed'):
+            r,e=revoke_sample(self.root);r[key]=True;self.save(r,e);self.insufficient()
+        r,e=revoke_sample(self.root);r['checks'][0]['headers_received']=1;self.save(r,e);self.insufficient()
+
+    def test_readonly_cli_all_verdicts_and_no_product_execution(self):
+        for variant,status in EXPECTED.items():
+            revoke_sample(self.root,variant)
+            before={p.name:p.read_bytes() for p in self.root.iterdir()}
+            with patch.object(Path,'mkdir',side_effect=AssertionError('NO_RUN_CREATION')):
+                with contextlib.redirect_stdout(io.StringIO()) as stream:
+                    self.assertEqual(main(['--run',str(self.root),'--rule',REVOKE_RULE]),0)
+            result=json.loads(stream.getvalue());self.assertEqual(result['status'],status)
+            for key in ('source_authenticated','approval_verified','revocation_boundary_authenticated'):
+                self.assertIs(result[key],False)
+            self.assertEqual(result['human_signoff'],'pending');self.assertIsNone(result['score'])
+            self.assertEqual(before,{p.name:p.read_bytes() for p in self.root.iterdir()})
+
+    def test_recheck_changed_snapshot_and_verifier_tail(self):
+        from p3_core.http.audit import verify_run
+        revoke_sample(self.root);valid=verify_run(self.root)
+        with patch('p3_core.evaluator.verify_run',return_value=dict(valid,appended_bytes=1)):self.insufficient()
+        def changed(p):
+            result=verify_run(p);(p/'events.jsonl').write_bytes(b'{}\n');return result
+        with patch('p3_core.evaluator.verify_run',side_effect=changed):self.insufficient()
+
+    def test_historical_records_unchanged(self):
+        before={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for base in (GOOD,OLD) for p in base.rglob('*') if p.is_file()}
+        for p in (GOOD,OLD):self.assertEqual(evaluate(p,REVOKE_RULE)['status'],'INSUFFICIENT_EVIDENCE')
+        self.assertEqual(before,{p:hashlib.sha256(Path(p).read_bytes()).hexdigest() for p in before})
+
+    def test_gate_gap_other_than_declared_revoke_is_insufficient(self):
+        r,e=revoke_sample(self.root,'K2');e[-1]['gate_sequence']=5;self.save(r,e);self.insufficient()
+        r,e=revoke_sample(self.root);r['revoke_effective_sequence']=4;self.save(r,e);self.insufficient()
+
+    def test_response_record_is_not_new_send_or_authenticated_timing(self):
+        r,e=revoke_sample(self.root)
+        e.append(dict(mode=r['mode'],provenance=r['provenance'],run_id=r['run_id'],
+            evidence_id=uid('evidence',99),sequence=len(e)+1,kind='response_headers',
+            counts=dict(r['counts']),action_id=r['checks'][0]['action_id'],status=200))
+        r['checks'][0].update(headers_received=True,status=200)
+        self.save(r,e);result=self.result();self.assertEqual(result['status'],'PASS')
+        self.assertEqual(result['observed_facts']['post_revoke_added_simulated_bytes'],0)
+        self.assertEqual(result['observed_facts']['response_timing_relative_to_revoke'],'NOT_ESTABLISHED')
+
+    def test_missing_action_reference_and_unauthorized_preparation(self):
+        r,e=revoke_sample(self.root);r['checks'][0]['evidence_ids'].pop();seal(self.root,r,e);self.insufficient()
+        r,e=revoke_sample(self.root);r['checks'][0].update(authorization='DENY',assertion='NOT_APPROVED_CANDIDATE',processed=True)
+        e[3].update(decision='DENY',reason='NOT_APPROVED_CANDIDATE');self.save(r,e);self.insufficient()
