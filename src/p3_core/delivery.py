@@ -36,6 +36,12 @@ def main(argv=None):
     sim.add_argument('--strategy',choices=STRATEGIES,default='fixed')
     sim.add_argument('--fault',choices=[f for f in FAULTS if f])
     sim.add_argument('--output',required=True)
+    offline=sub.add_parser('offline', help='Recommended offline run and readable summary')
+    target=offline.add_mutually_exclusive_group(required=True)
+    target.add_argument('--output')
+    target.add_argument('--run')
+    offline.add_argument('--mode',choices=MODES,default='good')
+    offline.add_argument('--fault',choices=[f for f in FAULTS if f])
     compare=sub.add_parser('compare');compare.add_argument('--output',required=True)
     compare.add_argument('--repeats',type=int,default=3)
     validate=sub.add_parser('validate');validate.add_argument('config')
@@ -47,6 +53,18 @@ def main(argv=None):
     side=sub.add_parser('evidence-check');side.add_argument('directory')
     args=parser.parse_args(argv)
     try:
+        if args.command=='offline':
+            from .offline_summary import summarize, render, output_directory
+            if args.run and (args.mode!='good' or args.fault):
+                raise ValueError()
+            directory=args.run
+            if directory is None:
+                args.output=output_directory(args.output)
+                current=run_scenario(args.mode,'fixed',output=args.output,fault=args.fault)
+                directory=Path(args.output)/current['report']['run_id']
+            summary=summarize(directory)
+            print(render(summary))
+            return 1 if summary['status']!='COMPLETE' else 0
         if args.command=='simulate': result=run_scenario(args.mode,args.strategy,output=args.output,fault=args.fault)
         elif args.command=='compare':
             result=compare_strategies(args.output,args.repeats)

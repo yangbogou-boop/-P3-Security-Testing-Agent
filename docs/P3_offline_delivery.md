@@ -48,3 +48,33 @@ events.jsonl 仅保存受控事件、检查关联、已验证封闭 schema 的�
 许可落实后先审查材料和范围；由可信宿主创建服务与 Executor（本轮没有可直接启动它们的 CLI）；先跑 Good 配对，再分别重置 AUTH/BOLA/RBAC；随后覆盖异常、撤权竞态、审计故障和资源释放。必须测量操作系统实际 connect/send、取消延迟、端口占用与身份绑定，验证代理环境、重定向和地址变化没有旁路。普通 push 的 CI 继续只运行无网络测试。
 
 真实响应采集、系统调度竞态、真实取消延迟、完整 HTTP GWT、实际策略成本及正式人工验收均未执行。本轮模拟包不能替代这些材料。
+
+## Recommended offline entry
+
+From the repository root in PowerShell:
+```powershell
+$env:PYTHONPATH = 'src'
+$env:PYTHONDONTWRITEBYTECODE = '1'
+python -m p3_core.delivery offline --output "$env:TEMP/p3-offline-review" --mode bola
+python -m p3_core.delivery offline --run <run-directory>
+```
+
+`offline` uses the existing fixed-strategy memory simulation. Modes: good/auth/bola/rbac.
+Optional --fault uses existing simulate faults. --run reads evidence without replay.
+Existing commands and JSON behavior remain available. Exit 0 means completed with
+at least one valid simulated verdict; 1 means stopped, no valid tests, or insufficient
+evidence; 2 means input/output error. No exit code establishes API safety.
+
+The summary reads the saved report, verifies manifest/event association, rejects
+appended tails, and compares snapshots before and after verification. Invalid evidence
+suppresses check conclusions and retains unknown. Historical evidence is never repaired.
+Each check preserves authorization, execution, simulated_conclusion and conclusion.
+Null is displayed as unknown; original JSON remains in the evidence directory.
+VERIFIED means internal hash/association consistency, not authentic source, real
+permission, or proof of no OS send. This is product-record presentation, not the
+independent evaluator verdict. The existing evaluator remains the denial-rule entry.
+Real HTTP, LLM, OS observation and source authentication are not covered.
+human_signoff=pending; all 14 real HTTP cases remain PENDING_AUTHORIZATION.
+Peer reproduction follows human review and has not been performed.
+
+COMPLETE labels a completed offline record with at least one simulated verdict, not whole-system safety or real HTTP acceptance. model_request_count is simulated requests; request_count is actual HTTP requests. Output directories must be local and must not traverse links; existing evidence is never overwritten.

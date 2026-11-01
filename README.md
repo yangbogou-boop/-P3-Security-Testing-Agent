@@ -113,3 +113,33 @@ Controller 的 `start` 先静态预检再计时规划；`round(proposals=..., re
 新入口 `python -m p3_core.delivery` 提供 simulate、compare、validate、verify、network-plan；不提供真实网络启动开关。原 offline 入口保留。运行方法、可信宿主接口和许可门槛见 [交付说明](docs/P3_offline_delivery.md)。新增静态 live/service 模块只在可信宿主显式调用且登记核验通过后才可能创建 socket；本轮没有执行该路径。
 
 完整交付见 [人工审核报告](review/P3_remaining_development_review.md)、[22 项需求追踪](eval/P3_requirement_traceability.md)、[逐次比较结果](eval/P3_offline_strategy_results.json) 和 [真实集成待验清单](eval/P3_http_integration_status.json)。前述 B、C-1 段落为历史基线记录，历史 Evidence 保留。
+
+## Recommended offline entry
+
+From the repository root in PowerShell:
+```powershell
+$env:PYTHONPATH = 'src'
+$env:PYTHONDONTWRITEBYTECODE = '1'
+python -m p3_core.delivery offline --output "$env:TEMP/p3-offline-review" --mode bola
+python -m p3_core.delivery offline --run <run-directory>
+```
+
+`offline` uses the existing fixed-strategy memory simulation. Modes: good/auth/bola/rbac.
+Optional --fault uses existing simulate faults. --run reads evidence without replay.
+Existing commands and JSON behavior remain available. Exit 0 means completed with
+at least one valid simulated verdict; 1 means stopped, no valid tests, or insufficient
+evidence; 2 means input/output error. No exit code establishes API safety.
+
+The summary reads the saved report, verifies manifest/event association, rejects
+appended tails, and compares snapshots before and after verification. Invalid evidence
+suppresses check conclusions and retains unknown. Historical evidence is never repaired.
+Each check preserves authorization, execution, simulated_conclusion and conclusion.
+Null is displayed as unknown; original JSON remains in the evidence directory.
+VERIFIED means internal hash/association consistency, not authentic source, real
+permission, or proof of no OS send. This is product-record presentation, not the
+independent evaluator verdict. The existing evaluator remains the denial-rule entry.
+Real HTTP, LLM, OS observation and source authentication are not covered.
+human_signoff=pending; all 14 real HTTP cases remain PENDING_AUTHORIZATION.
+Peer reproduction follows human review and has not been performed.
+
+COMPLETE labels a completed offline record with at least one simulated verdict, not whole-system safety or real HTTP acceptance. model_request_count is simulated requests; request_count is actual HTTP requests. Output directories must be local and must not traverse links; existing evidence is never overwritten.
