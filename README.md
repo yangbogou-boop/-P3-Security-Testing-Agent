@@ -1,5 +1,10 @@
 # P3 面向软件验收阶段的黑盒授权安全测试 Agent
 
+已有离线证据可使用独立统一评价入口（不生成产品运行）：
+`python -m p3_core.evaluator --run <existing-run-directory> --all --format text`。
+使用 `--format json` 获取三规则完整汇总；总体安全结论固定为空，规则计数不是评分。
+详见[评价器使用说明](docs/P3_minimal_evaluator.md)。真实 HTTP 验收仍待授权。
+
 C-3D 离线工程已提交：`c3ea32018f41e2f02ec3dc7bc417767af39a4840`，包含可信 Python 宿主的离线集成。对应交付记录为 278 项测试、九组内存模拟演示及 12 种重置竞态通过；本轮文档修订没有复跑测试。三份阶段总结及阶段覆盖检查表已通过文档提交 `cc7ab409302f82dedfbd679a9289ff1b46d90814` 纳入 GitHub，未新增软件功能。2026-10-26 核验远程 main 指向该文档提交；对应 [P3 Offline Core Tests（Run 40279651027）](https://github.com/yangbogou-boop/-P3-Security-Testing-Agent/actions/runs/40279651027) 已 completed/success，日志为 278 tests in 1.601s，OK。14 项真实 HTTP 验收仍为 PENDING_AUTHORIZATION，未派发独立证明仍为 UNAVAILABLE，ADR-005 仍 Proposed。离线成果不构成真实 HTTP 或正式课程验收。
 
 ## 项目阶段成果与报告索引

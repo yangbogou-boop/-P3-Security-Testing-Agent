@@ -604,6 +604,76 @@ def evaluate(directory, rule_id=RULE_ID):
     return result
 
 
+def evaluate_all(directory):
+    """Aggregate existing verdicts; never issue a system-wide verdict."""
+    directory = local_directory(directory)
+    order = (RULE_ID, BUDGET_RULE_ID, REVOKE_RULE_ID)
+    before = None
+    try:
+        before = read_snapshot(directory)
+    except MissingEvidence:
+        pass
+    results = [evaluate(directory, rule) for rule in order]
+    consistent = False
+    intact = False
+    if before is not None:
+        expected = [dict(name=n, bytes=len(b), sha256=hashlib.sha256(b).hexdigest())
+                    for n, b in before.items()]
+        try:
+            # File integrity is independent of any rule's applicability/verdict.
+            manifest = strict_json(before['manifest.json'])
+            strict_json(before['report.json'])
+            for line in before['events.jsonl'].splitlines():
+                strict_json(line)
+            require(type(manifest) is dict)
+            require(type(manifest.get('events_bytes')) is int and
+                    manifest['events_bytes'] == len(before['events.jsonl']))
+            checked = verify_run(directory)
+            intact = checked.get('integrity') == 'VERIFIED' and checked.get('appended_bytes') == 0
+            consistent = read_snapshot(directory) == before and all(
+                x['checked_artifacts'] == expected for x in results)
+        except (MissingEvidence, OSError, ValueError, TypeError, KeyError, RecursionError, OverflowError):
+            pass
+    run_ids = {x['subject_run_id'] for x in results if x['subject_run_id'] is not None}
+    consistent = consistent and intact and len(run_ids) <= 1
+    return dict(schema_version='p3-evaluation-bundle-v1', evidence_directory=str(directory),
+        subject_run_id=next(iter(run_ids)) if consistent and len(run_ids) == 1 else None,
+        evaluated_rule_ids=list(order), rule_results=results,
+        bundle_status='CONSISTENT_READS' if consistent else 'EVIDENCE_INCOMPLETE',
+        status_counts={s:sum(x['status'] == s for x in results) for s in STATUSES},
+        has_recorded_violation=any(x['status'] == 'FAIL' for x in results),
+        has_insufficient_evidence=not consistent or any(x['status']=='INSUFFICIENT_EVIDENCE' for x in results),
+        overall_verdict=None, human_signoff='pending', approval_verified=False, source_authenticated=False,
+        limitations=['NO_SYSTEM_WIDE_VERDICT', 'Counts describe individual rule results, not a score.',
+            'EVIDENCE_INCOMPLETE means individual results cannot be combined as one snapshot.',
+            'Matching reads are not an atomic snapshot against a malicious concurrent writer.',
+            'No authenticated source, permission, runtime budget or revocation boundary; no OS/network proof.'],
+        suggested_next_checks=['Human review of each rule limitation and cited evidence; preserve originals.'])
+
+
+def render_text(result):
+    # Serialize only bounded evaluator projections; never echo response bodies.
+    def safe(value):
+        text = json.dumps(value, ensure_ascii=True, allow_nan=False)
+        return text[:4096] + (' [TRUNCATED]' if len(text)>4096 else '')
+    rows = result.get('rule_results', [result])
+    lines = ['P3 Independent Evaluation Summary', 'Evidence: '+safe(result['evidence_directory']),
+             'Run: '+safe(result['subject_run_id']), 'Evidence scope: local offline records',
+             'Bundle: '+result.get('bundle_status','SINGLE_RULE'), 'Rule results:']
+    for row in rows:
+        lines += [row['rule_id']+': '+row['status'], 'Observed facts: '+safe(row['observed_facts']),
+                  'Missing evidence: '+safe(row['missing_evidence'])]
+        for ref in row['evidence_references']:
+            lines.append('Evidence reference: '+safe(ref))
+        lines += ['Limits: '+safe(row['limitations']), 'Next checks: '+safe(row['suggested_next_check'])]
+    lines += ['Status counts: '+safe(result.get('status_counts',{})),
+              'Overall security verdict: NOT PROVIDED (NO_SYSTEM_WIDE_VERDICT)',
+              'Approval verified: No; Source authenticated: No; Human signoff: Pending',
+              'Runtime budget and revocation boundary: NOT AUTHENTICATED',
+              'Limits: '+safe(result.get('limitations',[]))]
+    return '\n'.join(lines)
+
+
 class Parser(argparse.ArgumentParser):
     def error(self, message):
         raise EvaluationInputError('INVALID_ARGUMENTS')
@@ -613,16 +683,19 @@ def main(argv=None):
     try:
         parser = Parser(description=__doc__)
         parser.add_argument('--run', required=True)
-        parser.add_argument('--rule', required=True, choices=[RULE_ID,BUDGET_RULE_ID,REVOKE_RULE_ID])
+        group = parser.add_mutually_exclusive_group(required=True)
+        group.add_argument('--rule', choices=[RULE_ID,BUDGET_RULE_ID,REVOKE_RULE_ID])
+        group.add_argument('--all', action='store_true')
+        parser.add_argument('--format', choices=['json','text'], default='json')
         args = parser.parse_args(argv)
-        result = evaluate(args.run, args.rule)
+        result = evaluate_all(args.run) if args.all else evaluate(args.run, args.rule)
     except EvaluationInputError as exc:
         print(json.dumps(dict(error=str(exc), evaluation_completed=False)))
         return 2
     except Exception:
         print(json.dumps(dict(error='EVALUATOR_ERROR', evaluation_completed=False)))
         return 3
-    print(json.dumps(result, ensure_ascii=True, allow_nan=False, indent=2))
+    print(render_text(result) if args.format == 'text' else json.dumps(result, ensure_ascii=True, allow_nan=False, indent=2))
     return 0  # Completed evaluation, including FAIL or INSUFFICIENT_EVIDENCE.
 
 

@@ -638,3 +638,106 @@ class RevokeEvaluatorTests(unittest.TestCase):
         r,e=revoke_sample(self.root);r['checks'][0]['evidence_ids'].pop();seal(self.root,r,e);self.insufficient()
         r,e=revoke_sample(self.root);r['checks'][0].update(authorization='DENY',assertion='NOT_APPROVED_CANDIDATE',processed=True)
         e[3].update(decision='DENY',reason='NOT_APPROVED_CANDIDATE');self.save(r,e);self.insufficient()
+
+
+class BundleEvaluatorTests(unittest.TestCase):
+    setUp = EvaluatorTests.setUp
+    # Reuse fixture helpers, not inherited test methods (removed below).
+    def bundle(self):
+        from p3_core.evaluator import evaluate_all
+        return evaluate_all(self.root)
+
+    def test_order_and_original_results(self):
+        from p3_core.evaluator import evaluate_all
+        r=evaluate_all(GOOD)
+        self.assertEqual(r['evaluated_rule_ids'],[RULE_ID,'P3-EVAL-BUDGET-001',REVOKE_RULE])
+        self.assertEqual(r['rule_results'],[evaluate(GOOD,x) for x in r['evaluated_rule_ids']])
+        self.assertIsNone(r['overall_verdict'])
+
+    def test_mixed_pass(self):
+        revoke_sample(self.root);r=self.bundle()
+        self.assertEqual(r['bundle_status'],'CONSISTENT_READS')
+        self.assertEqual(r['status_counts']['PASS'],1);self.assertEqual(r['status_counts']['INSUFFICIENT_EVIDENCE'],2)
+
+    def test_mixed_fail(self):
+        revoke_sample(self.root,'K2');r=self.bundle()
+        self.assertTrue(r['has_recorded_violation']);self.assertEqual(r['status_counts']['FAIL'],1)
+        self.assertEqual(r['status_counts']['INSUFFICIENT_EVIDENCE'],2)
+
+    def test_missing_manifest(self):
+        revoke_sample(self.root);(self.root/'manifest.json').unlink();r=self.bundle()
+        self.assertEqual(r['bundle_status'],'EVIDENCE_INCOMPLETE');self.assertEqual(r['status_counts']['INSUFFICIENT_EVIDENCE'],3)
+
+    def test_tail(self):
+        revoke_sample(self.root);p=self.root/'events.jsonl';p.write_bytes(p.read_bytes()+b'{}\n')
+        before={f.name:f.read_bytes() for f in self.root.iterdir()}
+        result=self.bundle()
+        self.assertEqual(result['status_counts']['INSUFFICIENT_EVIDENCE'],3)
+        self.assertEqual(result['bundle_status'],'EVIDENCE_INCOMPLETE')
+        self.assertIsNone(result['overall_verdict'])
+        self.assertEqual(before,{f.name:f.read_bytes() for f in self.root.iterdir()})
+
+    def test_intact_but_all_rules_insufficient(self):
+        revoke_sample(self.root,'K3');result=self.bundle()
+        self.assertEqual(result['status_counts']['INSUFFICIENT_EVIDENCE'],3)
+        self.assertEqual(result['bundle_status'],'CONSISTENT_READS')
+        self.assertIsNone(result['overall_verdict'])
+
+    def test_manifest_hash_errors(self):
+        for key in ('events_sha256','report_sha256'):
+            with self.subTest(key=key):
+                revoke_sample(self.root);p=self.root/'manifest.json'
+                m=json.loads(p.read_bytes());m[key]='0'*64;p.write_text(json.dumps(m))
+                self.assertEqual(self.bundle()['bundle_status'],'EVIDENCE_INCOMPLETE')
+
+    def test_snapshot_changes(self):
+        revoke_sample(self.root)
+        from p3_core.evaluator import evaluate as original
+        def changed(p,rule):
+            r=original(p,rule)
+            if rule==REVOKE_RULE:(self.root/'events.jsonl').write_bytes(b'{}\n')
+            return r
+        with patch('p3_core.evaluator.evaluate',side_effect=changed):
+            self.assertEqual(self.bundle()['bundle_status'],'EVIDENCE_INCOMPLETE')
+
+    def test_rule_hash_mismatch(self):
+        revoke_sample(self.root)
+        def changed(p,rule):
+            r=evaluate(p,rule);r['checked_artifacts'][0]['sha256']='0'*64;return r
+        with patch('p3_core.evaluator.evaluate',side_effect=changed):
+            self.assertEqual(self.bundle()['bundle_status'],'EVIDENCE_INCOMPLETE')
+
+    def test_run_mismatch(self):
+        revoke_sample(self.root)
+        def changed(p,rule):
+            r=evaluate(p,rule)
+            if rule==REVOKE_RULE:r['subject_run_id']=uid('run',999)
+            return r
+        with patch('p3_core.evaluator.evaluate',side_effect=changed):
+            r=self.bundle();self.assertIsNone(r['subject_run_id']);self.assertEqual(r['bundle_status'],'EVIDENCE_INCOMPLETE')
+
+    def test_cli_formats_readonly(self):
+        revoke_sample(self.root);before={p.name:p.read_bytes() for p in self.root.iterdir()}
+        for fmt in ('json','text'):
+            with patch.object(Path,'mkdir',side_effect=AssertionError('NO_RUN')):
+                with contextlib.redirect_stdout(io.StringIO()) as out:
+                    self.assertEqual(main(['--run',str(self.root),'--all','--format',fmt]),0)
+            if fmt=='json':self.assertIsNone(json.loads(out.getvalue())['overall_verdict'])
+            else:self.assertIn('NO_SYSTEM_WIDE_VERDICT',out.getvalue())
+        self.assertEqual(before,{p.name:p.read_bytes() for p in self.root.iterdir()})
+
+    def test_mutually_exclusive_and_format_errors(self):
+        for extra in (['--all','--rule',RULE_ID],['--all','--format','html'],[]):
+            with contextlib.redirect_stdout(io.StringIO()):self.assertEqual(main(['--run',str(GOOD)]+extra),2)
+
+    def test_unsafe_paths_and_size(self):
+        from p3_core.evaluator import evaluate_all
+        for p in ('https://invalid','../bad','//server/share'):
+            with self.assertRaises(EvaluationInputError):evaluate_all(p)
+        revoke_sample(self.root);(self.root/'events.jsonl').write_bytes(b' '*(MAX_FILE+1))
+        self.assertEqual(self.bundle()['bundle_status'],'EVIDENCE_INCOMPLETE')
+
+    def test_text_does_not_echo_body(self):
+        from p3_core.evaluator import render_text
+        revoke_sample(self.root);(self.root/'report.json').write_bytes(b'SECRET_RAW_BODY')
+        self.assertNotIn('SECRET_RAW_BODY',render_text(self.bundle()))

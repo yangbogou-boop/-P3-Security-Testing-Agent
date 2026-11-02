@@ -1,5 +1,29 @@
 # 独立、只读的最小评价器
 
+## 统一只读评价入口
+
+```powershell
+python -m p3_core.evaluator --run <existing-run-directory> --all --format text
+python -m p3_core.evaluator --run <existing-run-directory> --all --format json
+```
+
+`--all` 与 `--rule` 互斥，按 DENY、BUDGET、REVOKE 固定顺序运行现有规则。
+默认 JSON；单规则 JSON 结构及退出码不变。退出码 0 只表示评价完成。
+综合结构为 `p3-evaluation-bundle-v1`，保留完整 rule_results，不改变任何单规则结论。
+status_counts 只是规则结果计数，不是安全评分；overall_verdict 永远为 null
+（NO_SYSTEM_WIDE_VERDICT），人工签署仍 pending，来源与批准仍 false。
+
+统一入口比较前后有界读取的三文件字节、各规则 checked_artifacts 和可确认 run_id。
+`CONSISTENT_READS` 表示各次读取一致且原始文件完整性校验通过，不表示来源可信或规则通过。
+综合入口另行使用严格 JSON、完整字节覆盖及 verify_run 校验，不依据单规则证据不足状态推断文件损坏。
+缺少文件、快照变化或规则间版本不同，bundle_status 为 EVIDENCE_INCOMPLETE，run_id 不推测；
+保留各规则结果供复核，但不能将其组合为同一快照的结论。尾部未核验仍由原规则拒绝。
+多次相同读取不构成对恶意并发写入者的原子快照保证。
+
+文本仅展示有界、转义后的评价投影，不输出原始 HTTP 正文或异常文本；JSON 保留全部规则限定。
+预算运行配置、撤权边界不被认证。没有总体安全认证、网络执行或文件输出功能。
+本轮不改变 14 项真实 HTTP 验收 PENDING_AUTHORIZATION 状态。
+
 本轮规则为 `P3-EVAL-DENY-001`，评价器版本为 `1.0`。它读取已有客户端证据，审查唯一一个 `NOT_APPROVED_CANDIDATE` 拒绝链是否有完整关联，以及在已验证的离线事件范围内是否存在该目标的模拟派发。它不生成计划、不调用产品运行入口、不取得执行许可、不修改产品报告。
 
 ## 规则范围与数据流
