@@ -1,8 +1,48 @@
-# 最新验证数量
+# P3 需求—设计—实现—验证—证据追踪
 
-当前 C-3C 候选共 **258 项无网络测试通过**，12 种重置竞争时序通过。下文 217 等数量属于历史阶段记录；真实 HTTP 验收继续 PENDING_AUTHORIZATION。
+导航更新：2026-11-16，读取基线 `28295838ec7e5324b9eb2ff2d7c8c0fba2b5c744`。返回[项目总索引](../docs/INDEX.md)。本页补充三条任务链，保留原有 22 项需求、GWT 和阶段追踪；不改变需求强度，不以文档存在替代执行或批准。
 
-# P3 需求—测试—证据追踪（2026-10-19）
+## 历史数量与当前阅读范围
+
+**258 项无网络测试、12 种重置竞争时序属于 C-3C 阶段历史结果，不是当前全部测试总量。** 来源为[监督审核报告](../review/P3_c3_supervisor_review.md)2026-10-22 当前交付状态及末尾“最终定点修复”；报告起始基线为 `3199b3f9a447cc15548523c995548f139cf8bc18`，后续带工作区修复，不能将最终258项结果直接绑定为该提交原样执行。外部日志位置和访问状态见[证据索引](P3_experiment_evidence_index.md#阶段数量与访问边界)。本轮不重跑测试，也不补推当前总量。
+
+## 任务链 A：授权拒绝
+
+| 环节 | 可追踪位置与核对内容 | 状态／限制 |
+|---|---|---|
+| 需求 | [RC2](../brief/P3_specification_v1.0-rc2.md) P3-REQ-007／008／014～017；[GWT](P3_GWT_scenarios.md) N03／A02；[授权边界](../brief/P3_authorization_boundary.md) | 独立授权、非法候选拒绝及审计要求；不是测试结果 |
+| 设计约束 | [ADR-001](../design/ADR_001_controller_split.md)当前澄清、[ADR-004](../design/ADR_004_http_dispatch_and_cancellation.md)、[HTTP 接入](../design/P3_http_integration_design.md)、[离线宿主](../design/P3_c3d_trusted_host_integration.md) | Planner不能授予执行权；同进程模块分离不等于物理隔离 |
+| 实现 | [Controller](../src/p3_core/controller.py)、[HTTP 模型](../src/p3_core/http/machine.py)的 `NOT_APPROVED_CANDIDATE`；[审计](../src/p3_core/http/audit.py) | 区分原离线Controller与受控HTTP模型，不从代码存在推定真实HTTP执行 |
+| 验证方法 | [证据契约测试](../tests/test_host_evidence_contract.py) `test_denied_candidate_has_linked_audit_but_no_dispatch`；[评价器测试](../tests/test_evaluator.py) `test_k1_historical_pass`；基础回归见[test_core.py](../tests/test_core.py) | 方法/测试定义；本轮未执行，历史执行结果需读下一行 |
+| 实际证据 | [第三章评价卡](P3_evaluation_observability_card.md)第G节与[两批原件入口](P3_experiment_evidence_index.md#仓库内实验与原件)；修复后R01为 `run_ce4b0027ae024f05a72d81173c9f05e2` | 历史报告DENY／NOT_EXECUTED、无目标action；首次失败保留。第二批版本为基线加修复差异，非原样HEAD |
+| 当前状态 | [HTTP状态](P3_http_integration_status.json)、[课程复核](../review/P3_course_delivery_index.md) | 有限离线拒绝证据可查；独立OS未派发证明、来源认证、真实HTTP及正式验收未由此建立 |
+
+## 任务链 B：Fixed／Dynamic
+
+| 环节 | 可追踪位置与核对内容 | 状态／限制 |
+|---|---|---|
+| 需求与策略设计 | [RC2](../brief/P3_specification_v1.0-rc2.md) P3-REQ-003／020／021；[ADR-005](../design/ADR_005_deterministic_strategy_comparison.md) | ADR正文仍Proposed，正式需求强度不变 |
+| 实现与验证方法 | [strategies.py](../src/p3_core/http/strategies.py) `FixedSelection`／`EvidenceSelection`；[experiments.py](../src/p3_core/experiments.py)；[策略测试](../tests/test_remaining.py) `test_strategy_repeatable`／`test_strategy_evidence_changes_next_choice`／`test_comparison_records_actual_observations` | 确定性对照策略；测试定义不等于本轮运行 |
+| 对照与结果分析 | [工程实验](P3_engineering_experiment.md)、[36次汇总](P3_offline_strategy_results.json)、[归档批次](P3_experiment_evidence_index.md#仓库内实验与原件) | 分析支持有限离线比较，不是独立评价器输出；含异常停止，历史执行版本NOT_FULLY_BOUND |
+| 历史用户决定 | [2026-11-16来源摘录](../review/P3_fixed_decision_source_excerpt_20261116.md)、[核验记录](../review/P3_fixed_decision_verification_20261116.md) | 2026-11-09用户决定暂时保留Fixed默认，Dynamic继续对照；历史消息有直接依据，损坏原件未恢复，新归档待用户最终复核 |
+| 当前策略与重评 | [delivery.py](../src/p3_core/delivery.py)默认fixed；上述摘录中的“重新评估条件”及[ADR-005 Reconsideration](../design/ADR_005_deterministic_strategy_comparison.md#reconsideration) | 更复杂检查依赖、可信运行/人工成本数据或可复现收益出现时重评；不永久否定Dynamic，不据此授予网络许可 |
+
+实验报告中“负责人仍需确认取舍”是原记录措辞；本次历史用户决定已可追踪，但不将其扩成正式ADR审核通过。该时点差异在[设计索引](../design/README.md#状态差异与决策依据)登记，ADR正文不改。
+
+## 任务链 C：评价 Agent
+
+| 环节 | 可追踪位置与核对内容 | 状态／限制 |
+|---|---|---|
+| 评价目标 | [评价手册](../docs/P3_minimal_evaluator.md)：DENY对应REQ-007／008／014～017，BUDGET对应REQ-010，REVOKE对应REQ-011；需求定义仍以[RC2](../brief/P3_specification_v1.0-rc2.md)为准 | 仅各需求的有限记录子场景，不另造完整验收要求 |
+| 只读设计 | [规则范围与可信边界](../docs/P3_minimal_evaluator.md)、[开发规则](../AGENTS.md) | 仅读既有三文件；不生成产品计划、取得许可、触发检查或修改报告 |
+| 实现 | [evaluator.py](../src/p3_core/evaluator.py) `inspect`／`inspect_budget`／`inspect_revoke`／`evaluate`／`evaluate_all` | 实现存在，不自动证明运行成功或人工批准 |
+| 校准与复核方法 | [test_evaluator.py](../tests/test_evaluator.py)各规则K1／K2／K3；[手册独立校准](../docs/P3_minimal_evaluator.md#独立校准与回归) | 区分历史产品输入与SYNTHETIC_CALIBRATION；本轮不运行 |
+| 历史输出 | [仓库外输出登记](P3_experiment_evidence_index.md#仓库外评价输出)：2026-11-04九次单规则及综合展示、2026-11-11两版兼容性输出 | 本机实际可读，有JSON/执行记录；跨机器移交尚未完成，产品report仅是输入 |
+| 当前状态 | [课程评价复核](../review/P3_course_delivery_index.md#人工复核与未完成事项) | 规则存在、历史执行完成、输出可复核分别有材料；human_signoff仍pending，overall_verdict=null，不等于人工批准或整体安全PASS |
+
+## 历史追踪正文（2026-10-19起）
+
+以下按原阶段保留；其中“本轮”“当前”和各测试数量仅对应其历史时点，不能覆盖上面的导航更新或升级为本轮验证结果。
 
 ## C-3C 增量（2026-10-21）
 

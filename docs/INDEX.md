@@ -1,8 +1,21 @@
 # P3 项目文档索引
 
-这是仓库级文档入口。课程章节清单、任务卡与证据索引各自服务于其所述范围。
+这是唯一的仓库级文档导航入口；[项目总体说明](../README.md)介绍产品，[开发规则](../AGENTS.md)约束开发。下列专项索引只负责各自范围，不替代规范、ADR 正文、原始证据或人工批准。
 
 整改前提交为 `eba1e1b7fe584331573aa3348c3b3fa9e89cebd1`。当前工程规格为 V1.0-RC2，交付范围为离线模拟与只读评价。真实 HTTP 的 14 项验收仍为 `PENDING_AUTHORIZATION`，见[状态清单](../eval/P3_http_integration_status.json)。C-3D 独立未派发证明仍为 `UNAVAILABLE`。旧测试数量按记录的阶段和版本阅读。
+
+## 按任务查找
+
+首次阅读建议：项目总体说明 → 开发规则 → 本页选择任务 → 相关需求与设计 → 实现／验证 → 证据及限制。
+
+| 我要查找 | 追踪入口 | 结果与复核入口 |
+|---|---|---|
+| 授权控制与未批准候选拒绝 | [任务链 A](../eval/P3_requirement_traceability.md#任务链-a授权拒绝)：需求、设计、Controller／HTTP 模型及具体测试 | [第三章两批原件](../eval/P3_experiment_evidence_index.md#仓库内实验与原件)，保留首次失败和修复后 R01 |
+| Fixed／Dynamic 对照与取舍 | [任务链 B](../eval/P3_requirement_traceability.md#任务链-bfixeddynamic)：策略、实验分析、用户决定及重评条件 | [ADR 与设计导航](../design/README.md)、[第四章证据](../eval/P3_experiment_evidence_index.md#仓库内实验与原件) |
+| 评价 Agent 的实现、输出和复核 | [任务链 C](../eval/P3_requirement_traceability.md#任务链-c评价-agent)：规则、只读设计、实现与校准 | [实际历史输出存储说明](../eval/P3_experiment_evidence_index.md#仓库外评价输出)，区分产品输入与评价输出 |
+| 课程交付及人工审核 | [课程交付索引](../review/P3_course_delivery_index.md)：章节、材料、复核与未完成事项 | 不把文件存在、可访问、有来源和人工批准合并为一个状态 |
+
+2026-11-09 用户决定暂时保留 Fixed 为默认，Dynamic 继续作为对照；2026-11-16 建立[历史消息摘录](../review/P3_fixed_decision_source_excerpt_20261116.md)及[核验记录](../review/P3_fixed_decision_verification_20261116.md)。历史决定有直接消息依据，损坏原件未恢复，新归档仍待用户最终复核；ADR-005 保持 Proposed，不代表永久否定 Dynamic 或课程验收完成。
 
 ## 规格与授权（Specification）
 
@@ -11,6 +24,8 @@
 - [RC1](../brief/P3_specification_v1.0-rc1.md)为历史快照，活动要求采用 RC2。正式课程与实际目标许可按治理材料核验。
 
 ## 决策（ADR）与架构（Architecture Design）
+
+按用途与正文状态查找，见[设计专项索引](../design/README.md)；历史 Proposed 段落与正文当前状态的区别在那里说明。
 
 - Accepted：[001 Planner／Controller 分离](../design/ADR_001_controller_split.md)、[002 黑盒 API 范围](../design/ADR_002_black_box_api_scope.md)、[003 本地执行与证据](../design/ADR_003_local_execution_and_evidence.md)、[004 派发与取消](../design/ADR_004_http_dispatch_and_cancellation.md)。
 - Proposed：[005 固定与证据优先策略](../design/ADR_005_deterministic_strategy_comparison.md)，对应[策略实现](../src/p3_core/http/strategies.py)与第四章实验。负责人取舍记录与 ADR 正式状态分别管理。
@@ -34,11 +49,15 @@
 
 ## 原始证据（Evidence）
 
+[实验与评价证据索引](../eval/P3_experiment_evidence_index.md)登记批次、需求、来源、访问状态和限制；仓库外资料仅登记实际位置与待移交事项，不提供伪装为可移交附件的本机链接。
+
 - 第三章首次执行的[评价约定](../evidence/course_ch03/eval_20261028_01/evaluation_agreement.md)和[原始文件清单](../evidence/course_ch03/eval_20261028_01/file_inventory.json)。
 - 修复后执行的[评价约定](../evidence/course_ch03/eval_20261028_02/evaluation_agreement.md)和[原始文件清单](../evidence/course_ch03/eval_20261028_02/file_inventory.json)。R01 的[事件](../evidence/course_ch03/eval_20261028_02/artifacts/run_ce4b0027ae024f05a72d81173c9f05e2/events.jsonl)、[报告](../evidence/course_ch03/eval_20261028_02/artifacts/run_ce4b0027ae024f05a72d81173c9f05e2/report.json)、[Manifest](../evidence/course_ch03/eval_20261028_02/artifacts/run_ce4b0027ae024f05a72d81173c9f05e2/manifest.json)可逐项关联。
 - 第四章[108 个原件清单](../evidence/course_ch04/strategy_history_36/archive_manifest.json)。历史执行版本为 `NOT_FULLY_BOUND`，归档提交仅用于定位原件。
 
 ## 审查（Review）与历史报告（Historical Report）
+
+[课程交付与复核导航](../review/P3_course_delivery_index.md)汇总第一至四章及评价 Agent 材料，沿用既有章节清单，不重复维护其细项。
 
 - 课程材料：[第一章 GWT](../review/P3_course_ch01_GWT.md)、[阅读测试](../review/P3_course_ch01_AI_reading_test.md)、[第二章 Pack 映射](../review/P3_spec_harness_pack_index.md)、[第二章完整性](../review/P3_ch02_completeness_check.md)。阅读测试按记录中的旧 AGENTS 版本与哈希复核。
 - [AI 使用与责任](../review/P3_ai_usage_and_responsibility.md)、[开发任务卡](../review/P3_development_task_cards.md)保留各自的来源与时点。Word/PDF 课程交付格式按教师要求另行处理。
@@ -47,4 +66,6 @@
 
 ## 维护
 
-新增文档按职责登记，状态以其权威来源更新。在仓库根目录运行 `python tools/check_doc_links.py` 检查入口，添加 `--all` 检查 Markdown 的本地相对链接。固定版本外链和机器本地日志按原记录核对。
+新增文档按职责登记，状态以其权威来源更新；总索引只维护任务路由和当前摘要，批次与历史细节留在专项索引及原记录。258 项是 C-3C 阶段历史测试数量，不是当前全部测试总量。
+
+在仓库根目录运行 `python tools/check_doc_links.py` 检查入口，添加 `--all` 检查 Markdown 的本地相对链接。此前 620 个链接通过仅是当时检查器覆盖范围的结果，不证明外部材料可访问、跨平台路径有效、语义追溯正确或证据完整归档。每次修改另记实际检查数量，并按 A／B／C 查找需求、证据与批准状态；固定版本外链和机器本地日志单独核对。
