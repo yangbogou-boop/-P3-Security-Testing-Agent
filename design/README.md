@@ -10,7 +10,7 @@
 | [002 黑盒API范围](ADR_002_black_box_api_scope.md) | Accepted，正文当前状态及第6节 | 用户、验收场景、首版黑盒范围；[问题框架](../brief/P3_problem_frame.md) | 首轮Proposed及统一待老师批准措辞属于历史，非当前状态 |
 | [003 本地执行与证据](ADR_003_local_execution_and_evidence.md) | Accepted，2026-10-14负责人确认技术方案 | Python标准库、可信配置、JSONL／Manifest和CLI；[离线交付手册](../docs/P3_offline_delivery.md) | 技术路线确认不等于运行许可、容量结论或验收完成 |
 | [004 派发与在途撤权](ADR_004_http_dispatch_and_cancellation.md) | Accepted，2026-10-19正文顶部当前Status | 分离状态机与单I/O所有者；[HTTP接入设计](P3_http_integration_design.md) | 下方2026-10-14 Proposed原文保留；不是实际目标许可 |
-| [005 Fixed／Dynamic比较](ADR_005_deterministic_strategy_comparison.md) | **Proposed**，2026-10-19 | [第四章实验分析](../eval/P3_engineering_experiment.md)、[36次归档入口](../evidence/course_ch04/strategy_history_36/README.md)、[历史用户决定](../review/P3_fixed_decision_source_excerpt_20261116.md) | 用户暂时保留Fixed的决定，不自动构成正式ADR接受、教师批准或验收 |
+| [005 Fixed／Dynamic比较](ADR_005_deterministic_strategy_comparison.md) | **Accepted**，2026-11-16（仅限当前离线模拟工程基线的内部工程决策）；2026-10-19 Proposed 原文保留在正文末段 | [第四章实验分析](../eval/P3_engineering_experiment.md)、[36次归档入口](../evidence/course_ch04/strategy_history_36/README.md)、[历史用户决定](../review/P3_fixed_decision_source_excerpt_20261116.md)、[正式接受记录](../review/P3_adr005_acceptance_20261116.md) | 接受仅覆盖离线基线取舍；C-02 未全部完成、REQ-021 未正式验收、人工成本未测、版本绑定不完整，教师批准与真实执行授权未取得 |
 
 ## 架构与实现设计
 
@@ -23,7 +23,7 @@
 ## 状态差异与决策依据
 
 - HTTP接入设计仍有“ADR-004 Proposed”等历史措辞，ADR-004正文顶部已经注明Accepted。此为可见时点差异，依正文当前状态阅读；本轮不改历史设计或ADR。
-- ADR-005及工程实验报告仍保留等待负责人确认的原措辞。2026-11-09用户决定**暂时保留Fixed为默认，Dynamic继续作为对照**；2026-11-16建立[来源摘录](../review/P3_fixed_decision_source_excerpt_20261116.md)与[核验记录](../review/P3_fixed_decision_verification_20261116.md)。历史决定有直接消息依据，损坏原件未恢复，新归档仍待用户最终复核，ADR-005未正式接受。
+- ADR-005 已于 2026-11-16 获得负责人有限范围接受（仅离线模拟基线）；2026-10-19 的 Proposed 原文与工程实验报告中“负责人仍需确认”措辞属于历史时点，依正文当前状态阅读。2026-11-09 用户决定**暂时保留Fixed为默认，Dynamic继续作为对照**；[来源摘录](../review/P3_fixed_decision_source_excerpt_20261116.md)、[核验记录](../review/P3_fixed_decision_verification_20261116.md)、[正式接受记录](../review/P3_adr005_acceptance_20261116.md) 分别记录来源、核验与决定。损坏原件未恢复。
 - 用户原话的重评条件是更复杂检查依赖、可信实际运行/人工成本数据或可复现Dynamic收益；正式设计的重评门槛另见[ADR-005 Reconsideration](ADR_005_deterministic_strategy_comparison.md#reconsideration)。这些条件不授予真实HTTP执行权。
 - [实验与评价索引](../eval/P3_experiment_evidence_index.md)负责批次和原件，[课程索引](../review/P3_course_delivery_index.md)负责交付及人审。文件存在、当前可访问、内容来源可追踪和结论经人工批准须分别判断；Accepted也不等于已实现或已验收。
 

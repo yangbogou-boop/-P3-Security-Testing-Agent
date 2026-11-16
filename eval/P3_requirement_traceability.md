@@ -21,13 +21,13 @@
 
 | 环节 | 可追踪位置与核对内容 | 状态／限制 |
 |---|---|---|
-| 需求与策略设计 | [RC2](../brief/P3_specification_v1.0-rc2.md) P3-REQ-003／020／021；[ADR-005](../design/ADR_005_deterministic_strategy_comparison.md) | ADR正文仍Proposed，正式需求强度不变 |
+| 需求与策略设计 | [RC2](../brief/P3_specification_v1.0-rc2.md) P3-REQ-003／020／021；[ADR-005](../design/ADR_005_deterministic_strategy_comparison.md)、[正式接受记录](../review/P3_adr005_acceptance_20261116.md) | ADR-005 已于2026-11-16有限范围Accepted（仅离线模拟基线）；需求强度不变，正式验收另见下方限制 |
 | 实现与验证方法 | [strategies.py](../src/p3_core/http/strategies.py) `FixedSelection`／`EvidenceSelection`；[experiments.py](../src/p3_core/experiments.py)；[策略测试](../tests/test_remaining.py) `test_strategy_repeatable`／`test_strategy_evidence_changes_next_choice`／`test_comparison_records_actual_observations` | 确定性对照策略；测试定义不等于本轮运行 |
 | 对照与结果分析 | [工程实验](P3_engineering_experiment.md)、[36次汇总](P3_offline_strategy_results.json)、[归档批次](P3_experiment_evidence_index.md#仓库内实验与原件) | 分析支持有限离线比较，不是独立评价器输出；含异常停止，历史执行版本NOT_FULLY_BOUND |
-| 历史用户决定 | [2026-11-16来源摘录](../review/P3_fixed_decision_source_excerpt_20261116.md)、[核验记录](../review/P3_fixed_decision_verification_20261116.md) | 2026-11-09用户决定暂时保留Fixed默认，Dynamic继续对照；历史消息有直接依据，损坏原件未恢复，新归档待用户最终复核 |
+| 历史用户决定 | [2026-11-16来源摘录](../review/P3_fixed_decision_source_excerpt_20261116.md)、[核验记录](../review/P3_fixed_decision_verification_20261116.md) | 2026-11-09用户决定暂时保留Fixed默认，Dynamic继续对照；历史消息有直接依据，损坏原件未恢复。2026-11-16负责人已接受归档及其限制，同日于[正式接受记录](../review/P3_adr005_acceptance_20261116.md)确认ADR-005有限范围接受 |
 | 当前策略与重评 | [delivery.py](../src/p3_core/delivery.py)默认fixed；上述摘录中的“重新评估条件”及[ADR-005 Reconsideration](../design/ADR_005_deterministic_strategy_comparison.md#reconsideration) | 更复杂检查依赖、可信运行/人工成本数据或可复现收益出现时重评；不永久否定Dynamic，不据此授予网络许可 |
 
-实验报告中“负责人仍需确认取舍”是原记录措辞；本次历史用户决定已可追踪，但不将其扩成正式ADR审核通过。该时点差异在[设计索引](../design/README.md#状态差异与决策依据)登记，ADR正文不改。
+实验报告中“负责人仍需确认取舍”是原记录措辞；2026-11-16 ADR-005 已在有限范围（仅离线模拟基线）正式接受，见[正式接受记录](../review/P3_adr005_acceptance_20261116.md)。C-02 未全部完成、REQ-021 正式验收未完成、36次执行版本仍为 `NOT_FULLY_BOUND`，这些限制不因接受而消失。
 
 ## 任务链 C：评价 Agent
 
@@ -42,7 +42,7 @@
 
 ## 历史追踪正文（2026-10-19起）
 
-以下按原阶段保留；其中“本轮”“当前”和各测试数量仅对应其历史时点，不能覆盖上面的导航更新或升级为本轮验证结果。
+以下按原阶段保留；其中“本轮”“当前”和各测试数量仅对应其历史时点，不能覆盖上面的导航更新或升级为本轮验证结果。本节（含下方需求表与各轮补充）中“ADR-005 仍 Proposed”等表述同样只对应其撰写时点；当前状态以 [ADR-005](../design/ADR_005_deterministic_strategy_comparison.md) 与[正式接受记录](../review/P3_adr005_acceptance_20261116.md)为准。
 
 ## C-3C 增量（2026-10-21）
 

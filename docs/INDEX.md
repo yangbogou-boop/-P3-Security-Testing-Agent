@@ -15,7 +15,7 @@
 | 评价 Agent 的实现、输出和复核 | [任务链 C](../eval/P3_requirement_traceability.md#任务链-c评价-agent)：规则、只读设计、实现与校准 | [历史输出归档](../eval/P3_experiment_evidence_index.md#评价与兼容性输出归档)，区分产品输入与评价输出 |
 | 课程交付及人工审核 | [课程交付索引](../review/P3_course_delivery_index.md)：章节、材料、复核与未完成事项 | 不把文件存在、可访问、有来源和人工批准合并为一个状态 |
 
-2026-11-09 用户决定暂时保留 Fixed 为默认，Dynamic 继续作为对照；2026-11-16 建立[历史消息摘录](../review/P3_fixed_decision_source_excerpt_20261116.md)及[核验记录](../review/P3_fixed_decision_verification_20261116.md)。历史决定有直接消息依据，损坏原件未恢复，新归档仍待用户最终复核；ADR-005 保持 Proposed，不代表永久否定 Dynamic 或课程验收完成。
+2026-11-09 用户决定暂时保留 Fixed 为默认，Dynamic 继续作为对照；2026-11-16 建立[历史消息摘录](../review/P3_fixed_decision_source_excerpt_20261116.md)与[核验记录](../review/P3_fixed_decision_verification_20261116.md)，项目负责人同日接受该归档及其限制，并[正式接受 ADR-005 的有限范围内部工程决定](../review/P3_adr005_acceptance_20261116.md)。损坏原件未恢复；该接受不代表 C-02 完成、REQ-021 正式验收、教师批准或真实 HTTP 授权。
 
 ## 规格与授权（Specification）
 
@@ -27,8 +27,8 @@
 
 按用途与正文状态查找，见[设计专项索引](../design/README.md)；历史 Proposed 段落与正文当前状态的区别在那里说明。
 
-- Accepted：[001 Planner／Controller 分离](../design/ADR_001_controller_split.md)、[002 黑盒 API 范围](../design/ADR_002_black_box_api_scope.md)、[003 本地执行与证据](../design/ADR_003_local_execution_and_evidence.md)、[004 派发与取消](../design/ADR_004_http_dispatch_and_cancellation.md)。
-- Proposed：[005 固定与证据优先策略](../design/ADR_005_deterministic_strategy_comparison.md)，对应[策略实现](../src/p3_core/http/strategies.py)与第四章实验。负责人取舍记录与 ADR 正式状态分别管理。
+- Accepted：[001 Planner／Controller 分离](../design/ADR_001_controller_split.md)、[002 黑盒 API 范围](../design/ADR_002_black_box_api_scope.md)、[003 本地执行与证据](../design/ADR_003_local_execution_and_evidence.md)、[004 派发与取消](../design/ADR_004_http_dispatch_and_cancellation.md)、[005 固定与证据优先策略](../design/ADR_005_deterministic_strategy_comparison.md)（2026-11-16，**仅限当前离线模拟工程基线的内部工程决定**；见[正式接受记录](../review/P3_adr005_acceptance_20261116.md)）。
+- 当前无正文仍为 Proposed 的 ADR。ADR-005 的 2026-10-19 Proposed 原文作为历史状态保留在其正文末段，不覆盖当前状态。负责人取舍记录与 ADR 正式状态分别管理；ADR-005 的接受不代表 C-02 完成、REQ-021 正式验收、教师批准或真实执行授权。
 - 实现参考：[HTTP 接入](../design/P3_http_integration_design.md)、[C-3C 生命周期](../design/P3_supervisor_lifecycle.md)、[C-3D 离线可信宿主](../design/P3_c3d_trusted_host_integration.md)。文中候选、待审核和测试数量按撰写时点解释。
 
 ## 开发规则（Harness）与运行手册（Runbook）
