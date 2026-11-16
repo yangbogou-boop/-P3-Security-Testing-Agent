@@ -1,0 +1,13 @@
+{
+  "completion_before_commit": "AUDIT_FAILED",
+  "actual_fixture_constructions": 0,
+  "legacy_reset_calls": 0,
+  "reset_commit_count": 0,
+  "old_binding_invalidated": false,
+  "old_generation": 1,
+  "failure_sequence": 1,
+  "caller_result": [
+    "RESET_FAILED"
+  ],
+  "final_state": "FAILED"
+}

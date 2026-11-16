@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "--run",
+    "D:\\codex\\P3_final_delivery_pack_20261102\\P3_evaluator_demo_20261104\\calibration_inputs\\REVOKE_K2",
+    "--all",
+    "--format",
+    "json"
+  ],
+  "exit_code": 0
+}

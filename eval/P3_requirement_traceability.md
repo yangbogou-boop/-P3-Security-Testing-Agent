@@ -4,7 +4,7 @@
 
 ## 历史数量与当前阅读范围
 
-**258 项无网络测试、12 种重置竞争时序属于 C-3C 阶段历史结果，不是当前全部测试总量。** 来源为[监督审核报告](../review/P3_c3_supervisor_review.md)2026-10-22 当前交付状态及末尾“最终定点修复”；报告起始基线为 `3199b3f9a447cc15548523c995548f139cf8bc18`，后续带工作区修复，不能将最终258项结果直接绑定为该提交原样执行。外部日志位置和访问状态见[证据索引](P3_experiment_evidence_index.md#阶段数量与访问边界)。本轮不重跑测试，也不补推当前总量。
+**258 项无网络测试、12 种重置竞争时序属于 C-3C 阶段历史结果，不是当前全部测试总量。** 来源为[监督审核报告](../review/P3_c3_supervisor_review.md)2026-10-22 当前交付状态及末尾“最终定点修复”；报告起始基线为 `3199b3f9a447cc15548523c995548f139cf8bc18`，后续带工作区修复，不能将最终258项结果直接绑定为该提交原样执行。历史日志已于2026-11-16归档仓库内，位置与逐件摘要见[证据索引](P3_experiment_evidence_index.md#阶段数量与访问边界)。本轮不重跑测试，也不补推当前总量。
 
 ## 任务链 A：授权拒绝
 
@@ -37,7 +37,7 @@
 | 只读设计 | [规则范围与可信边界](../docs/P3_minimal_evaluator.md)、[开发规则](../AGENTS.md) | 仅读既有三文件；不生成产品计划、取得许可、触发检查或修改报告 |
 | 实现 | [evaluator.py](../src/p3_core/evaluator.py) `inspect`／`inspect_budget`／`inspect_revoke`／`evaluate`／`evaluate_all` | 实现存在，不自动证明运行成功或人工批准 |
 | 校准与复核方法 | [test_evaluator.py](../tests/test_evaluator.py)各规则K1／K2／K3；[手册独立校准](../docs/P3_minimal_evaluator.md#独立校准与回归) | 区分历史产品输入与SYNTHETIC_CALIBRATION；本轮不运行 |
-| 历史输出 | [仓库外输出登记](P3_experiment_evidence_index.md#仓库外评价输出)：2026-11-04九次单规则及综合展示、2026-11-11两版兼容性输出 | 本机实际可读，有JSON/执行记录；跨机器移交尚未完成，产品report仅是输入 |
+| 历史输出 | [仓库内评价输出归档](../evidence/course_ch03/eval_20261104_evaluator/README.md)（2026-11-04九次单规则及综合展示）与[兼容性归档](../evidence/course_ch03/eval_20261111_compat/INVENTORY_SHA256.json)（2026-11-11）；索引见[评价输出归档](P3_experiment_evidence_index.md#评价与兼容性输出归档) | 已按字节移交，逐件SHA-256可核；产品report仅是输入，不是评价结论；candidate不是第二次独立产品复现；human_signoff仍pending |
 | 当前状态 | [课程评价复核](../review/P3_course_delivery_index.md#人工复核与未完成事项) | 规则存在、历史执行完成、输出可复核分别有材料；human_signoff仍pending，overall_verdict=null，不等于人工批准或整体安全PASS |
 
 ## 历史追踪正文（2026-10-19起）

@@ -1,0 +1,241 @@
+{
+  "record_type": "DERIVED_TRANSFER_INVENTORY_NOT_ORIGINAL_EXECUTION_MANIFEST",
+  "batch_id": "c3c_supervisor_20261022",
+  "batch_label": "2026-10-22 C-3C 监督审核历史测试日志与竞争时序记录",
+  "transferred_at": "2026-11-16T16:33:19.359807+08:00",
+  "transfer_tool": "p3_transfer_20261116.py (byte-preserving copy2 + SHA-256 before/after compare)",
+  "source_root_local": "D:\\codex\\2026-10-12\\referenced-chatgpt-conversation-this-is-an\\outputs\\c3-supervisor",
+  "source_root_is_private_local_only": true,
+  "source_root_not_a_transferable_link": true,
+  "repo_target_dir": "evidence/course_ch03/c3c_supervisor_20261022",
+  "human_signoff": "pending",
+  "approval_verified": false,
+  "source_authenticated": false,
+  "scan": {
+    "sensitive_patterns": "NO_MATCH (credential/email/session/identity patterns)",
+    "compressed_attachments_in_set": false,
+    "note": "本清单不是公开发布批准；源码内本机绝对路径为历史来源标注，不构成可移交链接。"
+  },
+  "file_count": 23,
+  "total_bytes": 437529,
+  "verification": {
+    "method": "SHA-256 + byte length, source vs target, per file",
+    "all_match": true,
+    "mismatches": []
+  },
+  "files": [
+    {
+      "path": "P3-c3-supervisor-review.diff",
+      "bytes": 172707,
+      "sha256": "f6e1178dda6552c87a91d1c6179bec085e041260e594e3aff8410e63483e0e8e",
+      "category": "diff",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "P3-c3-supervisor-review.diff"
+    },
+    {
+      "path": "baseline.json",
+      "bytes": 10323,
+      "sha256": "fabd323574651707ace69e7b0bd2ed1085845a1ee24bd5c85b1153b5d8645855",
+      "category": "baseline_snapshot",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "baseline.json"
+    },
+    {
+      "path": "blocking-regression-after.txt",
+      "bytes": 8262,
+      "sha256": "14c7cc49790d0fcbb4c7f2b4f6867140bab7e40de620bc8af58845486259ddab",
+      "category": "console_record",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "blocking-regression-after.txt"
+    },
+    {
+      "path": "blocking-regression-before.txt",
+      "bytes": 22456,
+      "sha256": "685b9905782531ffc0b7981812d22a136cf139c1658beaf204f31ae72c399e31",
+      "category": "console_record",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "blocking-regression-before.txt"
+    },
+    {
+      "path": "export_diff.py",
+      "bytes": 1232,
+      "sha256": "e1728571c17f8ae28c5e928b56fab62609cccf5ade36b0d7b5d658db6cd605de",
+      "category": "script",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "export_diff.py"
+    },
+    {
+      "path": "git-summary.txt",
+      "bytes": 1707,
+      "sha256": "8687854db7af6fd42f6d07dae2997c952d91606fd512f163878a6541543aa16d",
+      "category": "record",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "git-summary.txt"
+    },
+    {
+      "path": "independent-review-race.json",
+      "bytes": 223,
+      "sha256": "549edaff51a87ff2823d1a96f98b1c6c43285bdbd989085146e23856f293901a",
+      "category": "race_record",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "independent-review-race.json"
+    },
+    {
+      "path": "independent-review-unittest.txt",
+      "bytes": 19246,
+      "sha256": "ba6c6057b0fe01082b5c54f6b44307390a94ca8fc8ba3dadbb2b951e4006a7d2",
+      "category": "test_log",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "independent-review-unittest.txt"
+    },
+    {
+      "path": "local-commits.json",
+      "bytes": 1345,
+      "sha256": "6fe4955cceabe9a4efc75b9672138578bdaa67e7c34f24acaeac2c9013262502",
+      "category": "record",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "local-commits.json"
+    },
+    {
+      "path": "missing-sidecar-after.txt",
+      "bytes": 201,
+      "sha256": "aa139e098b0c4c975dfd9a0ed60375bfe4a05ad55470a209c6f41abb378076de",
+      "category": "console_record",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "missing-sidecar-after.txt"
+    },
+    {
+      "path": "missing-sidecar-before.txt",
+      "bytes": 766,
+      "sha256": "c29908287dab893081d44cc061662be0b743f592b2c80de161ce0ad9b02cecdb",
+      "category": "console_record",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "missing-sidecar-before.txt"
+    },
+    {
+      "path": "precommit-standard.txt",
+      "bytes": 45052,
+      "sha256": "6fcb8d039987ae3ff874f66060643bfabb832289ea3ada76dc18ec8a8e513c64",
+      "category": "test_log",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "precommit-standard.txt"
+    },
+    {
+      "path": "registration-before.txt",
+      "bytes": 6016,
+      "sha256": "9c774b15e955db7487d287754a8c06bc6fad13ccaeb935990c78624f26c10fdf",
+      "category": "console_record",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "registration-before.txt"
+    },
+    {
+      "path": "registration-reset-races.json",
+      "bytes": 7685,
+      "sha256": "859de4551105c17a9075a7fd9cf00bc560c59e040996f8d5382ea040e566142f",
+      "category": "race_record",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "registration-reset-races.json"
+    },
+    {
+      "path": "registration_races.py",
+      "bytes": 10465,
+      "sha256": "81714f116d20707dcaf01d1a5923923bf342bc13ec56fbdf801534d6cfc74dc1",
+      "category": "script",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "registration_races.py"
+    },
+    {
+      "path": "reset-commit-after.txt",
+      "bytes": 10272,
+      "sha256": "9acfe02a59d937314e891b5d7ea51168a2ce2a4f7f8d82dd3619ff774e13c848",
+      "category": "console_record",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "reset-commit-after.txt"
+    },
+    {
+      "path": "reset-commit-before.txt",
+      "bytes": 17950,
+      "sha256": "68e3f56fb95c30889e695ac5ccb7bd0eaf00dd891bf984a4dcedb93cb4c0f665",
+      "category": "console_record",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "reset-commit-before.txt"
+    },
+    {
+      "path": "reset-commit-race-after.json",
+      "bytes": 307,
+      "sha256": "382e27749fa628f93720d909a3706590245c4e0039696e91b8053ca9eaf940bc",
+      "category": "console_record",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "reset-commit-race-after.json"
+    },
+    {
+      "path": "unittest-final.txt",
+      "bytes": 22180,
+      "sha256": "0c63818a9959fb668168b5c36ac7b422f3cfb27ef455382222be99c99ca829b5",
+      "category": "test_log",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "unittest-final.txt"
+    },
+    {
+      "path": "unittest-first.txt",
+      "bytes": 37800,
+      "sha256": "e62b384b8f416dd91c297667740a87b71bf0425157471a1c6b95a947d9284c3a",
+      "category": "test_log",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "unittest-first.txt"
+    },
+    {
+      "path": "unittest-second.txt",
+      "bytes": 37350,
+      "sha256": "dc1dbcf33bd9edf0b8dd1e777e2729df053b6f2630f99016f3af653fd31e37e8",
+      "category": "test_log",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "unittest-second.txt"
+    },
+    {
+      "path": "validate.py",
+      "bytes": 3342,
+      "sha256": "74b04247a09a4250245203351293aa253461932b9bf8f9962b6938ef4c3cfc81",
+      "category": "script",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "validate.py"
+    },
+    {
+      "path": "validation.json",
+      "bytes": 642,
+      "sha256": "d81fc778516c00e69507905331f0106816c1d70e12569e2b79f1368e242bce91",
+      "category": "record",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "validation.json"
+    }
+  ],
+  "execution_head": "3199b3f9a447cc15548523c995548f139cf8bc18",
+  "execution_head_limitation": "报告起始基线为 3199b3f，最终 258 项带当时工作区增量；不能将该提交认定为原样执行版本。",
+  "historical_execution_sha": "3199b3f9a447cc15548523c995548f139cf8bc18 + 当时工作区增量（NOT_FULLY_BOUND）",
+  "test_count_note": "258 项为 C-3C 阶段历史数量，不是当前全部测试总量；不得标注为当前 HEAD 重新执行结果。",
+  "reset_races": "12 种确定性重置竞争时序已记录；本轮未重放。",
+  "source_path_mapping_note": "原始文件以 source_root_local + files[].source_relpath 定位；绝对路径仅作来源标注，不是可移交链接。"
+}

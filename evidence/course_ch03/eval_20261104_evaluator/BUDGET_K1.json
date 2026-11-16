@@ -1,0 +1,159 @@
+{
+  "schema_version": "p3-evaluation-v1",
+  "evaluator_version": "1.0",
+  "rule_id": "P3-EVAL-BUDGET-001",
+  "status": "PASS",
+  "evidence_directory": "D:\\codex\\P3_final_delivery_pack_20261102\\P3_evaluator_demo_20261104\\calibration_inputs\\BUDGET_K1",
+  "subject_run_id": "run_00000000000000000000000000000001",
+  "provenance": "SYNTHETIC_CALIBRATION",
+  "evidence_level": "LOCAL_OFFLINE_RECORD_INTERNAL_CONSISTENCY",
+  "checked_artifacts": [
+    {
+      "name": "manifest.json",
+      "bytes": 552,
+      "sha256": "e10586bbf658f49dbbd54ae4d765607b3d8ce8e2e1a9ba4816ccff5690edb50a"
+    },
+    {
+      "name": "report.json",
+      "bytes": 4527,
+      "sha256": "d85eb5ffa94bf2adebed73ea8028e3095c8fe683a8c867a08005c06f2922ac99"
+    },
+    {
+      "name": "events.jsonl",
+      "bytes": 8863,
+      "sha256": "7da452d730b151d98d987416ae6e844eeac39ed7090f59409c14cb0d62cf9644"
+    }
+  ],
+  "observed_facts": {
+    "counts": {
+      "attempt_count": 8,
+      "request_count": 0,
+      "model_request_count": 0,
+      "plan_count": 8
+    },
+    "benchmark_version": "p3-eval-trial-eight-v1",
+    "max_checks": 8,
+    "benchmark_binding": "RULE_SELECTION_ONLY",
+    "runtime_budget_verified": false,
+    "scope_digest": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "evidence_references": [
+    {
+      "artifact": "events.jsonl",
+      "line": 2,
+      "evidence_id": "evidence_00000000000000000000000000000002",
+      "kind": "plan_registered"
+    },
+    {
+      "artifact": "events.jsonl",
+      "line": 3,
+      "evidence_id": "evidence_00000000000000000000000000000003",
+      "kind": "proposal_registered"
+    },
+    {
+      "artifact": "events.jsonl",
+      "line": 4,
+      "evidence_id": "evidence_00000000000000000000000000000004",
+      "kind": "authorization"
+    },
+    {
+      "artifact": "events.jsonl",
+      "line": 5,
+      "evidence_id": "evidence_00000000000000000000000000000005",
+      "kind": "proposal_registered"
+    },
+    {
+      "artifact": "events.jsonl",
+      "line": 6,
+      "evidence_id": "evidence_00000000000000000000000000000006",
+      "kind": "authorization"
+    },
+    {
+      "artifact": "events.jsonl",
+      "line": 7,
+      "evidence_id": "evidence_00000000000000000000000000000007",
+      "kind": "proposal_registered"
+    },
+    {
+      "artifact": "events.jsonl",
+      "line": 8,
+      "evidence_id": "evidence_00000000000000000000000000000008",
+      "kind": "authorization"
+    },
+    {
+      "artifact": "events.jsonl",
+      "line": 9,
+      "evidence_id": "evidence_00000000000000000000000000000009",
+      "kind": "proposal_registered"
+    },
+    {
+      "artifact": "events.jsonl",
+      "line": 10,
+      "evidence_id": "evidence_0000000000000000000000000000000a",
+      "kind": "authorization"
+    },
+    {
+      "artifact": "events.jsonl",
+      "line": 11,
+      "evidence_id": "evidence_0000000000000000000000000000000b",
+      "kind": "proposal_registered"
+    },
+    {
+      "artifact": "events.jsonl",
+      "line": 12,
+      "evidence_id": "evidence_0000000000000000000000000000000c",
+      "kind": "authorization"
+    },
+    {
+      "artifact": "events.jsonl",
+      "line": 13,
+      "evidence_id": "evidence_0000000000000000000000000000000d",
+      "kind": "proposal_registered"
+    },
+    {
+      "artifact": "events.jsonl",
+      "line": 14,
+      "evidence_id": "evidence_0000000000000000000000000000000e",
+      "kind": "authorization"
+    },
+    {
+      "artifact": "events.jsonl",
+      "line": 15,
+      "evidence_id": "evidence_0000000000000000000000000000000f",
+      "kind": "proposal_registered"
+    },
+    {
+      "artifact": "events.jsonl",
+      "line": 16,
+      "evidence_id": "evidence_00000000000000000000000000000010",
+      "kind": "authorization"
+    },
+    {
+      "artifact": "events.jsonl",
+      "line": 17,
+      "evidence_id": "evidence_00000000000000000000000000000011",
+      "kind": "proposal_registered"
+    },
+    {
+      "artifact": "events.jsonl",
+      "line": 18,
+      "evidence_id": "evidence_00000000000000000000000000000012",
+      "kind": "authorization"
+    }
+  ],
+  "limitations": [
+    "Fixed evaluation benchmark p3-eval-trial-eight-v1: at most 8; actual runtime budget configuration is NOT independently bound.",
+    "No independent proof of original input, permission, source authenticity or historical execution version.",
+    "Absence of recorded model dispatch is not proof of no OS/network send.",
+    "No real API verdict, formal course grade or peer reproduction.",
+    "No independent 90-second, concurrency, cancellation, or stop-effective ordering proof; not full REQ-010/GWT-N04/N05 acceptance."
+  ],
+  "missing_evidence": [],
+  "suggested_next_check": [
+    "Human review of cited records and their source; no automatic re-execution."
+  ],
+  "human_signoff": "pending",
+  "score": null,
+  "approval_verified": false,
+  "source_authenticated": false
+}

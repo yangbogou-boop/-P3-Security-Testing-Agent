@@ -1,0 +1,89 @@
+{
+  "record_type": "DERIVED_TRANSFER_INVENTORY_NOT_ORIGINAL_EXECUTION_MANIFEST",
+  "batch_id": "eval_20261111_compat",
+  "batch_label": "2026-11-11 文档整改前后评价兼容性（同一 baseline 产品输入）",
+  "transferred_at": "2026-11-16T16:33:19.359807+08:00",
+  "transfer_tool": "p3_transfer_20261116.py (byte-preserving copy2 + SHA-256 before/after compare)",
+  "source_root_local": "D:\\codex\\P3_documentation_remediation_20261111",
+  "source_root_is_private_local_only": true,
+  "source_root_not_a_transferable_link": true,
+  "repo_target_dir": "evidence/course_ch03/eval_20261111_compat",
+  "human_signoff": "pending",
+  "approval_verified": false,
+  "source_authenticated": false,
+  "scan": {
+    "sensitive_patterns": "NO_MATCH (credential/email/session/identity patterns)",
+    "compressed_attachments_in_set": false,
+    "note": "本清单不是公开发布批准；源码内本机绝对路径为历史来源标注，不构成可移交链接。"
+  },
+  "file_count": 6,
+  "total_bytes": 102838,
+  "verification": {
+    "method": "SHA-256 + byte length, source vs target, per file",
+    "all_match": true,
+    "mismatches": []
+  },
+  "files": [
+    {
+      "path": "baseline_compatibility.json",
+      "bytes": 16381,
+      "sha256": "79c5ff0e4ece31c75b17e21c466286b2a2b53f391ab45e5cb11b8ee1d08daed2",
+      "category": "compatibility_result",
+      "input_tag": "HISTORICAL_PRODUCT_RECORD",
+      "verified": true,
+      "source_relpath": "baseline_compatibility.json"
+    },
+    {
+      "path": "baseline_unittest.log",
+      "bytes": 34093,
+      "sha256": "c591c8956f6898147fca7fb48a02cb2875775de686419b7c9bf5b6975151709e",
+      "category": "test_log",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "baseline_unittest.log"
+    },
+    {
+      "path": "candidate_compatibility.json",
+      "bytes": 16381,
+      "sha256": "bf706f0f4a5e629673845247c06a235df6e636ae5e33e701d9c07cb3618229bb",
+      "category": "compatibility_result",
+      "input_tag": "HISTORICAL_PRODUCT_RECORD",
+      "verified": true,
+      "source_relpath": "candidate_compatibility.json"
+    },
+    {
+      "path": "candidate_unittest.log",
+      "bytes": 34190,
+      "sha256": "32c86a87734e045be432490a364a5a9198bf9712a43b2e4e6f27b4d27ddaaa18",
+      "category": "test_log",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "candidate_unittest.log"
+    },
+    {
+      "path": "compatibility.py",
+      "bytes": 1502,
+      "sha256": "04dc42fbf544f3d220c0c0bef7b26cf3ae1d031c5ec26863d9fe27588cc7b373",
+      "category": "runner",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "compatibility.py"
+    },
+    {
+      "path": "compatibility_result.txt",
+      "bytes": 291,
+      "sha256": "003d08bd94bb210e00b00252141745882eb5089b18387550794af4fff07caaf9",
+      "category": "compatibility_result",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "compatibility_result.txt"
+    }
+  ],
+  "execution_head": "NOT_RECORDED_IN_FILES",
+  "execution_head_limitation": "baseline/candidate 为整改前后仓库快照；未在文件中记录唯一提交标识。",
+  "historical_execution_sha": "NOT_FULLY_BOUND",
+  "shared_input_note": "两份评价均复用同一 baseline 副本 product run（eval_20261028_02/run_ce4b0027ae024f05a72d81173c9f05e2 的 baseline 目录副本）；candidate 文件名不是另一产品 run，也不是两次独立产品复现。",
+  "rule_result": "DENY=PASS, BUDGET=PASS, REVOKE=INSUFFICIENT_EVIDENCE; bundle_status=CONSISTENT_READS; overall_verdict=null; human_signoff=pending",
+  "git_add_note": "本批 baseline_unittest.log、candidate_unittest.log 命中仓库 .gitignore 第59行 *.log，普通 git add 会跳过；提交时需 git add -f 这两个文件，或经用户批准后调整 .gitignore。",
+  "source_path_mapping_note": "原始文件以 source_root_local + files[].source_relpath 定位；绝对路径仅作来源标注，不是可移交链接。"
+}

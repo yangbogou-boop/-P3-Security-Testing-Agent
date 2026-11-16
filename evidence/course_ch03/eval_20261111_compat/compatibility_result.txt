@@ -1,0 +1,3 @@
+PASS: matching Good fixed/dynamic state, counts, coverage, order, verdicts and contract.
+PASS: evaluator exit code and parsed JSON match for R01 on the same input.
+Initial bytewise comparison returned COMPATIBILITY_DIFF because JSON object member order differed. Both raw files retained.

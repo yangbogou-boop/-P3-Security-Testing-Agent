@@ -1,0 +1,38 @@
+[
+  {
+    "source": "D:\\project\\-P3-Security-Testing-Agent\\evidence\\course_ch03\\eval_20261028_02\\artifacts\\run_ce4b0027ae024f05a72d81173c9f05e2\\events.jsonl",
+    "copy": "historical_reference/DENY_K1/events.jsonl",
+    "bytes": 22736,
+    "sha256": "a99b2ec71b534f4602bf59b7b7dc07387b078c1e0ee81fb7214e46217963791d"
+  },
+  {
+    "source": "D:\\project\\-P3-Security-Testing-Agent\\evidence\\course_ch03\\eval_20261028_02\\artifacts\\run_ce4b0027ae024f05a72d81173c9f05e2\\manifest.json",
+    "copy": "historical_reference/DENY_K1/manifest.json",
+    "bytes": 564,
+    "sha256": "17fe533cfc7b81a87555cf4b19e57ed5d792ba85ffc5e7137ca1aba724326ac4"
+  },
+  {
+    "source": "D:\\project\\-P3-Security-Testing-Agent\\evidence\\course_ch03\\eval_20261028_02\\artifacts\\run_ce4b0027ae024f05a72d81173c9f05e2\\report.json",
+    "copy": "historical_reference/DENY_K1/report.json",
+    "bytes": 7099,
+    "sha256": "bd41995bb5a384b754b15bcfa1747378c6e2ede3c15ac513b48c027ce02d86a2"
+  },
+  {
+    "source": "D:\\project\\-P3-Security-Testing-Agent\\evidence\\course_ch03\\eval_20261028_01\\artifacts\\run_e2b938e432d044e69427e50f2b1a9aaf\\events.jsonl",
+    "copy": "historical_reference/DENY_K3/events.jsonl",
+    "bytes": 22736,
+    "sha256": "9b927ffffced03e8c2fd42bf3e6d697271678ef8628be0a0a62f127796e9c68b"
+  },
+  {
+    "source": "D:\\project\\-P3-Security-Testing-Agent\\evidence\\course_ch03\\eval_20261028_01\\artifacts\\run_e2b938e432d044e69427e50f2b1a9aaf\\manifest.json",
+    "copy": "historical_reference/DENY_K3/manifest.json",
+    "bytes": 443,
+    "sha256": "2b1ab15f15e922ef8f6526b1e27916d95ce7b9b191eea8d97989f62a9d9744db"
+  },
+  {
+    "source": "D:\\project\\-P3-Security-Testing-Agent\\evidence\\course_ch03\\eval_20261028_01\\artifacts\\run_e2b938e432d044e69427e50f2b1a9aaf\\report.json",
+    "copy": "historical_reference/DENY_K3/report.json",
+    "bytes": 7099,
+    "sha256": "25bd1c156b05e4199ad8c43c761880195cf0e7208794c26f1b3a68871b7876f2"
+  }
+]

@@ -1,0 +1,664 @@
+{
+  "record_type": "DERIVED_TRANSFER_INVENTORY_NOT_ORIGINAL_EXECUTION_MANIFEST",
+  "batch_id": "eval_20261104_evaluator",
+  "batch_label": "2026-11-04 评价 Agent 九次单规则与 bundle 展示（历史离线执行）",
+  "transferred_at": "2026-11-16T16:33:19.359807+08:00",
+  "transfer_tool": "p3_transfer_20261116.py (byte-preserving copy2 + SHA-256 before/after compare)",
+  "source_root_local": "D:\\codex\\P3_final_delivery_pack_20261102\\P3_evaluator_demo_20261104",
+  "source_root_is_private_local_only": true,
+  "source_root_not_a_transferable_link": true,
+  "repo_target_dir": "evidence/course_ch03/eval_20261104_evaluator",
+  "human_signoff": "pending",
+  "approval_verified": false,
+  "source_authenticated": false,
+  "scan": {
+    "sensitive_patterns": "NO_MATCH (credential/email/session/identity patterns)",
+    "compressed_attachments_in_set": false,
+    "note": "本清单不是公开发布批准；源码内本机绝对路径为历史来源标注，不构成可移交链接。"
+  },
+  "file_count": 68,
+  "total_bytes": 291180,
+  "verification": {
+    "method": "SHA-256 + byte length, source vs target, per file",
+    "all_match": true,
+    "mismatches": []
+  },
+  "files": [
+    {
+      "path": "BUDGET_K1.json",
+      "bytes": 5063,
+      "sha256": "db9a47a5b1cce8e69dd0f6e66f7ce4e3d98328fd8c04e06e0a90ca8057c17a82",
+      "category": "evaluator_output",
+      "input_tag": "SYNTHETIC_CALIBRATION",
+      "verified": true,
+      "source_relpath": "BUDGET_K1.json"
+    },
+    {
+      "path": "BUDGET_K1.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "category": "execution_record",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "BUDGET_K1.stderr.txt"
+    },
+    {
+      "path": "BUDGET_K2.json",
+      "bytes": 5403,
+      "sha256": "d54f9926be5efcfa3aa055f3568aefae080e424b82fe57a585acc93ba02a4f4d",
+      "category": "evaluator_output",
+      "input_tag": "SYNTHETIC_CALIBRATION",
+      "verified": true,
+      "source_relpath": "BUDGET_K2.json"
+    },
+    {
+      "path": "BUDGET_K2.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "category": "execution_record",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "BUDGET_K2.stderr.txt"
+    },
+    {
+      "path": "BUDGET_K3.json",
+      "bytes": 1393,
+      "sha256": "2f0ec1ac81ff811fc43da2e7779303d98d3f8c9e801080bd8c2d6b728216b3b1",
+      "category": "evaluator_output",
+      "input_tag": "SYNTHETIC_CALIBRATION",
+      "verified": true,
+      "source_relpath": "BUDGET_K3.json"
+    },
+    {
+      "path": "BUDGET_K3.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "category": "execution_record",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "BUDGET_K3.stderr.txt"
+    },
+    {
+      "path": "DENY_K1.json",
+      "bytes": 2616,
+      "sha256": "befc8d7ee9f57796e20b1d4c085580ccf242dc233e1aae53ea0cb73e1b421acf",
+      "category": "evaluator_output",
+      "input_tag": "HISTORICAL_PRODUCT_RECORD",
+      "verified": true,
+      "source_relpath": "DENY_K1.json"
+    },
+    {
+      "path": "DENY_K1.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "category": "execution_record",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "DENY_K1.stderr.txt"
+    },
+    {
+      "path": "DENY_K2.json",
+      "bytes": 2942,
+      "sha256": "bd405bd6588e366bf4193f18cecda86aa366e0b9d9748ba7174e16547180e340",
+      "category": "evaluator_output",
+      "input_tag": "SYNTHETIC_CALIBRATION",
+      "verified": true,
+      "source_relpath": "DENY_K2.json"
+    },
+    {
+      "path": "DENY_K2.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "category": "execution_record",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "DENY_K2.stderr.txt"
+    },
+    {
+      "path": "DENY_K3.json",
+      "bytes": 1671,
+      "sha256": "6335b4b81dfaed81f8036ca2b28a3f034102c272fd6138a5e97811310e5c500e",
+      "category": "evaluator_output",
+      "input_tag": "HISTORICAL_PRODUCT_RECORD",
+      "verified": true,
+      "source_relpath": "DENY_K3.json"
+    },
+    {
+      "path": "DENY_K3.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "category": "execution_record",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "DENY_K3.stderr.txt"
+    },
+    {
+      "path": "README.md",
+      "bytes": 8622,
+      "sha256": "78ce523efa366af3e4195598d2671fc9664f18662f5b2ad2e4601410a4047195",
+      "category": "readme",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "README.md"
+    },
+    {
+      "path": "REVOKE_K1.json",
+      "bytes": 3324,
+      "sha256": "caf38adbf3ce3144cdc186ce06d2855605729f21e7ef6d348db7f2f3a6ca9e53",
+      "category": "evaluator_output",
+      "input_tag": "SYNTHETIC_CALIBRATION",
+      "verified": true,
+      "source_relpath": "REVOKE_K1.json"
+    },
+    {
+      "path": "REVOKE_K1.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "category": "execution_record",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "REVOKE_K1.stderr.txt"
+    },
+    {
+      "path": "REVOKE_K2.json",
+      "bytes": 3798,
+      "sha256": "aa67c5a11663b014ad4d2b7e7f76b5967c2d6de1099f0267c5730cf7454064bf",
+      "category": "evaluator_output",
+      "input_tag": "SYNTHETIC_CALIBRATION",
+      "verified": true,
+      "source_relpath": "REVOKE_K2.json"
+    },
+    {
+      "path": "REVOKE_K2.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "category": "execution_record",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "REVOKE_K2.stderr.txt"
+    },
+    {
+      "path": "REVOKE_K3.json",
+      "bytes": 2115,
+      "sha256": "c96f0c1ce00dfcce65e15556f38b5a0b1c28520fbf2b084c38574d56429d57b2",
+      "category": "evaluator_output",
+      "input_tag": "SYNTHETIC_CALIBRATION",
+      "verified": true,
+      "source_relpath": "REVOKE_K3.json"
+    },
+    {
+      "path": "REVOKE_K3.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "category": "execution_record",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "REVOKE_K3.stderr.txt"
+    },
+    {
+      "path": "bundle_history_good.json",
+      "bytes": 12938,
+      "sha256": "926e207b6e3f66b8275a45a42e3c0b1dc17738aef504bb2554a5bef6e1ce0723",
+      "category": "evaluator_output_bundle",
+      "input_tag": "HISTORICAL_PRODUCT_RECORD",
+      "verified": true,
+      "source_relpath": "bundle_history_good.json"
+    },
+    {
+      "path": "bundle_history_good.txt",
+      "bytes": 7194,
+      "sha256": "24f31b815a07f1973c0cd6971e9c45dc35c6c748a81bf402dd778d9b4cd51567",
+      "category": "evaluator_output_bundle_text",
+      "input_tag": "HISTORICAL_PRODUCT_RECORD",
+      "verified": true,
+      "source_relpath": "bundle_history_good.txt"
+    },
+    {
+      "path": "bundle_history_good_json_execution.json",
+      "bytes": 236,
+      "sha256": "c328b7294431d002968465cade2c6a50b5d8e4fb9c0ded57bd40389a124cff20",
+      "category": "evaluator_output_bundle",
+      "input_tag": "HISTORICAL_PRODUCT_RECORD",
+      "verified": true,
+      "source_relpath": "bundle_history_good_json_execution.json"
+    },
+    {
+      "path": "bundle_history_good_text_execution.json",
+      "bytes": 236,
+      "sha256": "8d4935fc22544f0c44134ccb8052b7c4078f02c6530bf548f9eaf7de60800588",
+      "category": "evaluator_output_bundle",
+      "input_tag": "HISTORICAL_PRODUCT_RECORD",
+      "verified": true,
+      "source_relpath": "bundle_history_good_text_execution.json"
+    },
+    {
+      "path": "bundle_history_incomplete.json",
+      "bytes": 7442,
+      "sha256": "fcfcc1b718e6982f99a4023c5643ddcadd902b82a08d692d024fbe08837e6051",
+      "category": "evaluator_output_bundle",
+      "input_tag": "HISTORICAL_PRODUCT_RECORD",
+      "verified": true,
+      "source_relpath": "bundle_history_incomplete.json"
+    },
+    {
+      "path": "bundle_history_incomplete.txt",
+      "bytes": 3113,
+      "sha256": "ae07218f89efaa33f7c6b5ffa7d9d012a0adb4cb3a1474166495596cd3c9f6bb",
+      "category": "evaluator_output_bundle_text",
+      "input_tag": "HISTORICAL_PRODUCT_RECORD",
+      "verified": true,
+      "source_relpath": "bundle_history_incomplete.txt"
+    },
+    {
+      "path": "bundle_history_incomplete_json_execution.json",
+      "bytes": 236,
+      "sha256": "51731188ae4adc0c363c1ae524baa7192e21f4418a94533e7782183be5f2d80e",
+      "category": "evaluator_output_bundle",
+      "input_tag": "HISTORICAL_PRODUCT_RECORD",
+      "verified": true,
+      "source_relpath": "bundle_history_incomplete_json_execution.json"
+    },
+    {
+      "path": "bundle_history_incomplete_text_execution.json",
+      "bytes": 236,
+      "sha256": "c0d95537540c483d7cbc6002774ad06495e5612c62ed30cf53c132831d6dd4b9",
+      "category": "evaluator_output_bundle",
+      "input_tag": "HISTORICAL_PRODUCT_RECORD",
+      "verified": true,
+      "source_relpath": "bundle_history_incomplete_text_execution.json"
+    },
+    {
+      "path": "bundle_synthetic_revoke_fail.json",
+      "bytes": 9398,
+      "sha256": "b68fe6329e453ba3450015a020ceff69c2d4a7dcdc0321fd2a1cd40ccabb78ef",
+      "category": "evaluator_output_bundle",
+      "input_tag": "SYNTHETIC_CALIBRATION",
+      "verified": true,
+      "source_relpath": "bundle_synthetic_revoke_fail.json"
+    },
+    {
+      "path": "bundle_synthetic_revoke_fail.txt",
+      "bytes": 4503,
+      "sha256": "9c27838eb19fcd7a07016f2505a85d5e71f3971b6f1d33f63a291736514546ce",
+      "category": "evaluator_output_bundle_text",
+      "input_tag": "SYNTHETIC_CALIBRATION",
+      "verified": true,
+      "source_relpath": "bundle_synthetic_revoke_fail.txt"
+    },
+    {
+      "path": "bundle_synthetic_revoke_fail_json_execution.json",
+      "bytes": 208,
+      "sha256": "828c650515a1dbcce9905052ccf99c7fa97082d118a8a3f904bed96f78360b3f",
+      "category": "evaluator_output_bundle",
+      "input_tag": "SYNTHETIC_CALIBRATION",
+      "verified": true,
+      "source_relpath": "bundle_synthetic_revoke_fail_json_execution.json"
+    },
+    {
+      "path": "bundle_synthetic_revoke_fail_text_execution.json",
+      "bytes": 208,
+      "sha256": "0288624a0ab730617256c80f78889971e32b69f808a702126199a43a21593660",
+      "category": "evaluator_output_bundle",
+      "input_tag": "SYNTHETIC_CALIBRATION",
+      "verified": true,
+      "source_relpath": "bundle_synthetic_revoke_fail_text_execution.json"
+    },
+    {
+      "path": "calibration_inputs/BUDGET_K1/events.jsonl",
+      "bytes": 8863,
+      "sha256": "7da452d730b151d98d987416ae6e844eeac39ed7090f59409c14cb0d62cf9644",
+      "category": "synthetic_calibration_input",
+      "input_tag": "SYNTHETIC_CALIBRATION",
+      "verified": true,
+      "source_relpath": "calibration_inputs/BUDGET_K1/events.jsonl"
+    },
+    {
+      "path": "calibration_inputs/BUDGET_K1/manifest.json",
+      "bytes": 552,
+      "sha256": "e10586bbf658f49dbbd54ae4d765607b3d8ce8e2e1a9ba4816ccff5690edb50a",
+      "category": "synthetic_calibration_input",
+      "input_tag": "SYNTHETIC_CALIBRATION",
+      "verified": true,
+      "source_relpath": "calibration_inputs/BUDGET_K1/manifest.json"
+    },
+    {
+      "path": "calibration_inputs/BUDGET_K1/report.json",
+      "bytes": 4527,
+      "sha256": "d85eb5ffa94bf2adebed73ea8028e3095c8fe683a8c867a08005c06f2922ac99",
+      "category": "synthetic_calibration_input",
+      "input_tag": "SYNTHETIC_CALIBRATION",
+      "verified": true,
+      "source_relpath": "calibration_inputs/BUDGET_K1/report.json"
+    },
+    {
+      "path": "calibration_inputs/BUDGET_K2/events.jsonl",
+      "bytes": 9845,
+      "sha256": "a60a9cf04d45027b3b5cee6b04a2da3e6366d8a5118006a333c63e87f6ba5a1f",
+      "category": "synthetic_calibration_input",
+      "input_tag": "SYNTHETIC_CALIBRATION",
+      "verified": true,
+      "source_relpath": "calibration_inputs/BUDGET_K2/events.jsonl"
+    },
+    {
+      "path": "calibration_inputs/BUDGET_K2/manifest.json",
+      "bytes": 552,
+      "sha256": "2f786a4b240c3ad44abdc060bfc3410a5282bcad9964f6af2901b77765658e81",
+      "category": "synthetic_calibration_input",
+      "input_tag": "SYNTHETIC_CALIBRATION",
+      "verified": true,
+      "source_relpath": "calibration_inputs/BUDGET_K2/manifest.json"
+    },
+    {
+      "path": "calibration_inputs/BUDGET_K2/report.json",
+      "bytes": 5006,
+      "sha256": "ff41a268e71c2452706b56d2f853642403ded265c5fec57df80fb718e1b5f499",
+      "category": "synthetic_calibration_input",
+      "input_tag": "SYNTHETIC_CALIBRATION",
+      "verified": true,
+      "source_relpath": "calibration_inputs/BUDGET_K2/report.json"
+    },
+    {
+      "path": "calibration_inputs/BUDGET_K3/events.jsonl",
+      "bytes": 8863,
+      "sha256": "7da452d730b151d98d987416ae6e844eeac39ed7090f59409c14cb0d62cf9644",
+      "category": "synthetic_calibration_input",
+      "input_tag": "SYNTHETIC_CALIBRATION",
+      "verified": true,
+      "source_relpath": "calibration_inputs/BUDGET_K3/events.jsonl"
+    },
+    {
+      "path": "calibration_inputs/BUDGET_K3/report.json",
+      "bytes": 4527,
+      "sha256": "d85eb5ffa94bf2adebed73ea8028e3095c8fe683a8c867a08005c06f2922ac99",
+      "category": "synthetic_calibration_input",
+      "input_tag": "SYNTHETIC_CALIBRATION",
+      "verified": true,
+      "source_relpath": "calibration_inputs/BUDGET_K3/report.json"
+    },
+    {
+      "path": "calibration_inputs/DENY_K2/events.jsonl",
+      "bytes": 2865,
+      "sha256": "e3006909c3666956718a5d127d8d94fbbc0e28f03c194d32cc6a936126b3acef",
+      "category": "synthetic_calibration_input",
+      "input_tag": "SYNTHETIC_CALIBRATION",
+      "verified": true,
+      "source_relpath": "calibration_inputs/DENY_K2/events.jsonl"
+    },
+    {
+      "path": "calibration_inputs/DENY_K2/manifest.json",
+      "bytes": 552,
+      "sha256": "f0e2e2e3014093c36eae52b1bb2352efb9c9d5ec1b6d5269d4cd4f52a06cdfcb",
+      "category": "synthetic_calibration_input",
+      "input_tag": "SYNTHETIC_CALIBRATION",
+      "verified": true,
+      "source_relpath": "calibration_inputs/DENY_K2/manifest.json"
+    },
+    {
+      "path": "calibration_inputs/DENY_K2/report.json",
+      "bytes": 1211,
+      "sha256": "1dc4453c969bc33cc5c292e05804d7a9099d1eea6c1bf2b67e7b72323ad4d978",
+      "category": "synthetic_calibration_input",
+      "input_tag": "SYNTHETIC_CALIBRATION",
+      "verified": true,
+      "source_relpath": "calibration_inputs/DENY_K2/report.json"
+    },
+    {
+      "path": "calibration_inputs/REVOKE_K1/events.jsonl",
+      "bytes": 2984,
+      "sha256": "d8dfbb66216c61033f55f12e78cd1eca4299d23e767b0faa5806dfacbed7a573",
+      "category": "synthetic_calibration_input",
+      "input_tag": "SYNTHETIC_CALIBRATION",
+      "verified": true,
+      "source_relpath": "calibration_inputs/REVOKE_K1/events.jsonl"
+    },
+    {
+      "path": "calibration_inputs/REVOKE_K1/manifest.json",
+      "bytes": 552,
+      "sha256": "a5bb612ae6c4108b02dba7c1d6ba419b329827d94870fd9eeb417c8c01e77d47",
+      "category": "synthetic_calibration_input",
+      "input_tag": "SYNTHETIC_CALIBRATION",
+      "verified": true,
+      "source_relpath": "calibration_inputs/REVOKE_K1/manifest.json"
+    },
+    {
+      "path": "calibration_inputs/REVOKE_K1/report.json",
+      "bytes": 1350,
+      "sha256": "95fa5c08c83d1dc726c640fcfffa69035d9f53930557ba5317af87f8c754159b",
+      "category": "synthetic_calibration_input",
+      "input_tag": "SYNTHETIC_CALIBRATION",
+      "verified": true,
+      "source_relpath": "calibration_inputs/REVOKE_K1/report.json"
+    },
+    {
+      "path": "calibration_inputs/REVOKE_K2/events.jsonl",
+      "bytes": 3435,
+      "sha256": "758c06391a46bc1d3a8b7b4bd7d7d1d10c20d2cce4f2f9d9e45cd8b8e55bcabd",
+      "category": "synthetic_calibration_input",
+      "input_tag": "SYNTHETIC_CALIBRATION",
+      "verified": true,
+      "source_relpath": "calibration_inputs/REVOKE_K2/events.jsonl"
+    },
+    {
+      "path": "calibration_inputs/REVOKE_K2/manifest.json",
+      "bytes": 552,
+      "sha256": "b0aa04f42081a2559f1c26c2958a8dbeafbbc8909b68b648a1bb2693354db951",
+      "category": "synthetic_calibration_input",
+      "input_tag": "SYNTHETIC_CALIBRATION",
+      "verified": true,
+      "source_relpath": "calibration_inputs/REVOKE_K2/manifest.json"
+    },
+    {
+      "path": "calibration_inputs/REVOKE_K2/report.json",
+      "bytes": 1395,
+      "sha256": "942d58548c5a7df69576804dddf3f7153a9d412a8c93e1af7506cb58a24e62c5",
+      "category": "synthetic_calibration_input",
+      "input_tag": "SYNTHETIC_CALIBRATION",
+      "verified": true,
+      "source_relpath": "calibration_inputs/REVOKE_K2/report.json"
+    },
+    {
+      "path": "calibration_inputs/REVOKE_K3/events.jsonl",
+      "bytes": 2984,
+      "sha256": "d8dfbb66216c61033f55f12e78cd1eca4299d23e767b0faa5806dfacbed7a573",
+      "category": "synthetic_calibration_input",
+      "input_tag": "SYNTHETIC_CALIBRATION",
+      "verified": true,
+      "source_relpath": "calibration_inputs/REVOKE_K3/events.jsonl"
+    },
+    {
+      "path": "calibration_inputs/REVOKE_K3/manifest.json",
+      "bytes": 552,
+      "sha256": "ddf48ef34d916a0b4d8c141583e2a4cbf59c01e5029bcaefef12518399fa98b0",
+      "category": "synthetic_calibration_input",
+      "input_tag": "SYNTHETIC_CALIBRATION",
+      "verified": true,
+      "source_relpath": "calibration_inputs/REVOKE_K3/manifest.json"
+    },
+    {
+      "path": "calibration_inputs/REVOKE_K3/report.json",
+      "bytes": 1353,
+      "sha256": "63bded0e69cb91339ef8a05616aca54d09a40d5be56662e5bbadfbe902ccc0ea",
+      "category": "synthetic_calibration_input",
+      "input_tag": "SYNTHETIC_CALIBRATION",
+      "verified": true,
+      "source_relpath": "calibration_inputs/REVOKE_K3/report.json"
+    },
+    {
+      "path": "case_execution_records.json",
+      "bytes": 9495,
+      "sha256": "859d3ecda478729eef707d79aa6d004a5cf9103a2700c61b14e68fe2ec44f91f",
+      "category": "execution_record",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "case_execution_records.json"
+    },
+    {
+      "path": "context_before.json",
+      "bytes": 39539,
+      "sha256": "b8b8caa8b9f5f1caed9dd31a2af5b5625d6f98af9c55c1b5d8b5a646a80333b2",
+      "category": "execution_record",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "context_before.json"
+    },
+    {
+      "path": "delivery_inventory.json",
+      "bytes": 10675,
+      "sha256": "4ea3c4393d781439a9a550c1966edf56bd091786a607c296c73c4158d1ce11ad",
+      "category": "derived_inventory",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "delivery_inventory.json"
+    },
+    {
+      "path": "execution_finished.json",
+      "bytes": 75,
+      "sha256": "162e1103653fe2207eb50aebe0351e09b32475ec9b04cbce2c620e1c94c7fed0",
+      "category": "execution_record",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "execution_finished.json"
+    },
+    {
+      "path": "execution_started.json",
+      "bytes": 464,
+      "sha256": "e6260d0793a2ba19bc1a1603c33640b034b8ba2a1efc674a9ab772260179d680",
+      "category": "execution_record",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "execution_started.json"
+    },
+    {
+      "path": "file_inventory.json",
+      "bytes": 9242,
+      "sha256": "682629f8adcdac75cd2eaec51356ca802011c54826982a8b2972c5044e836fc3",
+      "category": "derived_inventory",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "file_inventory.json"
+    },
+    {
+      "path": "historical_reference/DENY_K1/events.jsonl",
+      "bytes": 22736,
+      "sha256": "a99b2ec71b534f4602bf59b7b7dc07387b078c1e0ee81fb7214e46217963791d",
+      "category": "historical_product_input_copy",
+      "input_tag": "HISTORICAL_PRODUCT_RECORD_COPY",
+      "verified": true,
+      "source_relpath": "historical_reference/DENY_K1/events.jsonl"
+    },
+    {
+      "path": "historical_reference/DENY_K1/manifest.json",
+      "bytes": 564,
+      "sha256": "17fe533cfc7b81a87555cf4b19e57ed5d792ba85ffc5e7137ca1aba724326ac4",
+      "category": "historical_product_input_copy",
+      "input_tag": "HISTORICAL_PRODUCT_RECORD_COPY",
+      "verified": true,
+      "source_relpath": "historical_reference/DENY_K1/manifest.json"
+    },
+    {
+      "path": "historical_reference/DENY_K1/report.json",
+      "bytes": 7099,
+      "sha256": "bd41995bb5a384b754b15bcfa1747378c6e2ede3c15ac513b48c027ce02d86a2",
+      "category": "historical_product_input_copy",
+      "input_tag": "HISTORICAL_PRODUCT_RECORD_COPY",
+      "verified": true,
+      "source_relpath": "historical_reference/DENY_K1/report.json"
+    },
+    {
+      "path": "historical_reference/DENY_K3/events.jsonl",
+      "bytes": 22736,
+      "sha256": "9b927ffffced03e8c2fd42bf3e6d697271678ef8628be0a0a62f127796e9c68b",
+      "category": "historical_product_input_copy",
+      "input_tag": "HISTORICAL_PRODUCT_RECORD_COPY",
+      "verified": true,
+      "source_relpath": "historical_reference/DENY_K3/events.jsonl"
+    },
+    {
+      "path": "historical_reference/DENY_K3/manifest.json",
+      "bytes": 443,
+      "sha256": "2b1ab15f15e922ef8f6526b1e27916d95ce7b9b191eea8d97989f62a9d9744db",
+      "category": "historical_product_input_copy",
+      "input_tag": "HISTORICAL_PRODUCT_RECORD_COPY",
+      "verified": true,
+      "source_relpath": "historical_reference/DENY_K3/manifest.json"
+    },
+    {
+      "path": "historical_reference/DENY_K3/report.json",
+      "bytes": 7099,
+      "sha256": "25bd1c156b05e4199ad8c43c761880195cf0e7208794c26f1b3a68871b7876f2",
+      "category": "historical_product_input_copy",
+      "input_tag": "HISTORICAL_PRODUCT_RECORD_COPY",
+      "verified": true,
+      "source_relpath": "historical_reference/DENY_K3/report.json"
+    },
+    {
+      "path": "historical_reference_map.json",
+      "bytes": 2001,
+      "sha256": "40d7c35400dc9d7141b29bc6f0ddf07d8debb2e32df5469479235c21224ba504",
+      "category": "derived_inventory",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "historical_reference_map.json"
+    },
+    {
+      "path": "protection_result.json",
+      "bytes": 224,
+      "sha256": "0a3516defa7c5f001fb0c1a9023589065f03ffe8fd5749025708a5b496ec13b5",
+      "category": "protection_record",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "protection_result.json"
+    },
+    {
+      "path": "run_guarded.py",
+      "bytes": 5428,
+      "sha256": "caa93e13ca11d02ecdc09dd78a87347f3306170bdc83d9c2bc6f03aaa34fb27c",
+      "category": "runner",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "run_guarded.py"
+    },
+    {
+      "path": "unittest.log",
+      "bytes": 7798,
+      "sha256": "3cb162a86d62fa8a96e95126839b8c80d9989a9c16d64e5be6149a01e0381b77",
+      "category": "test_log",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "unittest.log"
+    },
+    {
+      "path": "unittest_result.json",
+      "bytes": 147,
+      "sha256": "12cab77a4813579bbf82f2f77cd3bff5096f06a38560420bfb0861903639391d",
+      "category": "test_log",
+      "input_tag": "NOT_APPLICABLE",
+      "verified": true,
+      "source_relpath": "unittest_result.json"
+    }
+  ],
+  "execution_head": "5a6e81a273be104f8703be984eba929334b18d9e",
+  "execution_head_limitation": "执行时工作区另含两处文档变更（M review/P3_course_ch01_AI_reading_test.md、?? review/P3_ch02_completeness_check.md），非原样 HEAD；执行由 Codex 辅助，非负责人亲自操作或人工签署。",
+  "historical_execution_sha": "5a6e81a273be104f8703be984eba929334b18d9e",
+  "evaluator_version": "1.0",
+  "rule_ids": [
+    "P3-EVAL-DENY-001",
+    "P3-EVAL-BUDGET-001",
+    "P3-EVAL-REVOKE-001"
+  ],
+  "nine_exit_codes_all_zero_note": "九次单规则退出码均为 0，仅表示评价程序完成，不代表九次结论全部 PASS。",
+  "expected_actual": [
+    "DENY K1 PASS",
+    "DENY K2 FAIL",
+    "DENY K3 INSUFFICIENT_EVIDENCE",
+    "BUDGET K1 PASS",
+    "BUDGET K2 FAIL",
+    "BUDGET K3 INSUFFICIENT_EVIDENCE",
+    "REVOKE K1 PASS",
+    "REVOKE K2 FAIL",
+    "REVOKE K3 INSUFFICIENT_EVIDENCE"
+  ],
+  "evaluator_selftest": "96 tests, 96 run, 0 failures/errors/skipped/expected_failures",
+  "git_add_note": "本批 unittest.log 命中仓库 .gitignore 第59行 *.log，普通 git add 会跳过；提交时需 git add -f 该文件，或经用户批准后调整 .gitignore。",
+  "source_path_mapping_note": "原始文件以 source_root_local + files[].source_relpath 定位；绝对路径仅作来源标注，不是可移交链接。"
+}

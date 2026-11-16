@@ -1,0 +1,17 @@
+{
+  "at": "2026-11-04T07:46:13.122312+00:00",
+  "command": [
+    "C:\\Users\\20573\\anaconda3\\python.exe",
+    "-I",
+    "-S",
+    "-B",
+    "D:\\codex\\P3_final_delivery_pack_20261102\\P3_evaluator_demo_20261104\\run_guarded.py",
+    "D:\\project\\-P3-Security-Testing-Agent"
+  ],
+  "network_guard": "installed before test discovery and product imports",
+  "expected": {
+    "K1": "PASS",
+    "K2": "FAIL",
+    "K3": "INSUFFICIENT_EVIDENCE"
+  }
+}

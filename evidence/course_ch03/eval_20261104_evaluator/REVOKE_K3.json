@@ -1,0 +1,48 @@
+{
+  "schema_version": "p3-evaluation-v1",
+  "evaluator_version": "1.0",
+  "rule_id": "P3-EVAL-REVOKE-001",
+  "status": "INSUFFICIENT_EVIDENCE",
+  "evidence_directory": "D:\\codex\\P3_final_delivery_pack_20261102\\P3_evaluator_demo_20261104\\calibration_inputs\\REVOKE_K3",
+  "subject_run_id": "run_00000000000000000000000000000001",
+  "provenance": "SYNTHETIC_CALIBRATION",
+  "evidence_level": "LOCAL_OFFLINE_RECORD_INTERNAL_CONSISTENCY",
+  "checked_artifacts": [
+    {
+      "name": "manifest.json",
+      "bytes": 552,
+      "sha256": "ddf48ef34d916a0b4d8c141583e2a4cbf59c01e5029bcaefef12518399fa98b0"
+    },
+    {
+      "name": "report.json",
+      "bytes": 1353,
+      "sha256": "63bded0e69cb91339ef8a05616aca54d09a40d5be56662e5bbadfbe902ccc0ea"
+    },
+    {
+      "name": "events.jsonl",
+      "bytes": 2984,
+      "sha256": "d8dfbb66216c61033f55f12e78cd1eca4299d23e767b0faa5806dfacbed7a573"
+    }
+  ],
+  "observed_facts": {},
+  "evidence_references": [],
+  "limitations": [
+    "Compare recorded model I/O gates with the report-declared revocation gate only; no independent revoke-effective event exists.",
+    "No independent proof of original input, permission, source authenticity or historical execution version.",
+    "Absence of recorded model dispatch is not proof of no OS/network send.",
+    "No real API verdict, formal course grade or peer reproduction.",
+    "Cumulative byte deltas are simulated; no proof of real revocation, socket closure, OS send cessation, cancellation latency or full REQ-011/GWT-A03 acceptance."
+  ],
+  "missing_evidence": [
+    "REVOKE_BOUNDARY_UNAVAILABLE"
+  ],
+  "suggested_next_check": [
+    "Obtain intact original gate observations and the associated revocation report; do not infer or backfill missing boundaries. Independent boundary authentication requires separately reviewed producer evidence."
+  ],
+  "human_signoff": "pending",
+  "score": null,
+  "approval_verified": false,
+  "source_authenticated": false,
+  "revocation_boundary_authenticated": false,
+  "evaluation_scope": "RECORDED_GATE_ORDER_CONSISTENCY"
+}

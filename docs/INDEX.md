@@ -12,7 +12,7 @@
 |---|---|---|
 | 授权控制与未批准候选拒绝 | [任务链 A](../eval/P3_requirement_traceability.md#任务链-a授权拒绝)：需求、设计、Controller／HTTP 模型及具体测试 | [第三章两批原件](../eval/P3_experiment_evidence_index.md#仓库内实验与原件)，保留首次失败和修复后 R01 |
 | Fixed／Dynamic 对照与取舍 | [任务链 B](../eval/P3_requirement_traceability.md#任务链-bfixeddynamic)：策略、实验分析、用户决定及重评条件 | [ADR 与设计导航](../design/README.md)、[第四章证据](../eval/P3_experiment_evidence_index.md#仓库内实验与原件) |
-| 评价 Agent 的实现、输出和复核 | [任务链 C](../eval/P3_requirement_traceability.md#任务链-c评价-agent)：规则、只读设计、实现与校准 | [实际历史输出存储说明](../eval/P3_experiment_evidence_index.md#仓库外评价输出)，区分产品输入与评价输出 |
+| 评价 Agent 的实现、输出和复核 | [任务链 C](../eval/P3_requirement_traceability.md#任务链-c评价-agent)：规则、只读设计、实现与校准 | [历史输出归档](../eval/P3_experiment_evidence_index.md#评价与兼容性输出归档)，区分产品输入与评价输出 |
 | 课程交付及人工审核 | [课程交付索引](../review/P3_course_delivery_index.md)：章节、材料、复核与未完成事项 | 不把文件存在、可访问、有来源和人工批准合并为一个状态 |
 
 2026-11-09 用户决定暂时保留 Fixed 为默认，Dynamic 继续作为对照；2026-11-16 建立[历史消息摘录](../review/P3_fixed_decision_source_excerpt_20261116.md)及[核验记录](../review/P3_fixed_decision_verification_20261116.md)。历史决定有直接消息依据，损坏原件未恢复，新归档仍待用户最终复核；ADR-005 保持 Proposed，不代表永久否定 Dynamic 或课程验收完成。
@@ -49,11 +49,14 @@
 
 ## 原始证据（Evidence）
 
-[实验与评价证据索引](../eval/P3_experiment_evidence_index.md)登记批次、需求、来源、访问状态和限制；仓库外资料仅登记实际位置与待移交事项，不提供伪装为可移交附件的本机链接。
+[实验与评价证据索引](../eval/P3_experiment_evidence_index.md)登记批次、需求、来源、访问状态和限制。2026-11-16 已将评价Agent历史输出、兼容性结果和C-3C历史日志按字节原样移交仓库内，逐件摘要见各目录`INVENTORY_SHA256.json`；原件仍留私有来源目录，本机绝对路径不作为可移交链接。
 
 - 第三章首次执行的[评价约定](../evidence/course_ch03/eval_20261028_01/evaluation_agreement.md)和[原始文件清单](../evidence/course_ch03/eval_20261028_01/file_inventory.json)。
 - 修复后执行的[评价约定](../evidence/course_ch03/eval_20261028_02/evaluation_agreement.md)和[原始文件清单](../evidence/course_ch03/eval_20261028_02/file_inventory.json)。R01 的[事件](../evidence/course_ch03/eval_20261028_02/artifacts/run_ce4b0027ae024f05a72d81173c9f05e2/events.jsonl)、[报告](../evidence/course_ch03/eval_20261028_02/artifacts/run_ce4b0027ae024f05a72d81173c9f05e2/report.json)、[Manifest](../evidence/course_ch03/eval_20261028_02/artifacts/run_ce4b0027ae024f05a72d81173c9f05e2/manifest.json)可逐项关联。
 - 第四章[108 个原件清单](../evidence/course_ch04/strategy_history_36/archive_manifest.json)。历史执行版本为 `NOT_FULLY_BOUND`，归档提交仅用于定位原件。
+- 第三章评价Agent历史输出（2026-11-04）已归档为[eval_20261104_evaluator](../evidence/course_ch03/eval_20261104_evaluator/README.md)，含九次单规则、bundle、执行记录、校准输入与历史输入副本；逐件摘要见[移交清单](../evidence/course_ch03/eval_20261104_evaluator/INVENTORY_SHA256.json)。九次退出码0不等于九次全部PASS。
+- 整改兼容性（2026-11-11）已归档为[eval_20261111_compat](../evidence/course_ch03/eval_20261111_compat/INVENTORY_SHA256.json)；两版复用同一baseline产品输入，不是两次独立复现。
+- C-3C历史测试日志（2026-10-22）已归档为[c3c_supervisor_20261022](../evidence/course_ch03/c3c_supervisor_20261022/INVENTORY_SHA256.json)；258项为阶段历史数量，执行版本为`3199b3f + 当时工作区增量`，不是当前HEAD重新执行。
 
 ## 审查（Review）与历史报告（Historical Report）
 

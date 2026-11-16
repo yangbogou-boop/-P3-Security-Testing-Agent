@@ -1,0 +1,2881 @@
+diff --git a/README.md b/README.md
+index 462277d..64374b7 100644
+--- a/README.md
++++ b/README.md
+@@ -1,5 +1,7 @@
+ # P3 面向软件验收阶段的黑盒授权安全测试 Agent
+ 
++当前 C-3C 候选新增离线 Supervisor、服务端摘要交付、独立证据关联、只读许可预检与 14 项验收管理清单；等待人工代码审核，未执行真实 HTTP。使用说明见 [生命周期设计](design/P3_supervisor_lifecycle.md)，交付与限制见 [C-3C 审核报告](review/P3_c3_supervisor_review.md)。以下历史阶段记录保留；真实集成始终为 PENDING_AUTHORIZATION，ADR-005 仍 Proposed。
++
+ > **课程名称**：专业综合能力提升
+ > **项目代号**：P3 - 黑盒授权安全测试 Agent（Planner–Controller 独立授权架构）  
+ 
+diff --git a/eval/P3_c3_authorization_checklist.md b/eval/P3_c3_authorization_checklist.md
+index 3cfede8..df585c6 100644
+--- a/eval/P3_c3_authorization_checklist.md
++++ b/eval/P3_c3_authorization_checklist.md
+@@ -1,5 +1,7 @@
+ # C-3 真实集成许可核验与验收卡
+ 
++C-3C 增量：新增 [机器可读 14 项清单](P3_c3_acceptance_manifest.json) 与 [只读预检／监督设计](../design/P3_supervisor_lifecycle.md)。所有用例仍待授权。服务端现在支持在下一连接前向可信消费者交付摘要；下文“仅保存最后摘要”是 C-3A/B 原限制，已补离线交付接口，但真实持久化、可信源、OS 资源及双端时间观察仍未验收。原审批状态、目录范围和用例名称不变。
++
+ 状态：**PENDING_AUTHORIZATION**。本文件不含批准记录，不构成实际执行许可。沿用 [14 项状态](P3_http_integration_status.json)、[RC2](../brief/P3_specification_v1.0-rc2.md)、[授权边界](../brief/P3_authorization_boundary.md) 和 [ADR-004](../design/ADR_004_http_dispatch_and_cancellation.md)，不改变稳定需求及强度。
+ 
+ ## 共同前置条件与许可字段（全部待取得／核验）
+diff --git a/eval/P3_requirement_traceability.md b/eval/P3_requirement_traceability.md
+index 2ecd97e..3cfea91 100644
+--- a/eval/P3_requirement_traceability.md
++++ b/eval/P3_requirement_traceability.md
+@@ -1,5 +1,18 @@
+ # P3 需求—测试—证据追踪（2026-10-19）
+ 
++## C-3C 增量（2026-10-21）
++
++基线 182 项保留，新增 [test_c3_supervisor.py](../tests/test_c3_supervisor.py) 35 项，本地共 217 项无网络测试通过。原表和历史数量保留，不表示正式 GWT／HTTP 验收通过。
++
++| 稳定需求 | 新增离线覆盖 | 限制 |
++| --- | --- | --- |
++| P3-REQ-001、002、007、008、009 | 只读预检、来源未核验、材料冲突、旧 run／generation／实例拒绝 | 不生成真实许可，LocalRegistry 不变 |
++| P3-REQ-010、011、012 | 双端撤权顺序、幂等、清理超时／失败、审计中禁止重置、并发重置 | 三计数与 RC2 不改；OS 延迟未测 |
++| P3-REQ-014、015、016、017 | 服务摘要不覆盖、关联失败／缺失／重复、部分发送未知、独立 sidecar 哈希、敏感字符串拒绝 | 不生成确认性真实安全结论 |
++| P3-REQ-018、019 | 清理后准备新夹具、只读 CLI、14 项管理状态 | 新夹具不继承执行权；网络入口未增加 |
++
++REQ-013 实际响应证据和 REQ-021 真实策略比较仍待授权。见 [机器清单](P3_c3_acceptance_manifest.json)、[生命周期设计](../design/P3_supervisor_lifecycle.md) 和 [本轮报告](../review/P3_c3_supervisor_review.md)。
++
+ [RC2](../brief/P3_specification_v1.0-rc2.md) 为规范基线；本表不修改 ID 或强度。没有真实 HTTP 或正式课程验收通过声明。158 项为本地无网络测试数量，并非 158 个 GWT 全项通过。
+ 
+ | 稳定 ID | 强度 | 原 GWT | 当前实现／验证状态 | 可定位自动化测试 |
+diff --git a/src/p3_core/delivery.py b/src/p3_core/delivery.py
+index a49c366..48bd1a5 100644
+--- a/src/p3_core/delivery.py
++++ b/src/p3_core/delivery.py
+@@ -6,6 +6,11 @@ from pathlib import Path
+ from .experiments import run_scenario, compare_strategies, MODES, STRATEGIES, FAULTS
+ from .http.audit import verify_run
+ from .http.contract import HttpConfig
++from .http.contract import strict_json
++from .preflight import authorization_preflight
++from .acceptance import acceptance_plan
++from .coordination import check_sidecar
++import time
+ 
+ 
+ def integration_plan():
+@@ -36,12 +41,27 @@ def main(argv=None):
+     validate=sub.add_parser('validate');validate.add_argument('config')
+     verify=sub.add_parser('verify');verify.add_argument('directory')
+     sub.add_parser('network-plan')
++    sub.add_parser('supervisor-plan')
++    sub.add_parser('integration-status')
++    pre=sub.add_parser('authorization-preflight');pre.add_argument('document')
++    side=sub.add_parser('evidence-check');side.add_argument('directory')
+     args=parser.parse_args(argv)
+     try:
+         if args.command=='simulate': result=run_scenario(args.mode,args.strategy,output=args.output,fault=args.fault)
+         elif args.command=='compare':
+             result=compare_strategies(args.output,args.repeats)
+         elif args.command=='verify': result=verify_run(args.directory)
++        elif args.command=='integration-status':result=acceptance_plan()
++        elif args.command=='supervisor-plan':
++            result=dict(states=['BOUND','STOPPING','STOPPED','FAILED','RETIRED'],
++                        network_status='PENDING_AUTHORIZATION',execution_entrypoint=None,
++                        steps=['bind exact run/fixture/scope/version/generation','revoke both independent gates',
++                               'poll owner cleanup without waiting in locks','invalidate after cleanup','prepare new fixture'])
++        elif args.command=='evidence-check':result=check_sidecar(args.directory)
++        elif args.command=='authorization-preflight':
++            with Path(args.document).open('rb') as stream:data=stream.read(1048577)
++            if len(data)>1048576:raise ValueError()
++            result=authorization_preflight(strict_json(data),now=time.time())
+         elif args.command=='validate':
+             def pairs(items):
+                 out={}
+@@ -55,7 +75,7 @@ def main(argv=None):
+             result=dict(schema='VALID',scope_digest=cfg.scope_digest,network_status='PENDING_AUTHORIZATION')
+         else: result=integration_plan()
+         print(json.dumps(result,ensure_ascii=False,indent=2))
+-        return 1 if (result.get('integrity')=='INCOMPLETE_OR_INVALID' or
++        return 1 if (result.get('integrity') in ('INCOMPLETE_OR_INVALID','EVIDENCE_INCOMPLETE') or
+                      result.get('report',{}).get('audit_gap') or
+                      result.get('report',{}).get('state')=='STOPPED') else 0
+     except (OSError,ValueError,TypeError,KeyError):
+diff --git a/src/p3_core/http/live.py b/src/p3_core/http/live.py
+index d7210cb..0faa6d4 100644
+--- a/src/p3_core/http/live.py
++++ b/src/p3_core/http/live.py
+@@ -165,6 +165,16 @@ class AuthorizedHttpRun(SimulationRun):
+     def _first_send_locked(self):
+         self._requests += 1
+ 
++    def lifecycle_status(self):
++        """Nonblocking observation; never closes another owner's socket."""
++        if not self._lock.acquire(blocking=False):
++            return dict(revoked=self._revoked, clean=False, failed=self._cleanup_failed or self._audit_gap)
++        try:
++            with self._gate:
++                clean=self._revoked and (self._active is None or self._active.get('closed',False))
++                return dict(revoked=self._revoked,clean=bool(clean),failed=self._cleanup_failed or self._audit_gap)
++        finally: self._lock.release()
++
+     def run_until_terminal(self):
+         """Explicit trusted-host driver only. Never called by ordinary CLI/tests."""
+         self.start()
+diff --git a/src/p3_core/mock_api/adapter.py b/src/p3_core/mock_api/adapter.py
+index 5521a91..c1e3a09 100644
+--- a/src/p3_core/mock_api/adapter.py
++++ b/src/p3_core/mock_api/adapter.py
+@@ -12,6 +12,10 @@ class ServiceAdapter:
+         self.fixture, self.port, self.header_limit = fixture, port, header_limit
+ 
+     def handle_bytes(self, raw):
++        return self.handle_with_action(raw)[0]
++
++    def handle_with_action(self, raw):
++        """Action is exposed only after the complete finite request is accepted."""
+         if type(raw) is not bytes or len(raw) > self.header_limit:
+             raise RequestRejected('INVALID_HTTP_REQUEST')
+         if not raw.endswith(b'\r\n\r\n') or raw.count(b'\r\n\r\n') != 1:
+@@ -40,4 +44,5 @@ class ServiceAdapter:
+                 token=headers['authorization'][7:]
+         except (ValueError, UnicodeError):
+             raise RequestRejected('INVALID_HTTP_REQUEST') from None
+-        return self.fixture.handle(MockRequest(method,target,headers['x-p3-action-id'],token)).to_bytes()
++        response=self.fixture.handle(MockRequest(method,target,headers['x-p3-action-id'],token)).to_bytes()
++        return response,headers['x-p3-action-id']
+diff --git a/src/p3_core/mock_api/core.py b/src/p3_core/mock_api/core.py
+index 291cf42..551197b 100644
+--- a/src/p3_core/mock_api/core.py
++++ b/src/p3_core/mock_api/core.py
+@@ -147,6 +147,16 @@ class FixtureManager:
+     """
+     @staticmethod
+     def reset(mode=Mode.GOOD):
++        # Compatibility factory. There is no global active instance to switch.
++        return FixtureManager.prepare(mode)
++
++    @staticmethod
++    def prepare(mode=Mode.GOOD):
++        """Allocate a private immutable candidate; no publication or activation.
++
++        UUID/credential generation stays outside the supervisor commit gate.
++        Discarding this candidate does not mutate an old instance or registry.
++        """
+         if type(mode) is not Mode:
+             raise RequestRejected('INVALID_FIXTURE_MODE')
+         instance = uuid4().hex
+diff --git a/src/p3_core/mock_api/service.py b/src/p3_core/mock_api/service.py
+index 355fb2f..f89dd99 100644
+--- a/src/p3_core/mock_api/service.py
++++ b/src/p3_core/mock_api/service.py
+@@ -30,12 +30,32 @@ class AuthorizedService:
+         self.revoke_effective_at = None
+         self.cleanup_failed = False
+         self.last_connection = None
++        self._listener_closed = False
++        self._summary_consumer = None
++        self.summary_audit_failed = False
++        self.summary_sequence = 0
++
++    def attach_summary_consumer(self, consumer):
++        """Trusted host only, before any connection; cannot replace mid-lifecycle."""
++        with self._gate:
++            if self._handling or self.last_connection is not None or self._summary_consumer is not None:
++                raise InvalidInput('SUMMARY_CONSUMER_ALREADY_BOUND')
++            if not callable(consumer): raise InvalidInput('INVALID_SUMMARY_CONSUMER')
++            self._summary_consumer=consumer
++
++    def lifecycle_status(self):
++        with self._gate:
++            return dict(revoked=self._revoked,
++                        clean=self._revoked and not self._handling and (self._server is None or self._listener_closed),
++                        failed=self.cleanup_failed or self.summary_audit_failed)
+ 
+     def _check(self):
+         if self._revoked:
+             raise InvalidInput('REVOKED')
+         if self.cleanup_failed:
+             raise InvalidInput('RUNTIME_ERROR')
++        if self.summary_audit_failed:
++            raise InvalidInput('AUDIT_ERROR')
+         if self.snapshot is None or type(self.binding) is not FixtureBinding:
+             raise InvalidInput('PENDING_AUTHORIZATION')
+         self.binding.verify(self.config)
+@@ -67,7 +87,7 @@ class AuthorizedService:
+             if self._owner!=get_ident() or self._handling:
+                 raise InvalidInput('SINGLE_IO_OWNER_REQUIRED')
+             self._handling=True
+-        record=dict(connection_id=unique_id('connection'),sent_bytes=0,received_bytes=0,
++        record=dict(connection_id=unique_id('connection'),action_id=None,sent_bytes=0,received_bytes=0,
+                     first_send_sequence=None,last_send_sequence=None,reason=None,cleanup_failed=False)
+         try:
+             connection.setblocking(False)
+@@ -84,7 +104,7 @@ class AuthorizedService:
+                 if not piece: raise InvalidInput('TRUNCATED_REQUEST')
+                 raw.extend(piece);record['received_bytes']+=len(piece)
+                 if len(raw)>adapter.header_limit: raise InvalidInput('REQUEST_TOO_LARGE')
+-            result=adapter.handle_bytes(bytes(raw))
++            result,record['action_id']=adapter.handle_with_action(bytes(raw))
+             while record['sent_bytes']<len(result):
+                 with self._gate: self._check_connection(deadline)
+                 if not self._wait_ready(connection,True,deadline): continue
+@@ -105,7 +125,7 @@ class AuthorizedService:
+         except InvalidInput as error:
+             allowed={'REVOKED','TIMEOUT','AUTHORIZATION_INVALID','PENDING_AUTHORIZATION',
+                      'FIXTURE_BINDING_INVALID','CREDENTIAL_BINDING_INVALID','RUNTIME_ERROR',
+-                     'TRUNCATED_REQUEST','REQUEST_TOO_LARGE','TRANSPORT_ERROR'}
++                     'TRUNCATED_REQUEST','REQUEST_TOO_LARGE','TRANSPORT_ERROR','AUDIT_ERROR'}
+             record['reason']=str(error) if str(error) in allowed else 'INVALID_REQUEST'
+         except RequestRejected: record['reason']='INVALID_REQUEST'
+         except TimeoutError: record['reason']='TIMEOUT'
+@@ -122,8 +142,20 @@ class AuthorizedService:
+                 record['revoke_requested_at']=self.revoke_requested_at
+                 record['revoke_effective_sequence']=self.revoke_effective_sequence
+                 record['revoke_effective_at']=self.revoke_effective_at
+-                self.last_connection=record
+-                self._handling=False
++                self.summary_sequence+=1
++                record['summary_sequence']=self.summary_sequence
++                self.last_connection=dict(record)
++            # Bounded summary handoff before another connection can replace it.
++            # No component gate held across sink/coordination callbacks.
++            try:
++                if self._summary_consumer is not None:
++                    self._summary_consumer(dict(record))
++            except Exception:
++                self.summary_audit_failed=True
++                self.revoke()
++            finally:
++                with self._gate:
++                    self._handling=False
+ 
+     def start(self):
+         # Material read/verification occurs before the short bind authorization gate.
+@@ -177,8 +209,12 @@ class AuthorizedService:
+ 
+     def close(self):
+         self.revoke()
++        if self._owner is not None and self._owner!=get_ident():
++            raise InvalidInput('SINGLE_IO_OWNER_REQUIRED')
+         if self._server is not None:
+-            try: self._server.server_close()
++            try:
++                self._server.server_close()
++                self._listener_closed=True
+             except Exception:
+                 self.cleanup_failed=True
+                 raise InvalidInput('SERVICE_CLOSE_FAILED') from None
+diff --git a/src/p3_core/acceptance.py b/src/p3_core/acceptance.py
+new file mode 100644
+index 0000000..5b0cdcc
+--- /dev/null
++++ b/src/p3_core/acceptance.py
+@@ -0,0 +1,78 @@
++"""Offline acceptance-management format; no runner and no automatic VERIFIED."""
++from .models import InvalidInput
++
++STATUSES=('PENDING_AUTHORIZATION','READY_FOR_HUMAN_REVIEW','NOT_EXECUTED',
++          'EXECUTED_PENDING_VERIFICATION','VERIFIED','FAILED')
++CASES=(
++ ('GOOD_PAIRED_CONTROLS','Good: six paired checks','test_good_all_six_fixed'),
++ ('AUTH_DISCLOSURE','AUTH: anonymous profile plus legal control','test_three_defects_both_strategies'),
++ ('BOLA_DISCLOSURE','BOLA: obj-b owner control','test_three_defects_both_strategies'),
++ ('RBAC_DISCLOSURE','RBAC: admin report control','test_three_defects_both_strategies'),
++ ('CONNECTION_FAILURE','Authorized connection fault','test_read_timeout_and_transport_failure_no_raw_exception'),
++ ('UNEXPECTED_STATUS','404/5xx/redirect; no following redirect','test_404_and_5xx_no_leak_are_inconclusive'),
++ ('INVALID_JSON','Malformed JSON/UTF8/duplicates','test_t34_canary_cannot_rescue_malformed_framing_or_json'),
++ ('TRUNCATION','Incomplete or oversized response','test_header_fact_survives_incomplete_body_without_verdict'),
++ ('TIMEOUT','Read/write deadline fault','test_service_timeout_read_and_partial_write_close'),
++ ('REVOKE_CONNECT','Revoke before/after connect','test_t27_connect_then_revoke_before_first_send'),
++ ('REVOKE_FIRST_SEND','Both gate orderings','test_service_send_and_revoke_have_total_gate_order'),
++ ('REVOKE_PARTIAL_SEND','Revoke after partial positive send','test_service_partial_send_then_effective_revoke'),
++ ('LATE_RESPONSE','Terminal late response and stale instance','test_late_response_during_read_cannot_upgrade'),
++ ('AUDIT_FAILURE','Before/after send evidence failure','test_audit_failure_cannot_confirm_response'))
++
++CRITERIA={
++ 'GOOD_PAIRED_CONTROLS':'Three successful legal controls and complete 401/403 denial assertions; status alone is insufficient.',
++ 'AUTH_DISCLOSURE':'Paired profile control plus complete, instance-bound protected anonymous response; fragment alone is inconclusive.',
++ 'BOLA_DISCLOSURE':'Paired bob control plus complete obj-b/owner=bob assertion for alice; wrong instance/object is inconclusive.',
++ 'RBAC_DISCLOSURE':'Paired admin control plus complete period=demo/admin audience assertion for member.',
++ 'CONNECTION_FAILURE':'ERROR/INCONCLUSIVE; zero requests before positive send, one after partial send; no retry.',
++ 'UNEXPECTED_STATUS':'INCONCLUSIVE/RESPONSE_ERROR unless independently complete protected disclosure meets existing contract; never follow redirect.',
++ 'INVALID_JSON':'INCONCLUSIVE/RESPONSE_ERROR for invalid UTF8, duplicate keys, unknown fields or conflicting lengths; no canary override.',
++ 'TRUNCATION':'Preserve recognized header fact but no confirmed conclusion for incomplete body; bounded storage and explicit gap.',
++ 'TIMEOUT':'Stop at applicable deadline; no late upgrade; retain sent count and observe cleanup latency.',
++ 'REVOKE_CONNECT':'No positive send after effective revoke; connect alone counts zero; cleanup without reconnect.',
++ 'REVOKE_FIRST_SEND':'Exercise both gate orders; first positive send counts once, revoke winning prevents send; bytes cannot be recalled.',
++ 'REVOKE_PARTIAL_SEND':'No continued write after effective revoke; retain one send count, unknown unfinished result and explicit close failure.',
++ 'LATE_RESPONSE':'No terminal resurrection or stale instance/credential confirmation.',
++ 'AUDIT_FAILURE':'Stop new dispatch; no confirmation from unpersisted evidence; recover unknown prefix without replay.'}
++
++
++def acceptance_plan():
++    common=['owner_material','teacher_catalog','source_review','scope_version_match',
++            'fixture_credential_binding','budget_record','revocation_responsibility']
++    return dict(schema_version='p3-c3-management-v1',network_status='PENDING_AUTHORIZATION',
++        allowed_statuses=list(STATUSES),execution_entrypoint=None,cases=[dict(
++            case=name,status='PENDING_AUTHORIZATION',scope=scope,
++            required_permissions=dict(owner='original permission/delegation chain and source review',
++                teacher='approved target/endpoint/identity/check catalog',
++                binding='exact HttpConfig scope digest, versions, fixture and credentials',
++                exception_scope=name if i>=4 else None),
++            criteria=CRITERIA[name],
++            observations=['both revoke-request/effective timestamps and gate sequences',
++                          'first/last positive send and byte counts',
++                          'owner close completion/failure and OS resource observation'],
++            preconditions=common+(['explicit_exception_permission'] if i>=4 else []),
++            offline_tests=[test],evidence_required=['client_events_manifest_report','server_connection_summary',
++                'run_fixture_action_connection_binding','revocation_gate_sequences','cleanup_observation'],
++            cannot_prove_offline=['real_permission_authenticity','OS_send_and_close','cancellation_latency',
++                                 'actual_target_identity','durable_dual_source_capture'],
++            result=dict(executed_at=None,execution_proof=None,reviewer_record=None,verdict=None))
++            for i,(name,scope,test) in enumerate(CASES)])
++
++
++def validate_management_record(row):
++    """Validate external review records; does not authenticate them or run tests."""
++    if type(row) is not dict or row.get('case') not in {c[0] for c in CASES} or row.get('status') not in STATUSES:
++        raise InvalidInput('INVALID_MANAGEMENT_RECORD')
++    status=row['status'];result=row.get('result')
++    if type(result) is not dict or set(result)!={'executed_at','execution_proof','reviewer_record','verdict'}:
++        raise InvalidInput('INVALID_MANAGEMENT_RECORD')
++    if status in ('EXECUTED_PENDING_VERIFICATION','VERIFIED') and not result['execution_proof']:
++        raise InvalidInput('EXECUTION_PROOF_REQUIRED')
++    if status in ('VERIFIED','FAILED') and not result['reviewer_record']:
++        raise InvalidInput('HUMAN_REVIEW_REQUIRED')
++    return dict(format='VALID',source_verified=False,execution_allowed=False,status='PENDING_AUTHORIZATION')
++
++
++def offline_status(plan=None):
++    # Offline checks never consume supplied statuses as authority for promotion.
++    return acceptance_plan()
+diff --git a/src/p3_core/coordination.py b/src/p3_core/coordination.py
+new file mode 100644
+index 0000000..661c44c
+--- /dev/null
++++ b/src/p3_core/coordination.py
+@@ -0,0 +1,261 @@
++"""Bounded sidecar evidence. Correlation is not an API verdict or permission."""
++import copy
++import re
++import json
++import hashlib
++from pathlib import Path
++from threading import Lock
++
++from .evidence import MemoryEvidence, JsonlEvidence, Redactor, unique_id
++from .models import InvalidInput, number
++from .http.contract import strict_json
++
++
++REASONS={'RESPONSE_SENT','REVOKED','TIMEOUT','AUTHORIZATION_INVALID','PENDING_AUTHORIZATION',
++         'FIXTURE_BINDING_INVALID','CREDENTIAL_BINDING_INVALID','RUNTIME_ERROR','TRUNCATED_REQUEST',
++         'REQUEST_TOO_LARGE','TRANSPORT_ERROR','INVALID_REQUEST','AUDIT_ERROR'}
++FIELDS={'connection_id','action_id','sent_bytes','received_bytes','first_send_sequence','last_send_sequence',
++        'reason','cleanup_failed','revoke_requested_at','revoke_effective_sequence','revoke_effective_at','summary_sequence'}
++
++
++class EvidenceCoordinator:
++    """Only synthetic/offline sidecars in this round; no live-evidence toggle.
++
++    expect() declares correlation expectations only. Verification additionally
++    requires capture_controller() from the actual offline Controller. Records
++    from another binding are rejected without echoing data.
++    """
++    def __init__(self,binding,*,sink=None,limit=32,on_failure=None):
++        if type(limit) is not int or not 1<=limit<=256:raise InvalidInput('INVALID_CAPACITY')
++        self.binding,self.limit,self.on_failure=binding,limit,on_failure
++        self.sink=sink if sink is not None else MemoryEvidence()
++        self._lock=Lock();self._actions=set();self._records={};self._seen_actions=set()
++        self._sequence=0;self._bad=False;self._audit_gap=False;self._finished=False
++        self._completion='PENDING';self._finished_report=None
++        self._controller=None;self._registered=();self._verified=False
++        self.sidecar_id=unique_id('coordination')
++        try:self.sink.open(self.sidecar_id,Redactor())
++        except Exception:self._fail(audit=True)
++
++    def _fail(self,*,audit=False):
++        self._bad=True;self._audit_gap=self._audit_gap or audit
++        if self.on_failure is not None:
++            try:self.on_failure()
++            except Exception:self._audit_gap=True
++
++    def expect(self,action_id,binding):
++        if binding!=self.binding or type(action_id) is not str or not re.fullmatch(r'action_[0-9a-f]{32}',action_id):
++            raise InvalidInput('INVALID_ACTION_BINDING')
++        with self._lock:
++            if self._finished or self._bad:raise InvalidInput('COORDINATION_CLOSED')
++            if len(self._actions)>=self.limit and action_id not in self._actions:raise InvalidInput('CAPACITY')
++            self._actions.add(action_id)
++
++    def capture_controller(self,controller):
++        """Trusted host binds the actual offline Controller, not a claimed list.
++
++        This process-local root is never reconstructed from JSON or a digest.
++        Python host code is trusted; this is not a sandbox against host mutation.
++        Synthetic Controller approval proves only offline action registration.
++        """
++        from .http.machine import SimulationRun
++        if type(controller) is not SimulationRun:
++            raise InvalidInput('OFFLINE_CONTROLLER_REQUIRED')
++        if not controller._lock.acquire(blocking=False):raise InvalidInput('OWNER_BUSY')
++        try:
++            cfg=controller.config
++            if (cfg is None or controller.run_id!=self.binding.run_id
++                    or cfg.fixture_instance_id!=self.binding.fixture_instance_id
++                    or cfg.scope_digest!=self.binding.scope_digest
++                    or cfg.authorization_version!=self.binding.authorization_version
++                    or controller._audit_gap or not controller.simulation):
++                raise InvalidInput('CONTROLLER_BINDING_INVALID')
++            registered=tuple(sorted((s.action_id,s.check.check_id,s.attempt_id)
++                for s in controller._slots if s.action_id and s.authorization=='ALLOW'
++                and s.check in cfg.candidates and s.attempt_id))
++        finally:controller._lock.release()
++        with self._lock:
++            if self._finished or self._bad or (self._controller is not None and self._controller is not controller):
++                raise InvalidInput('COORDINATION_CLOSED')
++            if not registered or len(registered)>self.limit or not set(self._registered)<=set(registered):
++                raise InvalidInput('INVALID_REGISTRATION')
++            self._controller=controller;self._registered=registered
++            self._actions.update(row[0] for row in registered)
++
++    @staticmethod
++    def _validate(row):
++        if type(row) is not dict or set(row)!=FIELDS:raise ValueError()
++        if not re.fullmatch(r'connection_[0-9a-f]{32}',row['connection_id']):raise ValueError()
++        if row['action_id'] is not None and not re.fullmatch(r'action_[0-9a-f]{32}',row['action_id']):raise ValueError()
++        if row['reason'] not in REASONS or type(row['cleanup_failed']) is not bool:raise ValueError()
++        for key in ('sent_bytes','received_bytes','summary_sequence'):
++            if type(row[key]) is not int or not 0<=row[key]<=1048576:raise ValueError()
++        if row['summary_sequence']<1:raise ValueError()
++        for key in ('first_send_sequence','last_send_sequence','revoke_effective_sequence'):
++            if row[key] is not None and (type(row[key]) is not int or not 1<=row[key]<=1000000):raise ValueError()
++        for key in ('revoke_requested_at','revoke_effective_at'):
++            if row[key] is not None:number(row[key])
++        if (row['revoke_requested_at'] is not None and row['revoke_effective_at'] is not None
++                and row['revoke_requested_at']>row['revoke_effective_at']):raise ValueError()
++        first,last=row['first_send_sequence'],row['last_send_sequence']
++        if row['sent_bytes']==0 and (first is not None or last is not None):raise ValueError()
++        if row['sent_bytes'] and (first is None or last is None or first>last):raise ValueError()
++        revoke=row['revoke_effective_sequence']
++        if revoke is not None and last is not None and last>=revoke:raise ValueError()
++
++    def accept(self,summary,binding):
++        failure=False
++        with self._lock:
++            try:
++                if self._finished or self._bad or binding!=self.binding:raise ValueError()
++                self._validate(summary)
++                row=copy.deepcopy(summary);cid=row['connection_id']
++                if cid in self._records:
++                    if self._records[cid]==row:return 'DUPLICATE'
++                    raise ValueError()
++                if len(self._records)>=self.limit:raise ValueError()
++                if row['summary_sequence']!=self._sequence+1:raise ValueError()
++                action=row['action_id']
++                if action in self._seen_actions:raise ValueError()
++                correlated=action is not None and action in self._actions
++                status='CORRELATED' if correlated else 'UNKNOWN'
++                event=dict(run_id=self.sidecar_id,evidence_id=unique_id('evidence'),kind='server_summary',
++                           provenance='NO_NETWORK_SIMULATION',linked_run_id=self.binding.run_id,
++                           fixture_instance_id=self.binding.fixture_instance_id,generation=self.binding.generation,
++                           authorization_version=self.binding.authorization_version,
++                           scope_digest=self.binding.scope_digest,association=status,
++                           outcome='RESPONSE_SENT' if row['reason']=='RESPONSE_SENT' and not row['cleanup_failed'] else 'UNKNOWN',summary=row)
++                try:self.sink.emit(event)
++                except Exception:self._audit_gap=True;raise ValueError()
++                self._records[cid]=row;self._sequence=row['summary_sequence']
++                if correlated:self._seen_actions.add(action)
++                if not correlated or row['cleanup_failed']:self._bad=True;failure=True
++            except Exception:self._bad=True;failure=True;status='EVIDENCE_INCOMPLETE'
++        # Revocation callback must never run while evidence lock is held.
++        if failure:self._fail(audit=self._audit_gap)
++        if self._audit_gap:raise InvalidInput('AUDIT_ERROR')
++        return status
++
++    def report(self):
++        with self._lock:
++            missing=sorted(self._actions-self._seen_actions)
++            status=('AUDIT_FAILED' if self._audit_gap else 'EVIDENCE_INCOMPLETE' if self._bad else
++                    'OFFLINE_VERIFIED' if self._verified else
++                    'SOURCE_UNVERIFIED' if self._completion=='FINISHED' and self._controller is None else
++                    'WRITTEN_UNVERIFIED' if self._completion=='FINISHED' else self._completion)
++            return dict(run_id=self.sidecar_id,linked_run_id=self.binding.run_id,
++                        fixture_instance_id=self.binding.fixture_instance_id,scope_digest=self.binding.scope_digest,
++                        generation=self.binding.generation,
++                        authorization_version=self.binding.authorization_version,
++                        provenance='NO_NETWORK_SIMULATION',network_status='PENDING_AUTHORIZATION',
++                        outcome='UNKNOWN',integrity='EVIDENCE_INCOMPLETE' if self._bad or missing or not self._actions else 'CORRELATED',
++                        missing_actions=missing,connection_count=len(self._records),audit_gap=self._audit_gap,
++                        expected_actions=sorted(self._actions),
++                        connections=copy.deepcopy(sorted(self._records.values(),key=lambda r:r['summary_sequence'])),
++                        completion=status,api_conclusion='INCONCLUSIVE',replay_allowed=False)
++
++    def finish(self):
++        with self._lock:
++            if self._finished:raise InvalidInput('COORDINATION_CLOSED')
++            self._finished=True;self._completion='FINALIZING'
++        report=self.report()
++        if report['integrity']!='CORRELATED':self._fail();report=self.report()
++        report['completion']='COMPLETE' if report['integrity']=='CORRELATED' else 'INCOMPLETE'
++        digest=hashlib.sha256(json.dumps(report,sort_keys=True).encode()).hexdigest()
++        try:self.sink.finish(dict(run_id=self.sidecar_id,provenance='NO_NETWORK_SIMULATION',audit_gap=self._audit_gap,
++                                 linked_run_id=self.binding.run_id,fixture_instance_id=self.binding.fixture_instance_id,
++                                 generation=self.binding.generation,scope_digest=self.binding.scope_digest,
++                                 authorization_version=self.binding.authorization_version,
++                                 completion=report['completion'],report_sha256=digest),report)
++        except Exception:self._fail(audit=True);report=self.report()
++        with self._lock:
++            self._finished_report=copy.deepcopy(report)
++            self._completion='FINISHED'
++        self.completion_status()
++        return self.report()
++
++
++    def completion_status(self):
++        """Observe completion independently of in-memory correlation.
++
++        Disk reads and failure callbacks never run under a Supervisor lock.
++        Memory/test sinks cannot prove durable completion. No missing-action
++        exemption is inferred from an absent service summary.
++        """
++        if not self._lock.acquire(blocking=False):return 'PENDING'
++        try:
++            if self._audit_gap:return 'AUDIT_FAILED'
++            if self._bad:return 'INCOMPLETE'
++            if self._completion!='FINISHED':return 'PENDING'
++            expected=copy.deepcopy(self._finished_report)
++        finally:self._lock.release()
++        if type(self.sink) is not JsonlEvidence:return 'UNVERIFIED'
++        checked=check_sidecar(self.sink.directory,expected_report=expected)
++        if checked['integrity']!='CONSISTENT_OFFLINE_SIDECAR':
++            self._fail(audit=True)
++            return 'AUDIT_FAILED'
++        # The report and accepted connection map were captured before disk writes.
++        # A self-consistent replacement of all three files cannot replace this root.
++        if self._controller is None:return 'SOURCE_UNVERIFIED'
++        if (self._controller._audit_gap or set(expected['expected_actions'])!={r[0] for r in self._registered}
++                or expected['connections']!=sorted(self._records.values(),key=lambda r:r['summary_sequence'])):
++            self._fail(audit=True)
++            return 'AUDIT_FAILED'
++        with self._lock:
++            if self._audit_gap:return 'AUDIT_FAILED'
++            if self._bad:return 'INCOMPLETE'
++            self._verified=True
++        return 'VERIFIED'
++
++
++def check_sidecar(directory,*,expected_report=None):
++    """Bounded local consistency check, not an authenticity or permission check."""
++    try:
++        blobs={}
++        for name in ('events.jsonl','manifest.json','report.json'):
++            with (Path(directory)/name).open('rb') as f:blobs[name]=f.read(1048577)
++            if len(blobs[name])>1048576:raise ValueError()
++        manifest=strict_json(blobs['manifest.json']);report=strict_json(blobs['report.json'])
++        if expected_report is not None and report!=expected_report:raise ValueError()
++        for doc in (manifest,report):
++            if type(doc.get('audit_gap')) is not bool or doc['audit_gap']:raise ValueError()
++            if doc.get('completion')!='COMPLETE':raise ValueError()
++            if doc.get('provenance')!='NO_NETWORK_SIMULATION':raise ValueError()
++        if manifest['audit_gap']!=report['audit_gap']:raise ValueError()
++        for key in ('linked_run_id','fixture_instance_id','generation','scope_digest','authorization_version'):
++            if manifest[key]!=report[key]:raise ValueError()
++        if type(report['generation']) is not int or report['generation']<0:raise ValueError()
++        count=manifest['events_bytes']
++        if type(count) is not int or count!=len(blobs['events.jsonl']):raise ValueError()
++        if hashlib.sha256(blobs['events.jsonl']).hexdigest()!=manifest['events_sha256']:raise ValueError()
++        if hashlib.sha256(json.dumps(report,sort_keys=True).encode()).hexdigest()!=manifest['report_sha256']:raise ValueError()
++        if manifest['run_id']!=report['run_id'] or report['provenance']!='NO_NETWORK_SIMULATION':raise ValueError()
++        rows=[strict_json(x) for x in blobs['events.jsonl'].splitlines()]
++        actions=report['expected_actions']
++        if (type(actions) is not list or not actions or len(actions)>256
++                or any(type(a) is not str or not re.fullmatch(r'action_[0-9a-f]{32}',a) for a in actions)
++                or len(set(actions))!=len(actions)):raise ValueError()
++        if not rows or report.get('missing_actions')!=[]:raise ValueError()
++        if len(rows)>256 or len({r['evidence_id'] for r in rows})!=len(rows):raise ValueError()
++        if len(rows)!=report['connection_count'] or len({r['summary']['connection_id'] for r in rows})!=len(rows):raise ValueError()
++        if len({r['summary']['action_id'] for r in rows})!=len(rows):raise ValueError()
++        if {r['summary']['action_id'] for r in rows}!=set(actions):raise ValueError()
++        if [r['summary'] for r in rows]!=report['connections']:raise ValueError()
++        for index,row in enumerate(rows,1):
++            # This format has exactly one event type. Lifecycle observations live
++            # in the separate Supervisor stream and cannot masquerade as actions.
++            if row['kind']!='server_summary' or type(row['summary']['action_id']) is not str:raise ValueError()
++            if set(row)!={'run_id','evidence_id','kind','provenance','linked_run_id','fixture_instance_id',
++                          'generation','scope_digest','authorization_version','association','outcome','summary'}:raise ValueError()
++            if type(row['generation']) is not int:raise ValueError()
++            if row['outcome']!=('RESPONSE_SENT' if row['summary']['reason']=='RESPONSE_SENT' else 'UNKNOWN'):raise ValueError()
++            if any(row[k]!=report[k] for k in ('fixture_instance_id','generation','scope_digest','authorization_version')):raise ValueError()
++            if row['summary']['summary_sequence']!=index or row['association']!='CORRELATED':raise ValueError()
++            if row['summary']['cleanup_failed'] or row['provenance']!='NO_NETWORK_SIMULATION':raise ValueError()
++            if row['run_id']!=report['run_id'] or row['linked_run_id']!=report['linked_run_id']:raise ValueError()
++            EvidenceCoordinator._validate(row['summary'])
++        if report['audit_gap'] or report['integrity']!='CORRELATED':raise ValueError()
++        return dict(integrity='CONSISTENT_OFFLINE_SIDECAR',registration_status='SOURCE_UNVERIFIED',
++                    source_verified=False,api_conclusion='INCONCLUSIVE')
++    except Exception:
++        return dict(integrity='EVIDENCE_INCOMPLETE',source_verified=False,api_conclusion='INCONCLUSIVE')
+diff --git a/src/p3_core/preflight.py b/src/p3_core/preflight.py
+new file mode 100644
+index 0000000..ee59ae0
+--- /dev/null
++++ b/src/p3_core/preflight.py
+@@ -0,0 +1,87 @@
++"""Read-only material diagnostics. No snapshot minting, grant, or live switch."""
++import hashlib
++import json
++
++from .http.contract import HttpConfig
++from .models import number
++from .acceptance import CASES
++
++
++MATERIAL_KEYS={'reference','source','sha256','authorization_version','scope_digest','valid_from','valid_until',
++               'role','principal','delegation_ref'}
++
++
++def authorization_preflight(document,*,now,review_source=None):
++    """review_source is a trusted-host read-only lookup, unavailable in CLI.
++
++    Even that lookup only recognizes prior human review; no executable permit is
++    returned. JSON assertions about approval never substitute for this lookup.
++    """
++    issues=[]
++    def add(category,field):issues.append(dict(category=category,field=field))
++    if type(document) is not dict:
++        return dict(status='PENDING_AUTHORIZATION',issues=[dict(category='INVALID_FORMAT',field='document')],execution_allowed=False)
++    allowed={'config','owner','teacher_catalog','fixture_binding','budget_record','revocation_responsibility','experiment_scope','exception_permissions'}
++    if set(document)-allowed:add('INVALID_FORMAT','unknown_fields')
++    for field in sorted(allowed):
++        if document.get(field) is None:add('MISSING',field)
++    cfg=None
++    try:cfg=HttpConfig.parse(document.get('config'));number(now)
++    except Exception:add('INVALID_FORMAT','config')
++    reviewed=True
++    for field in ('owner','teacher_catalog'):
++        value=document.get(field)
++        if value is None:reviewed=False;continue
++        try:
++            if type(value) is not dict or set(value)!=MATERIAL_KEYS:raise ValueError()
++            for key in ('reference','source','sha256','authorization_version','scope_digest','principal'):
++                if type(value[key]) is not str or not 1<=len(value[key])<=256:raise ValueError()
++            for key in ('sha256','scope_digest'):
++                if len(value[key])!=64 or any(c not in '0123456789abcdef' for c in value[key]):raise ValueError()
++            if field=='teacher_catalog' and (value['role']!='teacher' or value['delegation_ref'] is not None):raise ValueError()
++            if field=='owner':
++                if value['role'] not in ('owner','delegate'):raise ValueError()
++                if value['role']=='delegate' and (type(value['delegation_ref']) is not str or not value['delegation_ref']):
++                    add('MISSING','owner.delegation_ref')
++                if value['role']=='owner' and value['delegation_ref'] is not None:add('CONFLICT','owner.delegation_ref')
++            start,end=number(value['valid_from']),number(value['valid_until'])
++            if start>=end:raise ValueError()
++            if not start<=now<end:add('CONFLICT',field+'.validity')
++            if cfg and (value['scope_digest']!=cfg.scope_digest or value['authorization_version']!=cfg.authorization_version):
++                add('CONFLICT',field+'.scope')
++            # Human review evidence is bound to the exact submitted material metadata.
++            digest=hashlib.sha256(json.dumps(value,sort_keys=True).encode()).hexdigest()
++            try: known=review_source is not None and review_source(field,digest) is True
++            except Exception: known=False
++            if not known:
++                add('SOURCE_UNVERIFIED',field);reviewed=False
++        except Exception:add('INVALID_FORMAT',field);reviewed=False
++    for field in ('budget_record','revocation_responsibility'):
++        if field in document and (type(document[field]) is not str or not 1<=len(document[field])<=128):
++            add('INVALID_FORMAT',field)
++    for field in ('experiment_scope','exception_permissions'):
++        value=document.get(field)
++        if value is not None and (type(value) is not list or len(value)>32 or any(type(x) is not str or len(x)>64 for x in value)):
++            add('INVALID_FORMAT',field)
++    if isinstance(document.get('experiment_scope'),list) and isinstance(document.get('exception_permissions'),list):
++        ordinary={'GOOD_PAIRED_CONTROLS','AUTH_DISCLOSURE','BOLA_DISCLOSURE','RBAC_DISCLOSURE'}
++        if any(type(c) is str and c not in ordinary and c not in document['exception_permissions'] for c in document['experiment_scope']):
++            add('CONFLICT','exception_permissions')
++        known={c[0] for c in CASES}
++        if (not document['experiment_scope'] or any(type(c) is not str or c not in known for c in document['experiment_scope'])
++                or any(type(c) is not str or c not in known for c in document['exception_permissions'])):
++            add('INVALID_FORMAT','experiment_scope')
++    binding=document.get('fixture_binding')
++    if binding is not None:
++        if type(binding) is not dict or set(binding)!={'fixture_instance_id','scope_digest','credential_digest','supervisor_record_ref'}:
++            add('INVALID_FORMAT','fixture_binding')
++        elif (any(type(v) is not str or not v or len(v)>128 for v in binding.values()) or
++              len(binding['credential_digest'])!=64 or any(c not in '0123456789abcdef' for c in binding['credential_digest'])):
++            add('INVALID_FORMAT','fixture_binding')
++        elif cfg and (binding['fixture_instance_id']!=cfg.fixture_instance_id or binding['scope_digest']!=cfg.scope_digest):
++            add('CONFLICT','fixture_binding')
++        else:add('RUN_BINDING_PENDING','fixture_binding')
++    if reviewed and cfg:add('RUN_BINDING_PENDING','trusted_host')
++    return dict(status='PENDING_AUTHORIZATION',execution_allowed=False,issues=issues,
++                human_review_observed=reviewed and cfg is not None,
++                note='No permission minted; source authenticity and actual runtime binding require trusted human review.')
+diff --git a/src/p3_core/supervision.py b/src/p3_core/supervision.py
+new file mode 100644
+index 0000000..e35ad70
+--- /dev/null
++++ b/src/p3_core/supervision.py
+@@ -0,0 +1,244 @@
++"""Lifecycle coordination only: no start, network permission, dispatch or replay."""
++from dataclasses import dataclass
++from threading import Lock
++import time
++
++from .models import InvalidInput, identifier, number
++from .http.contract import HttpConfig
++from .http.live import AuthorizedHttpRun
++from .mock_api.service import AuthorizedService
++from .mock_api import FixtureManager
++from .mock_api.core import Fixture
++from .coordination import EvidenceCoordinator
++
++
++@dataclass(frozen=True)
++class RunBinding:
++    run_id: str
++    fixture_instance_id: str
++    scope_digest: str
++    authorization_version: str
++    generation: int
++
++    def __post_init__(self):
++        for v in (self.run_id,self.fixture_instance_id,self.authorization_version): identifier(v)
++        if type(self.scope_digest) is not str or (len(self.scope_digest)!=64 or any(c not in '0123456789abcdef' for c in self.scope_digest)):
++            raise InvalidInput('INVALID_SCOPE')
++        if type(self.generation) is not int or self.generation<0: raise InvalidInput('INVALID_GENERATION')
++
++
++class LifecyclePort:
++    """Trusted host adapter; exposes revoke and observation, never start/step."""
++    def __init__(self, endpoint, binding):
++        if type(endpoint) is AuthorizedHttpRun:
++            config=endpoint.config or HttpConfig.parse(endpoint._raw)
++            if endpoint.run_id!=binding.run_id: raise InvalidInput('RUN_MISMATCH')
++            endpoint.binding.verify(config)
++            endpoint.binding.verify_credentials(endpoint._credentials)
++        elif type(endpoint) is AuthorizedService:
++            config=endpoint.config
++            endpoint.binding.verify(config)
++            if endpoint.fixture.fixture_instance_id!=binding.fixture_instance_id:
++                raise InvalidInput('FIXTURE_MISMATCH')
++            endpoint.binding.verify_credentials(endpoint.fixture.credential_bindings())
++        else: raise InvalidInput('INVALID_LIFECYCLE_ENDPOINT')
++        if (config.fixture_instance_id!=binding.fixture_instance_id or config.scope_digest!=binding.scope_digest
++                or config.authorization_version!=binding.authorization_version):
++            raise InvalidInput('BINDING_MISMATCH')
++        self.endpoint,self.binding=endpoint,binding
++
++    def revoke(self): self.endpoint.revoke()
++    def status(self): return self.endpoint.lifecycle_status()
++    def invalidate(self): self.endpoint.binding.status.invalidate()
++
++    def actions(self):
++        if type(self.endpoint) is not AuthorizedHttpRun:raise InvalidInput('CLIENT_REQUIRED')
++        if not self.endpoint._lock.acquire(blocking=False):raise InvalidInput('OWNER_BUSY')
++        try:return tuple(s.action_id for s in self.endpoint._slots if s.action_id and s.authorization=='ALLOW')
++        finally:self.endpoint._lock.release()
++
++    def attach_consumer(self,consumer):
++        if type(self.endpoint) is not AuthorizedService:raise InvalidInput('SERVICE_REQUIRED')
++        self.endpoint.attach_summary_consumer(consumer)
++
++
++class Supervisor:
++    """One immutable run. Poll cleanup; I/O owners must do their own closing.
++
++    Fake ports are for offline tests only. No constructor here grants permission.
++    Revoke order is selectable for deterministic scheduling; no nested gate calls.
++    """
++    def __init__(self,binding,client,service,*,clock=time.monotonic,cleanup_timeout=5,evidence=None):
++        if client.binding!=binding or service.binding!=binding: raise InvalidInput('BINDING_MISMATCH')
++        if any(p.status()['revoked'] or p.status()['failed'] for p in (client,service)):
++            raise InvalidInput('STALE_ENDPOINT')
++        if number(cleanup_timeout)<=0: raise InvalidInput('INVALID_TIMEOUT')
++        self.binding,self.client,self.service=binding,client,service
++        self.clock,self.timeout,self.evidence=clock,cleanup_timeout,evidence
++        self._lock=Lock();self._observation=Lock();self.state='BOUND';self.reason=None;self._deadline=None
++        self._issued=False;self._revocation_done=False;self._last=None;self.audit_failed=False
++        self.coordinator=None
++        self._reset_reserved=False;self._transition_sequence=0
++        self._failure_sequence=None;self._reset_commit_sequence=None
++        self._reset_commit_count=0;self._committed_fixture_id=None;self._next_fixture=None
++
++    def attach_evidence(self,coordinator):
++        if type(coordinator) is not EvidenceCoordinator or coordinator.binding!=self.binding or self.state!='BOUND' or self.coordinator is not None:
++            raise InvalidInput('BINDING_MISMATCH')
++        coordinator.on_failure=self._evidence_failed
++        def consume(row):
++            result=coordinator.accept(row,self.binding)
++            if result not in ('CORRELATED','DUPLICATE'):raise InvalidInput('EVIDENCE_INCOMPLETE')
++        self.service.attach_consumer(consume)
++        self.coordinator=coordinator
++
++    def _latch_failure(self,reason):
++        # Same short gate as reference publication: neither path does I/O here.
++        with self._lock:
++            self.audit_failed=True
++            if self._failure_sequence is None:
++                self._transition_sequence+=1
++                self._failure_sequence=self._transition_sequence
++                self.reason=reason
++            self.state='FAILED'
++            self._next_fixture=None
++
++    def _evidence_failed(self):
++        self._latch_failure('EVIDENCE_INCOMPLETE')
++        self.revoke()
++
++    def _evidence_status(self):
++        if self.coordinator is None:return 'MISSING'
++        try:status=self.coordinator.completion_status()
++        except Exception:status='UNVERIFIED'
++        if status not in ('PENDING','VERIFIED'):
++            self._evidence_failed()
++        return status
++
++    def register_actions(self):
++        """Declare expected actions after prepare, before the next owner step.
++
++        This list alone is not a trusted source. The coordinator must separately
++        capture the actual offline Controller before finish; without that root
++        completion is SOURCE_UNVERIFIED and cannot authorize fixture retirement.
++        This adapter does not certify live Controller or service provenance.
++        """
++        if self.state!='BOUND' or self.coordinator is None:raise InvalidInput('NOT_BOUND')
++        try:
++            for action in self.client.actions():self.coordinator.expect(action,self.binding)
++        except Exception:
++            self.revoke();raise InvalidInput('ACTION_REGISTRATION_FAILED') from None
++
++    def _emit(self,kind):
++        if self.evidence is None: return
++        with self._lock:
++            event=dict(kind=kind,run_id=self.binding.run_id,generation=self.binding.generation,
++                       reset_commit_sequence=self._reset_commit_sequence,failure_sequence=self._failure_sequence,
++                       reset_commit_count=self._reset_commit_count,committed_fixture_id=self._committed_fixture_id,
++                       provenance='LIFECYCLE_ONLY',network_status='PENDING_AUTHORIZATION')
++        try:self.evidence(event)
++        except Exception:
++            self._latch_failure('AUDIT_ERROR')
++
++    def revoke(self,binding=None,*,service_first=False):
++        if binding is not None and binding!=self.binding: raise InvalidInput('STALE_BINDING')
++        with self._lock:
++            if self._issued or self.state=='RETIRED':return
++            self._issued=True
++            if self.state!='FAILED':self.state='STOPPING'
++            try:
++                self._last=number(self.clock());self._deadline=self._last+self.timeout
++            except Exception:self.state='FAILED';self.reason='CLOCK_ERROR'
++        # Never hold Supervisor lock or one endpoint gate while calling the other.
++        ports=(self.service,self.client) if service_first else (self.client,self.service)
++        failed=False
++        for port in ports:
++            try:port.revoke()
++            except Exception:failed=True
++        if failed:
++            with self._lock:self.state='FAILED';self.reason='REVOKE_ERROR'
++        self._emit('revocation_requested')
++        with self._lock:self._revocation_done=True
++
++    def poll(self):
++        if not self._observation.acquire(blocking=False):
++            with self._lock:return self.report_unlocked()
++        try:return self._poll()
++        finally:self._observation.release()
++
++    def _poll(self):
++        cleaned=False
++        with self._lock:
++            if self.state!='STOPPING' or not self._revocation_done:return self.report_unlocked()
++        try:
++            rows=[self.client.status(),self.service.status()]
++            if any(set(r)!= {'revoked','clean','failed'} or any(type(v) is not bool for v in r.values()) for r in rows):
++                raise ValueError()
++            evidence_status=self._evidence_status()
++            now=number(self.clock())
++            with self._lock:
++                if self.state!='STOPPING':return self.report_unlocked()
++                if now<self._last:raise ValueError()
++                self._last=now
++                if any(r['failed'] for r in rows):self.state='FAILED';self.reason='CLEANUP_FAILED'
++                elif now>=self._deadline:self.state='FAILED';self.reason='CLEANUP_TIMEOUT'
++                # STOPPED records resource cleanup, not permission to reset.
++                # A lifecycle-only observer can finish without a sidecar, but
++                # prepare_next still requires independently VERIFIED evidence.
++                elif all(r['revoked'] and r['clean'] for r in rows) and evidence_status in ('VERIFIED','MISSING'):cleaned=True
++        except Exception:
++            with self._lock:self.state='FAILED';self.reason='OBSERVATION_ERROR'
++        self._emit('cleanup_observed')
++        with self._lock:
++            if cleaned and self.state=='STOPPING':self.state='STOPPED'
++            return self.report_unlocked()
++
++    def report_unlocked(self):
++        return dict(state=self.state,reason=self.reason,run_id=self.binding.run_id,
++                    generation=self.binding.generation,audit_failed=self.audit_failed,
++                    reset_commit_count=self._reset_commit_count,reset_commit_sequence=self._reset_commit_sequence,
++                    failure_sequence=self._failure_sequence,committed_fixture_id=self._committed_fixture_id,
++                    committed_generation=self.binding.generation+1 if self._reset_commit_count else None,
++                    next_fixture_available=self._next_fixture is not None,
++                    network_status='PENDING_AUTHORIZATION',replay_allowed=False)
++
++    def prepare_next(self,mode):
++        # Re-read completion outside the Supervisor lock, including disk checks.
++        if self._evidence_status()!='VERIFIED':raise InvalidInput('EVIDENCE_NOT_COMPLETE')
++        with self._lock:
++            if self.state!='STOPPED' or self.audit_failed or self._reset_reserved:
++                raise InvalidInput('OLD_RUN_NOT_CLEAN')
++            self._reset_reserved=True  # one preparer; this is NOT the commit point
++        try:
++            for port in (self.client,self.service):
++                s=port.status()
++                if s!={'revoked':True,'clean':True,'failed':False}:raise InvalidInput('OLD_RUN_NOT_CLEAN')
++            with self._lock:
++                if self.state!='STOPPED' or self.audit_failed:raise InvalidInput('RESET_CANCELLED')
++            # Allocation has no active-reference or old-generation side effects.
++            fixture=FixtureManager.prepare(mode)
++            if type(fixture) is not Fixture or fixture.fixture_instance_id==self.binding.fixture_instance_id:
++                raise InvalidInput('INVALID_PREPARED_FIXTURE')
++            if self._evidence_status()!='VERIFIED':raise InvalidInput('EVIDENCE_NOT_COMPLETE')
++            self._emit('fixture_prepared')
++            with self._lock:
++                if self.state!='STOPPED' or self.audit_failed:raise InvalidInput('RESET_CANCELLED')
++                # LINEARIZATION POINT: only bounded in-memory assignments.
++                # A failure that won this gate prevents publication entirely.
++                self._transition_sequence+=1
++                self._reset_commit_sequence=self._transition_sequence
++                self._reset_commit_count=1
++                self._committed_fixture_id=fixture.fixture_instance_id
++                self._next_fixture=fixture
++                self.state='RETIRED'
++            # These callbacks may fail/block, so never execute them in the gate.
++            # A subsequent failure retains commit history, clears availability,
++            # and does not claim the already committed switch was rolled back.
++            self.client.invalidate();self.service.invalidate()
++            self._emit('fixture_committed')
++            with self._lock:
++                if self.audit_failed or self.state!='RETIRED':raise InvalidInput('AUDIT_ERROR')
++                return fixture
++        except Exception:
++            self._latch_failure('RESET_FAILED')
++            raise InvalidInput('RESET_FAILED') from None
+diff --git a/tests/test_c3_registration.py b/tests/test_c3_registration.py
+new file mode 100644
+index 0000000..e60d189
+--- /dev/null
++++ b/tests/test_c3_registration.py
+@@ -0,0 +1,215 @@
++"""Disk tampering regressions: synthetic evidence, never network execution."""
++import hashlib
++import json
++import tempfile
++import unittest
++from pathlib import Path
++from test_c3_supervisor import FakePort, summary, ACTION
++from p3_core.supervision import RunBinding, Supervisor
++from p3_core.coordination import EvidenceCoordinator, check_sidecar
++from p3_core.evidence import JsonlEvidence
++from p3_core.mock_api import Mode
++from p3_core.models import InvalidInput
++from p3_core.experiments import configuration, synthetic_registry
++from p3_core.http.machine import SimulationRun
++from p3_core.http.transport import MemoryTransport
++from p3_core.mock_api import FixtureManager
++from unittest.mock import patch
++import socket
++
++
++def rewrite(directory, mutate, report_mutate=None):
++    path=directory/'events.jsonl'
++    rows=[json.loads(line) for line in path.read_text().splitlines()]
++    mutate(rows)
++    data=('\n'.join(json.dumps(row) for row in rows)+'\n').encode()
++    path.write_bytes(data)
++    manifest=json.loads((directory/'manifest.json').read_text())
++    manifest.update(events_bytes=len(data),events_sha256=hashlib.sha256(data).hexdigest())
++    if report_mutate:
++        report=json.loads((directory/'report.json').read_text());report_mutate(report)
++        (directory/'report.json').write_text(json.dumps(report))
++        manifest['report_sha256']=hashlib.sha256(json.dumps(report,sort_keys=True).encode()).hexdigest()
++    (directory/'manifest.json').write_text(json.dumps(manifest))
++
++
++class RegistrationTests(unittest.TestCase):
++    def setUp(self):
++        for name in ('socket','create_connection','getaddrinfo','gethostbyname','gethostbyname_ex'):
++            guard=patch.object(socket,name,side_effect=AssertionError('NETWORK_FORBIDDEN'))
++            guard.start();self.addCleanup(guard.stop)
++
++    def trusted_sidecar(self,finish=True):
++        root=tempfile.TemporaryDirectory();self.addCleanup(root.cleanup)
++        fixture=FixtureManager.prepare(Mode.GOOD);raw=configuration(fixture)
++        controller=SimulationRun(raw,synthetic_registry(raw),credentials=fixture.credential_bindings())
++        controller.start();controller.step(MemoryTransport())
++        binding=RunBinding(controller.run_id,fixture.fixture_instance_id,controller.config.scope_digest,'v1',1)
++        c=EvidenceCoordinator(binding,sink=JsonlEvidence(root.name));c.capture_controller(controller)
++        action=controller._slots[0].action_id
++        c.accept(summary(action_id=action),binding)
++        if finish:c.finish()
++        return c,c.sink.directory,controller
++
++    def setup_sidecar(self):
++        root=tempfile.TemporaryDirectory();self.addCleanup(root.cleanup)
++        binding=RunBinding('run_test','fixture_test','a'*64,'v1',1)
++        sink=JsonlEvidence(root.name);c=EvidenceCoordinator(binding,sink=sink)
++        c.expect(ACTION,binding);c.accept(summary(),binding);c.finish()
++        return c,sink.directory
++
++    def test_null_action_rehashed(self):
++        c,path=self.setup_sidecar()
++        rewrite(path,lambda rows:rows[0]['summary'].update(action_id=None))
++        self.assertEqual(check_sidecar(path)['integrity'],'EVIDENCE_INCOMPLETE')
++
++    def test_unregistered_action_rehashed(self):
++        c,path=self.setup_sidecar()
++        rewrite(path,lambda rows:rows[0]['summary'].update(action_id='action_'+'c'*32))
++        self.assertEqual(check_sidecar(path)['integrity'],'EVIDENCE_INCOMPLETE')
++
++    def test_missing_controller_root_blocks_reset(self):
++        c,path=self.setup_sidecar();events=[]
++        a=FakePort(c.binding,'client',events);b=FakePort(c.binding,'service',events)
++        s=Supervisor(c.binding,a,b);s.attach_evidence(c);s.revoke()
++        a.clean=b.clean=True;s.poll()
++        self.assertNotEqual(c.completion_status(),'VERIFIED')
++        with self.assertRaises(InvalidInput):s.prepare_next(Mode.GOOD)
++        self.assertEqual(s.poll()['reset_commit_count'],0)
++
++    def test_public_report_after_finish_not_pending(self):
++        c,path=self.setup_sidecar()
++        self.assertNotEqual(c.report()['completion'],'PENDING')
++
++    def test_other_run_registered_action_rejected(self):
++        c,path,controller=self.trusted_sidecar()
++        other,_,other_controller=self.trusted_sidecar()
++        rewrite(path,lambda rows:rows[0]['summary'].update(action_id=other_controller._slots[0].action_id))
++        self.assertEqual(check_sidecar(path)['integrity'],'EVIDENCE_INCOMPLETE')
++        self.assertEqual(c.completion_status(),'AUDIT_FAILED')
++
++    def test_editing_all_files_cannot_replace_independent_root(self):
++        c,path,controller=self.trusted_sidecar()
++        fake='action_'+'e'*32
++        def replace_report(report):
++            report['expected_actions']=[fake];report['connections'][0]['action_id']=fake
++        rewrite(path,lambda rows:rows[0]['summary'].update(action_id=fake),replace_report)
++        structural=check_sidecar(path)
++        self.assertEqual(structural['integrity'],'CONSISTENT_OFFLINE_SIDECAR')
++        self.assertEqual(structural['registration_status'],'SOURCE_UNVERIFIED')
++        self.assertFalse(structural['source_verified'])
++        self.assertEqual(c.completion_status(),'AUDIT_FAILED')
++
++    def test_real_offline_controller_snapshot_positive(self):
++        c,path,controller=self.trusted_sidecar()
++        self.assertEqual(c.completion_status(),'VERIFIED')
++        self.assertEqual(c.report()['completion'],'OFFLINE_VERIFIED')
++        self.assertFalse(check_sidecar(path)['source_verified'])
++        self.assertEqual(controller.counts['request_count'],0)
++
++    def test_lifecycle_null_cannot_masquerade_as_action(self):
++        c,path,controller=self.trusted_sidecar()
++        def mutate(rows):
++            rows[0]['kind']='revocation_requested';rows[0]['summary']['action_id']=None
++        rewrite(path,mutate)
++        self.assertEqual(check_sidecar(path)['integrity'],'EVIDENCE_INCOMPLETE')
++        # Legitimate lifecycle observations use the separate Supervisor stream.
++        events=[];a=FakePort(c.binding,'client',[]);b=FakePort(c.binding,'service',[])
++        s=Supervisor(c.binding,a,b,evidence=events.append);s.revoke()
++        self.assertEqual(events[0]['kind'],'revocation_requested')
++        self.assertNotIn('action_id',events[0])
++
++    def test_connection_association_rehashed_rejected(self):
++        c,path,controller=self.trusted_sidecar()
++        rewrite(path,lambda rows:rows[0]['summary'].update(connection_id='connection_'+'f'*32))
++        self.assertEqual(check_sidecar(path)['integrity'],'EVIDENCE_INCOMPLETE')
++
++    def test_failure_blocks_supervisor_commit(self):
++        c,path,controller=self.trusted_sidecar();events=[]
++        a=FakePort(c.binding,'client',events);b=FakePort(c.binding,'service',events)
++        s=Supervisor(c.binding,a,b);s.attach_evidence(c);s.revoke();a.clean=b.clean=True
++        self.assertEqual(s.poll()['state'],'STOPPED')
++        rewrite(path,lambda rows:rows[0]['summary'].update(action_id=None))
++        with patch.object(FixtureManager,'prepare',wraps=FixtureManager.prepare) as prepare:
++            with self.assertRaises(InvalidInput):s.prepare_next(Mode.GOOD)
++            self.assertEqual(prepare.call_count,0)
++        self.assertEqual(s.poll()['state'],'FAILED')
++        self.assertEqual(s.poll()['reset_commit_count'],0)
++
++    def test_report_lifecycle_states(self):
++        c,path,controller=self.trusted_sidecar(finish=False)
++        self.assertEqual(c.report()['completion'],'PENDING')
++        with patch.object(c,'completion_status',return_value='PENDING'):
++            c.finish()
++        self.assertEqual(c.report()['completion'],'WRITTEN_UNVERIFIED')
++        self.assertEqual(c.completion_status(),'VERIFIED')
++        self.assertEqual(c.report()['completion'],'OFFLINE_VERIFIED')
++        c._fail(audit=True)
++        self.assertEqual(c.report()['completion'],'AUDIT_FAILED')
++
++    def test_untrusted_report_and_gap_states(self):
++        c,path=self.setup_sidecar()
++        self.assertEqual(c.report()['completion'],'SOURCE_UNVERIFIED')
++        c._fail()
++        self.assertEqual(c.report()['completion'],'EVIDENCE_INCOMPLETE')
++
++    def test_planner_dictionary_cannot_supply_root(self):
++        c,path=self.setup_sidecar()
++        with self.assertRaises(InvalidInput):c.capture_controller({'approved':True,'actions':[ACTION]})
++        self.assertEqual(c.completion_status(),'SOURCE_UNVERIFIED')
++
++    def test_all_binding_fields_checked_on_disk(self):
++        for key,value in (('linked_run_id','other'),('fixture_instance_id','other'),
++                          ('generation',2),('scope_digest','b'*64),('authorization_version','v2')):
++            with self.subTest(key=key):
++                c,path,controller=self.trusted_sidecar()
++                rewrite(path,lambda rows:rows[0].update({key:value}))
++                self.assertEqual(check_sidecar(path)['integrity'],'EVIDENCE_INCOMPLETE')
++
++    def test_missing_duplicate_and_sequence_gap(self):
++        for mode in ('missing','duplicate','gap'):
++            with self.subTest(mode=mode):
++                c,path,controller=self.trusted_sidecar()
++                def mutate(rows):
++                    if mode=='missing':rows.clear()
++                    elif mode=='duplicate':rows.append(dict(rows[0]))
++                    else:rows[0]['summary']['summary_sequence']=2
++                rewrite(path,mutate)
++                self.assertEqual(check_sidecar(path)['integrity'],'EVIDENCE_INCOMPLETE')
++
++    def test_controller_audit_failure_invalidates_completion(self):
++        c,path,controller=self.trusted_sidecar()
++        controller._audit_gap=True
++        self.assertEqual(c.completion_status(),'AUDIT_FAILED')
++        self.assertEqual(c.report()['completion'],'AUDIT_FAILED')
++
++    def test_non_dispatched_action_not_filled_with_fake_summary(self):
++        c,path,controller=self.trusted_sidecar(finish=False)
++        # This adapter has no trusted non-dispatch proof format: fail closed.
++        c.expect('action_'+'d'*32,c.binding);c.finish()
++        self.assertEqual(c.completion_status(),'INCOMPLETE')
++        self.assertEqual(c.report()['missing_actions'],['action_'+'d'*32])
++
++    def test_action_wrong_types_rehashed(self):
++        for value in (False,17,[],{}):
++            with self.subTest(value=value):
++                c,path=self.setup_sidecar()
++                rewrite(path,lambda rows:rows[0]['summary'].update(action_id=value))
++                self.assertEqual(check_sidecar(path)['integrity'],'EVIDENCE_INCOMPLETE')
++
++    def test_other_controller_cannot_bind_root(self):
++        c,path,controller=self.trusted_sidecar(finish=False)
++        other,_,other_controller=self.trusted_sidecar()
++        with self.assertRaises(InvalidInput):c.capture_controller(other_controller)
++        c.finish()
++        self.assertEqual(c.completion_status(),'VERIFIED')
++
++    def test_markers_remain_fail_closed_with_root(self):
++        for name in ('manifest','report'):
++            for key,value in (('audit_gap',True),('audit_gap',None),('completion','PENDING')):
++                with self.subTest(name=name,key=key,value=value):
++                    c,path,controller=self.trusted_sidecar()
++                    p=path/(name+'.json');doc=json.loads(p.read_text());doc[key]=value;p.write_text(json.dumps(doc))
++                    self.assertEqual(check_sidecar(path)['integrity'],'EVIDENCE_INCOMPLETE')
++                    self.assertEqual(c.completion_status(),'AUDIT_FAILED')
++
+diff --git a/tests/test_c3_supervisor.py b/tests/test_c3_supervisor.py
+new file mode 100644
+index 0000000..9bbca4e
+--- /dev/null
++++ b/tests/test_c3_supervisor.py
+@@ -0,0 +1,655 @@
++"""NO_NETWORK_SIMULATION: fake lifecycle and summaries are not live evidence."""
++import copy
++import io
++import json
++import socket
++import tempfile
++import threading
++import unittest
++from contextlib import redirect_stdout
++from dataclasses import replace
++from pathlib import Path
++from unittest.mock import patch
++
++from p3_core.supervision import Supervisor, RunBinding, LifecyclePort
++from p3_core.coordination import EvidenceCoordinator, check_sidecar
++from p3_core.preflight import authorization_preflight
++from p3_core.acceptance import acceptance_plan, offline_status, validate_management_record
++from p3_core.delivery import main
++from p3_core.evidence import MemoryEvidence, JsonlEvidence
++from p3_core.models import InvalidInput
++from p3_core.experiments import configuration, synthetic_registry
++from p3_core.http.contract import HttpConfig
++from p3_core.http.live import AuthorizedHttpRun, FixtureBinding, InstanceStatus, credential_binding_digest
++from p3_core.mock_api import FixtureManager, Mode
++from p3_core.mock_api.service import AuthorizedService
++
++
++ACTION='action_'+'a'*32
++
++
++class FakePort:
++    def __init__(self,binding,name,events):
++        self.binding,self.name,self.events=binding,name,events
++        self.revoked=False;self.clean=False;self.failed=False;self.invalidated=False
++    def revoke(self):self.events.append(self.name);self.revoked=True
++    def status(self):return dict(revoked=self.revoked,clean=self.clean,failed=self.failed)
++    def invalidate(self):self.invalidated=True
++    def actions(self):return (ACTION,)
++    def attach_consumer(self,consumer):self.consumer=consumer
++
++
++def summary(**changes):
++    row=dict(connection_id='connection_'+'b'*32,action_id=ACTION,sent_bytes=10,received_bytes=20,
++             first_send_sequence=1,last_send_sequence=1,reason='RESPONSE_SENT',cleanup_failed=False,
++             revoke_requested_at=None,revoke_effective_sequence=None,revoke_effective_at=None,summary_sequence=1)
++    row.update(changes);return row
++
++
++class SupervisorTests(unittest.TestCase):
++    def setUp(self):
++        for name in ('socket','create_connection','getaddrinfo','gethostbyname','gethostbyname_ex'):
++            guard=patch.object(socket,name,side_effect=AssertionError('NETWORK_FORBIDDEN'))
++            guard.start();self.addCleanup(guard.stop)
++        self.binding=RunBinding('run_test','fixture_test','a'*64,'v1',1)
++        self.events=[];self.now=0
++        self.client=FakePort(self.binding,'client',self.events)
++        self.service=FakePort(self.binding,'service',self.events)
++        self.supervisor=Supervisor(self.binding,self.client,self.service,clock=lambda:self.now)
++
++    def clean(self):
++        self.client.clean=self.service.clean=True
++        return self.supervisor.poll()
++
++    def test_missing_sidecar_never_creates_or_commits_fixture(self):
++        self.supervisor.revoke()
++        self.assertEqual(self.clean()['state'],'STOPPED')
++        with patch.object(FixtureManager,'prepare',wraps=FixtureManager.prepare) as prepared:
++            for _ in range(2):
++                with self.assertRaises(InvalidInput):self.supervisor.prepare_next(Mode.GOOD)
++            self.assertEqual(prepared.call_count,0)
++        self.assertEqual(self.supervisor.poll()['reset_commit_count'],0)
++        self.assertFalse(self.client.invalidated or self.service.invalidated)
++        self.assertNotEqual(self.supervisor._evidence_status(),'VERIFIED')
++
++    def coordinator(self,**kw):
++        c=EvidenceCoordinator(self.binding,**kw);c.expect(ACTION,self.binding);return c
++
++    def verified_sidecar_fixture(self):
++        controller=self.trusted_controller_fixture()
++        root=tempfile.TemporaryDirectory();self.addCleanup(root.cleanup)
++        coordinator=EvidenceCoordinator(self.binding,sink=JsonlEvidence(root.name))
++        self.supervisor.attach_evidence(coordinator)
++        coordinator.capture_controller(controller)
++        coordinator.accept(summary(),self.binding);coordinator.finish()
++        self.assertEqual(coordinator.completion_status(),'VERIFIED')
++
++    def trusted_controller_fixture(self):
++        # Preserve the lifecycle assertions, but replace the old self-claimed
++        # action fixture with an actual offline Controller approval.
++        from p3_core.http.machine import SimulationRun
++        from p3_core.http.transport import MemoryTransport
++        global ACTION
++        original=ACTION
++        fixture=FixtureManager.prepare(Mode.GOOD);raw=configuration(fixture)
++        run=SimulationRun(raw,synthetic_registry(raw),credentials=fixture.credential_bindings())
++        run.start();run.step(MemoryTransport())
++        ACTION=run._slots[0].action_id
++        self.addCleanup(lambda:globals().__setitem__('ACTION',original))
++        self.binding=RunBinding(run.run_id,fixture.fixture_instance_id,run.config.scope_digest,'v1',1)
++        self.client=FakePort(self.binding,'client',self.events)
++        self.service=FakePort(self.binding,'service',self.events)
++        self.supervisor=Supervisor(self.binding,self.client,self.service,clock=lambda:self.now)
++        return run
++
++    def document(self):
++        fixture=FixtureManager.reset(Mode.GOOD);raw=configuration(fixture);cfg=HttpConfig.parse(raw)
++        def material(role):return dict(reference='reference',source='offline-placeholder',sha256='a'*64,
++            authorization_version=cfg.authorization_version,scope_digest=cfg.scope_digest,
++            valid_from=0,valid_until=100,role=role,principal='reviewer',delegation_ref=None)
++        return dict(config=raw,owner=material('owner'),teacher_catalog=material('teacher'),
++            fixture_binding=dict(fixture_instance_id=cfg.fixture_instance_id,scope_digest=cfg.scope_digest,
++                credential_digest='b'*64,supervisor_record_ref='record'),budget_record='record',
++            revocation_responsibility='record',experiment_scope=['GOOD_PAIRED_CONTROLS'],exception_permissions=[])
++
++    def test_both_revocation_orders(self):
++        for first in (False,True):
++            events=[];a=FakePort(self.binding,'client',events);b=FakePort(self.binding,'service',events)
++            s=Supervisor(self.binding,a,b);s.revoke(service_first=first)
++            self.assertEqual(events,['service','client'] if first else ['client','service'])
++            self.assertTrue(a.revoked and b.revoked)
++
++    def test_simultaneous_revocation_is_idempotent(self):
++        barrier=threading.Barrier(3)
++        threads=[threading.Thread(target=lambda:(barrier.wait(),self.supervisor.revoke())) for _ in range(2)]
++        for t in threads:t.start()
++        barrier.wait()
++        for t in threads:t.join(2);self.assertFalse(t.is_alive())
++        self.assertEqual(self.events,['client','service'])
++
++    def test_pending_cleanup_does_not_block_revoke(self):
++        self.supervisor.revoke();self.assertEqual(self.supervisor.poll()['state'],'STOPPING')
++        self.supervisor.revoke();self.assertTrue(self.service.revoked)
++        self.assertEqual(self.clean()['state'],'STOPPED')
++
++    def test_cleanup_failure_is_terminal(self):
++        self.supervisor.revoke();self.client.failed=True
++        self.assertEqual(self.clean()['state'],'FAILED')
++        self.client.failed=False
++        self.assertEqual(self.supervisor.poll()['state'],'FAILED')
++        with self.assertRaises(InvalidInput):self.supervisor.prepare_next(Mode.GOOD)
++
++    def test_timeout_does_not_claim_cleanup(self):
++        self.supervisor.revoke();self.now=5
++        self.assertEqual(self.supervisor.poll()['reason'],'CLEANUP_TIMEOUT')
++        self.assertEqual(self.clean()['state'],'FAILED')
++
++    def test_clock_regression_fails_closed(self):
++        self.supervisor.revoke();self.now=-1
++        self.assertEqual(self.supervisor.poll()['state'],'FAILED')
++
++    def test_revoke_exception_still_reaches_other_endpoint(self):
++        self.client.revoke=lambda:(_ for _ in ()).throw(ValueError('secret'))
++        self.supervisor.revoke()
++        self.assertTrue(self.service.revoked);self.assertEqual(self.supervisor.poll()['reason'],'REVOKE_ERROR')
++
++    def test_reset_requires_both_clean_and_new_instance(self):
++        self.verified_sidecar_fixture()
++        self.supervisor.revoke();self.client.clean=True
++        with self.assertRaises(InvalidInput):self.supervisor.prepare_next(Mode.GOOD)
++        self.assertFalse(self.client.invalidated)
++        self.clean();fixture=self.supervisor.prepare_next(Mode.GOOD)
++        self.assertNotEqual(fixture.fixture_instance_id,self.binding.fixture_instance_id)
++        self.assertTrue(self.client.invalidated and self.service.invalidated)
++        with self.assertRaises(InvalidInput):self.supervisor.prepare_next(Mode.GOOD)
++
++    def test_concurrent_reset_has_one_winner(self):
++        self.verified_sidecar_fixture()
++        self.supervisor.revoke();self.clean();results=[];barrier=threading.Barrier(3)
++        def reset():
++            barrier.wait()
++            try:self.supervisor.prepare_next(Mode.GOOD);results.append('prepared')
++            except InvalidInput:results.append('rejected')
++        ts=[threading.Thread(target=reset) for _ in range(2)]
++        for t in ts:t.start()
++        barrier.wait()
++        for t in ts:t.join(2);self.assertFalse(t.is_alive())
++        self.assertCountEqual(results,['prepared','rejected'])
++
++    def test_stale_binding_and_endpoint_rejected(self):
++        with self.assertRaises(InvalidInput):self.supervisor.revoke(replace(self.binding,generation=0))
++        self.supervisor.revoke()
++        with self.assertRaises(InvalidInput):Supervisor(self.binding,self.client,self.service)
++        with self.assertRaises(InvalidInput):Supervisor(replace(self.binding,run_id='run_other'),self.client,self.service)
++
++    def test_audit_failure_revoke_and_no_reset(self):
++        self.supervisor.evidence=lambda event:(_ for _ in ()).throw(OSError('secret'))
++        self.supervisor.revoke();self.clean()
++        self.assertTrue(self.client.revoked and self.service.revoked)
++        self.assertEqual(self.supervisor.poll()['state'],'FAILED')
++        with self.assertRaises(InvalidInput):self.supervisor.prepare_next(Mode.GOOD)
++
++    def test_poll_cannot_race_revocation_audit(self):
++        entered=threading.Event();release=threading.Event()
++        def audit(event):entered.set();release.wait(2)
++        self.supervisor.evidence=audit
++        t=threading.Thread(target=self.supervisor.revoke);t.start()
++        try:
++            self.assertTrue(entered.wait(1));self.client.clean=self.service.clean=True
++            self.assertEqual(self.supervisor.poll()['state'],'STOPPING')
++            with self.assertRaises(InvalidInput):self.supervisor.prepare_next(Mode.GOOD)
++        finally:release.set();t.join(2)
++        self.assertEqual(self.supervisor.poll()['state'],'STOPPED')
++
++    def test_evidence_valid_duplicate_and_missing(self):
++        c=self.coordinator();self.assertEqual(c.accept(summary(),self.binding),'CORRELATED')
++        self.assertEqual(c.accept(summary(),self.binding),'DUPLICATE')
++        self.assertEqual(c.report()['connection_count'],1)
++        c.expect('action_'+'c'*32,self.binding)
++        self.assertEqual(c.finish()['integrity'],'EVIDENCE_INCOMPLETE')
++
++    def test_conflicting_duplicate_rejected(self):
++        c=self.coordinator();c.accept(summary(),self.binding)
++        self.assertEqual(c.accept(summary(sent_bytes=11),self.binding),'EVIDENCE_INCOMPLETE')
++
++    def test_cross_run_and_unknown_action_rejected(self):
++        c=self.coordinator()
++        self.assertEqual(c.accept(summary(),replace(self.binding,run_id='run_other')),'EVIDENCE_INCOMPLETE')
++        c=self.coordinator()
++        self.assertEqual(c.accept(summary(action_id='action_'+'d'*32),self.binding),'UNKNOWN')
++
++    def test_overwritten_or_gapped_summary_detected(self):
++        c=self.coordinator()
++        self.assertEqual(c.accept(summary(summary_sequence=2),self.binding),'EVIDENCE_INCOMPLETE')
++
++    def test_partial_send_stays_unknown(self):
++        c=self.coordinator();c.accept(summary(reason='REVOKED',revoke_requested_at=2,
++            revoke_effective_at=3,revoke_effective_sequence=2),self.binding)
++        self.assertEqual(c.sink.events[0]['outcome'],'UNKNOWN')
++        self.assertEqual(c.finish()['api_conclusion'],'INCONCLUSIVE')
++
++    def test_close_failure_prevents_complete_evidence(self):
++        c=self.coordinator();c.accept(summary(cleanup_failed=True),self.binding)
++        self.assertEqual(c.report()['integrity'],'EVIDENCE_INCOMPLETE')
++
++    def test_invalid_summary_does_not_echo_secrets(self):
++        for row in (summary(token='SENSITIVE_TOKEN'),summary(reason='SENSITIVE_EXCEPTION'),summary(action_id='SENSITIVE_PARAM')):
++            c=self.coordinator();c.accept(row,self.binding);c.finish()
++            self.assertNotIn('SENSITIVE',json.dumps([c.sink.events,c.sink.report,c.sink.manifest]))
++
++    def test_sidecar_audit_failure_revokes_both(self):
++        c=EvidenceCoordinator(self.binding);self.supervisor.attach_evidence(c);self.supervisor.register_actions()
++        c.sink.emit=lambda row:(_ for _ in ()).throw(OSError('secret'))
++        with self.assertRaises(InvalidInput):self.service.consumer(summary())
++        self.assertTrue(self.client.revoked and self.service.revoked)
++        self.assertTrue(c.report()['audit_gap'])
++
++    def test_sidecar_roundtrip_and_tamper(self):
++        with tempfile.TemporaryDirectory() as root:
++            sink=JsonlEvidence(root);c=self.coordinator(sink=sink);c.accept(summary(),self.binding);c.finish()
++            self.assertEqual(check_sidecar(sink.directory)['integrity'],'CONSISTENT_OFFLINE_SIDECAR')
++            (sink.directory/'events.jsonl').write_text('secret')
++            self.assertEqual(check_sidecar(sink.directory)['integrity'],'EVIDENCE_INCOMPLETE')
++
++    def test_empty_or_capacity_exceeded_not_complete(self):
++        self.assertEqual(EvidenceCoordinator(self.binding).finish()['integrity'],'EVIDENCE_INCOMPLETE')
++        c=self.coordinator(limit=1)
++        with self.assertRaises(InvalidInput):c.expect('action_'+'c'*32,self.binding)
++
++    def test_complete_fields_are_not_authorization(self):
++        result=authorization_preflight(self.document(),now=1)
++        self.assertEqual(result['status'],'PENDING_AUTHORIZATION');self.assertFalse(result['execution_allowed'])
++        self.assertEqual(sum(i['category']=='SOURCE_UNVERIFIED' for i in result['issues']),2)
++
++    def test_missing_teacher_owner_and_planner_flag(self):
++        doc=self.document();doc.pop('owner');doc.pop('teacher_catalog');doc['active']=True
++        result=authorization_preflight(doc,now=1)
++        self.assertIn(dict(category='MISSING',field='teacher_catalog'),result['issues'])
++        self.assertIn(dict(category='MISSING',field='owner'),result['issues'])
++        self.assertIn(dict(category='INVALID_FORMAT',field='unknown_fields'),result['issues'])
++
++    def test_human_lookup_still_needs_runtime_binding(self):
++        result=authorization_preflight(self.document(),now=1,review_source=lambda field,digest:True)
++        self.assertTrue(result['human_review_observed']);self.assertFalse(result['execution_allowed'])
++        self.assertIn(dict(category='RUN_BINDING_PENDING',field='trusted_host'),result['issues'])
++
++    def test_material_conflicts_and_exception_permission(self):
++        doc=self.document();doc['owner']['scope_digest']='f'*64;doc['experiment_scope']=['TIMEOUT']
++        result=authorization_preflight(doc,now=101)
++        self.assertIn(dict(category='CONFLICT',field='owner.scope'),result['issues'])
++        self.assertIn(dict(category='CONFLICT',field='owner.validity'),result['issues'])
++        self.assertIn(dict(category='CONFLICT',field='exception_permissions'),result['issues'])
++
++    def test_malformed_lists_and_lookup_failure_are_safe(self):
++        doc=self.document();doc['experiment_scope']=[{}]
++        result=authorization_preflight(doc,now=1,review_source=lambda *args:(_ for _ in ()).throw(OSError('secret')))
++        self.assertFalse(result['execution_allowed']);self.assertNotIn('secret',json.dumps(result))
++        self.assertIn(dict(category='INVALID_FORMAT',field='experiment_scope'),result['issues'])
++
++    def test_all_fourteen_remain_pending(self):
++        plan=acceptance_plan();self.assertEqual(len(plan['cases']),14)
++        for row in plan['cases']:row['status']='VERIFIED'
++        result=offline_status(plan)
++        self.assertTrue(all(r['status']=='PENDING_AUTHORIZATION' for r in result['cases']))
++        self.assertIsNone(result['execution_entrypoint'])
++
++    def test_management_format_does_not_authenticate(self):
++        row=acceptance_plan()['cases'][0];row['status']='VERIFIED'
++        with self.assertRaises(InvalidInput):validate_management_record(row)
++        row['result'].update(execution_proof='untrusted',reviewer_record='untrusted')
++        self.assertFalse(validate_management_record(row)['source_verified'])
++
++    def test_read_only_cli_no_network(self):
++        for command in ('supervisor-plan','integration-status'):
++            out=io.StringIO()
++            with redirect_stdout(out):self.assertEqual(main([command]),0)
++            self.assertEqual(json.loads(out.getvalue())['network_status'],'PENDING_AUTHORIZATION')
++        with tempfile.TemporaryDirectory() as root:
++            path=Path(root)/'input.json';path.write_text(json.dumps(self.document()))
++            before=path.read_bytes();out=io.StringIO()
++            with redirect_stdout(out):self.assertEqual(main(['authorization-preflight',str(path)]),0)
++            self.assertEqual(path.read_bytes(),before);self.assertFalse(json.loads(out.getvalue())['execution_allowed'])
++
++    def test_real_ports_only_observe_and_revoke_without_permission(self):
++        fixture=FixtureManager.reset(Mode.GOOD);raw=configuration(fixture);cfg=HttpConfig.parse(raw)
++        registry=synthetic_registry(raw)
++        fb=FixtureBinding(fixture.fixture_instance_id,cfg.scope_digest,'host',InstanceStatus(),
++                          credential_binding_digest(fixture.credential_bindings()))
++        run=AuthorizedHttpRun(raw,registry,credentials=fixture.credential_bindings(),binding=fb)
++        service=AuthorizedService(cfg,registry,fixture,fb)
++        binding=RunBinding(run.run_id,fixture.fixture_instance_id,cfg.scope_digest,cfg.authorization_version,1)
++        sup=Supervisor(binding,LifecyclePort(run,binding),LifecyclePort(service,binding))
++        sup.revoke();self.assertEqual(sup.poll()['state'],'STOPPED')
++        self.assertIsNone(service._server)
++
++    def test_missing_summary_blocks_fixture_reset(self):
++        c=EvidenceCoordinator(self.binding)
++        self.supervisor.attach_evidence(c);self.supervisor.register_actions()
++        self.supervisor.revoke();self.clean()
++        with self.assertRaises(InvalidInput):self.supervisor.prepare_next(Mode.GOOD)
++        c.finish()
++        self.assertEqual(self.supervisor.poll()['state'],'FAILED')
++
++    def test_sidecar_failure_after_revoke_is_latched(self):
++        c=EvidenceCoordinator(self.binding)
++        self.supervisor.attach_evidence(c);self.supervisor.register_actions()
++        self.supervisor.revoke()
++        c.sink.emit=lambda row:(_ for _ in ()).throw(OSError('secret'))
++        with self.assertRaises(InvalidInput):c.accept(summary(),self.binding)
++        self.assertEqual(self.clean()['state'],'FAILED')
++        with self.assertRaises(InvalidInput):self.supervisor.prepare_next(Mode.GOOD)
++        self.assertEqual(self.events,['client','service'])
++
++    def test_manifest_completion_required_before_reset(self):
++        controller=self.trusted_controller_fixture()
++        with tempfile.TemporaryDirectory() as root:
++            sink=JsonlEvidence(root);c=EvidenceCoordinator(self.binding,sink=sink)
++            c.capture_controller(controller)
++            self.supervisor.attach_evidence(c);self.supervisor.register_actions()
++            c.accept(summary(),self.binding);self.supervisor.revoke();self.clean()
++            with self.assertRaises(InvalidInput):self.supervisor.prepare_next(Mode.GOOD)
++            entered=threading.Event();release=threading.Event();original=sink.finish
++            def blocked(*args):entered.set();release.wait(2);original(*args)
++            sink.finish=blocked
++            worker=threading.Thread(target=c.finish);worker.start()
++            try:
++                self.assertTrue(entered.wait(1));self.supervisor.poll()
++                with self.assertRaises(InvalidInput):self.supervisor.prepare_next(Mode.GOOD)
++            finally:release.set();worker.join(2)
++            self.assertFalse(worker.is_alive())
++            self.assertEqual(self.supervisor.poll()['state'],'STOPPED')
++            self.assertIsNotNone(self.supervisor.prepare_next(Mode.GOOD))
++
++    def test_manifest_audit_markers_fail_closed(self):
++        for value in (True,None,0,'false','MISSING'):
++            with self.subTest(value=value),tempfile.TemporaryDirectory() as root:
++                sink=JsonlEvidence(root);c=self.coordinator(sink=sink)
++                c.accept(summary(),self.binding);c.finish()
++                path=sink.directory/'manifest.json';manifest=json.loads(path.read_text())
++                if value=='MISSING':manifest.pop('audit_gap')
++                else:manifest['audit_gap']=value
++                path.write_text(json.dumps(manifest))
++                self.assertEqual(check_sidecar(sink.directory)['integrity'],'EVIDENCE_INCOMPLETE')
++
++    def test_manifest_identity_provenance_completion(self):
++        for key,value in (('run_id','other'),('provenance','REAL_HTTP'),('completion','PENDING')):
++            with self.subTest(key=key),tempfile.TemporaryDirectory() as root:
++                sink=JsonlEvidence(root);c=self.coordinator(sink=sink)
++                c.accept(summary(),self.binding);c.finish()
++                self.assertEqual(check_sidecar(sink.directory)['integrity'],'CONSISTENT_OFFLINE_SIDECAR')
++                path=sink.directory/'manifest.json';manifest=json.loads(path.read_text());manifest[key]=value
++                path.write_text(json.dumps(manifest))
++                self.assertEqual(check_sidecar(sink.directory)['integrity'],'EVIDENCE_INCOMPLETE')
++
++    def test_memory_correlation_is_not_verified_completion(self):
++        c=EvidenceCoordinator(self.binding)
++        self.supervisor.attach_evidence(c);self.supervisor.register_actions()
++        c.accept(summary(),self.binding);c.finish();self.supervisor.revoke();self.clean()
++        with self.assertRaises(InvalidInput):self.supervisor.prepare_next(Mode.GOOD)
++
++    def test_sidecar_tamper_after_stopped_blocks_reset(self):
++        controller=self.trusted_controller_fixture()
++        with tempfile.TemporaryDirectory() as root:
++            sink=JsonlEvidence(root);c=EvidenceCoordinator(self.binding,sink=sink)
++            c.capture_controller(controller)
++            self.supervisor.attach_evidence(c);self.supervisor.register_actions()
++            c.accept(summary(),self.binding);c.finish();self.supervisor.revoke()
++            self.assertEqual(self.clean()['state'],'STOPPED')
++            path=sink.directory/'manifest.json';manifest=json.loads(path.read_text());manifest['audit_gap']=True
++            path.write_text(json.dumps(manifest))
++            with self.assertRaises(InvalidInput):self.supervisor.prepare_next(Mode.GOOD)
++            self.assertFalse(self.client.invalidated)
++
++    def test_report_audit_markers_fail_even_with_updated_hash(self):
++        import hashlib
++        for value in (None,0,'false','MISSING',True):
++            with self.subTest(value=value),tempfile.TemporaryDirectory() as root:
++                sink=JsonlEvidence(root);c=self.coordinator(sink=sink)
++                c.accept(summary(),self.binding);c.finish()
++                path=sink.directory/'report.json';report=json.loads(path.read_text())
++                if value=='MISSING':report.pop('audit_gap')
++                else:report['audit_gap']=value
++                path.write_text(json.dumps(report))
++                path=sink.directory/'manifest.json';manifest=json.loads(path.read_text())
++                manifest['report_sha256']=hashlib.sha256(json.dumps(report,sort_keys=True).encode()).hexdigest()
++                path.write_text(json.dumps(manifest))
++                self.assertEqual(check_sidecar(sink.directory)['integrity'],'EVIDENCE_INCOMPLETE')
++
++    def test_manifest_write_failure_after_revoke_blocks_reset(self):
++        with tempfile.TemporaryDirectory() as root:
++            sink=JsonlEvidence(root);c=EvidenceCoordinator(self.binding,sink=sink)
++            self.supervisor.attach_evidence(c);self.supervisor.register_actions()
++            c.accept(summary(),self.binding);self.supervisor.revoke()
++            sink.finish=lambda *args:(_ for _ in ()).throw(OSError('secret'))
++            self.assertTrue(c.finish()['audit_gap'])
++            self.assertEqual(c.completion_status(),'AUDIT_FAILED')
++            self.assertEqual(self.clean()['state'],'FAILED')
++            with self.assertRaises(InvalidInput):self.supervisor.prepare_next(Mode.GOOD)
++            self.assertEqual(self.events,['client','service'])
++
++    def test_completion_io_is_outside_supervisor_lock(self):
++        controller=self.trusted_controller_fixture()
++        with tempfile.TemporaryDirectory() as root:
++            sink=JsonlEvidence(root);c=EvidenceCoordinator(self.binding,sink=sink)
++            c.capture_controller(controller)
++            self.supervisor.attach_evidence(c);self.supervisor.register_actions()
++            c.accept(summary(),self.binding);c.finish();self.supervisor.revoke()
++            from p3_core.coordination import check_sidecar as original
++            def checked(*args,**kwargs):
++                acquired=self.supervisor._lock.acquire(blocking=False)
++                self.assertTrue(acquired)
++                if acquired:self.supervisor._lock.release()
++                return original(*args,**kwargs)
++            with patch('p3_core.coordination.check_sidecar',side_effect=checked):
++                self.assertEqual(self.clean()['state'],'STOPPED')
++                self.supervisor.prepare_next(Mode.GOOD)
++
++    def test_reset_failure_at_endpoint_barrier_has_no_creation(self):
++        self.verified_sidecar_fixture()
++        from p3_core.mock_api.core import Fixture
++        self.supervisor.revoke();self.clean()
++        entered=threading.Event();release=threading.Event();old_status=self.client.status
++        def status():entered.set();self.assertTrue(release.wait(2));return old_status()
++        self.client.status=status;results=[]
++        def run():
++            try:self.supervisor.prepare_next(Mode.GOOD);results.append('returned')
++            except InvalidInput:results.append('rejected')
++        with patch('p3_core.mock_api.core.Fixture',wraps=Fixture) as created:
++            worker=threading.Thread(target=run);worker.start()
++            try:
++                self.assertTrue(entered.wait(1));self.supervisor._evidence_failed()
++            finally:release.set();worker.join(2)
++            self.assertFalse(worker.is_alive());self.assertEqual(created.call_count,0)
++        self.assertEqual(results,['rejected']);self.assertFalse(self.client.invalidated)
++        self.assertEqual(self.supervisor.binding.generation,1)
++        self.assertEqual(self.supervisor.poll()['reset_commit_count'],0)
++
++    def test_prepared_candidate_failure_before_commit_never_published(self):
++        self.verified_sidecar_fixture()
++        from p3_core.mock_api.core import Fixture
++        self.supervisor.revoke();self.clean()
++        prepare=getattr(FixtureManager,'prepare',FixtureManager.reset)
++        entered=threading.Event();release=threading.Event();outcomes=[]
++        def blocked(mode):
++            fixture=prepare(mode);entered.set();self.assertTrue(release.wait(2));return fixture
++        def run():
++            try:self.supervisor.prepare_next(Mode.GOOD);outcomes.append('returned')
++            except InvalidInput:outcomes.append('rejected')
++        with patch.object(FixtureManager,'prepare',side_effect=blocked,create=True),patch('p3_core.mock_api.core.Fixture',wraps=Fixture) as created:
++            worker=threading.Thread(target=run);worker.start()
++            try:
++                self.assertTrue(entered.wait(1));self.supervisor._evidence_failed()
++            finally:release.set();worker.join(2)
++            self.assertFalse(worker.is_alive());self.assertEqual(created.call_count,1)
++        self.assertEqual(outcomes,['rejected']);self.assertFalse(self.client.invalidated)
++        report=self.supervisor.poll()
++        self.assertEqual(report['reset_commit_count'],0);self.assertFalse(report['next_fixture_available'])
++
++    def test_commit_wins_then_failure_records_order_and_stops(self):
++        self.verified_sidecar_fixture()
++        from p3_core.mock_api.core import Fixture
++        self.supervisor.revoke();self.clean()
++        def audit(event):
++            if event['kind']=='fixture_committed':self.supervisor._evidence_failed()
++        self.supervisor.evidence=audit
++        with patch('p3_core.mock_api.core.Fixture',wraps=Fixture) as created:
++            with self.assertRaises(InvalidInput):self.supervisor.prepare_next(Mode.GOOD)
++            self.assertEqual(created.call_count,1)
++        report=self.supervisor.poll()
++        self.assertEqual(report['reset_commit_count'],1)
++        self.assertLess(report['reset_commit_sequence'],report['failure_sequence'])
++        self.assertIsNotNone(report['committed_fixture_id'])
++        self.assertFalse(report['next_fixture_available']);self.assertEqual(report['state'],'FAILED')
++        with self.assertRaises(InvalidInput):self.supervisor.prepare_next(Mode.GOOD)
++
++    def test_two_reset_threads_only_one_actual_creation_and_commit(self):
++        self.verified_sidecar_fixture()
++        from p3_core.mock_api.core import Fixture
++        self.supervisor.revoke();self.clean();barrier=threading.Barrier(3);results=[]
++        def run():
++            barrier.wait()
++            try:self.supervisor.prepare_next(Mode.GOOD);results.append('returned')
++            except InvalidInput:results.append('rejected')
++        with patch('p3_core.mock_api.core.Fixture',wraps=Fixture) as created:
++            workers=[threading.Thread(target=run) for _ in range(2)]
++            for worker in workers:worker.start()
++            barrier.wait()
++            for worker in workers:worker.join(2);self.assertFalse(worker.is_alive())
++            self.assertEqual(created.call_count,1)
++        self.assertCountEqual(results,['returned','rejected'])
++        self.assertEqual(self.supervisor.poll()['reset_commit_count'],1)
++
++    def test_precommit_audit_failure_has_zero_commits_and_no_retry(self):
++        self.verified_sidecar_fixture()
++        from p3_core.mock_api.core import Fixture
++        self.supervisor.revoke();self.clean()
++        def audit(event):
++            if event['kind']=='fixture_prepared':raise OSError('secret')
++        self.supervisor.evidence=audit
++        with patch('p3_core.mock_api.core.Fixture',wraps=Fixture) as created:
++            with self.assertRaises(InvalidInput):self.supervisor.prepare_next(Mode.GOOD)
++            with self.assertRaises(InvalidInput):self.supervisor.prepare_next(Mode.GOOD)
++            self.assertEqual(created.call_count,1)
++        self.assertEqual(self.supervisor.poll()['reset_commit_count'],0)
++        self.assertFalse(self.client.invalidated)
++
++    def test_endpoint_exception_has_no_creation_and_no_retry(self):
++        self.verified_sidecar_fixture()
++        from p3_core.mock_api.core import Fixture
++        self.supervisor.revoke();self.clean()
++        self.client.status=lambda:(_ for _ in ()).throw(ValueError('secret'))
++        with patch('p3_core.mock_api.core.Fixture',wraps=Fixture) as created:
++            for _ in range(2):
++                with self.assertRaises(InvalidInput):self.supervisor.prepare_next(Mode.GOOD)
++            self.assertEqual(created.call_count,0)
++        self.assertEqual(self.supervisor.poll()['reset_commit_count'],0)
++
++    def test_reset_old_generation_wrong_instance_and_repeat_failure(self):
++        self.verified_sidecar_fixture()
++        self.supervisor.revoke();self.clean();fixture=self.supervisor.prepare_next(Mode.GOOD)
++        with self.assertRaises(InvalidInput):self.supervisor.revoke(replace(self.binding,generation=0))
++        with self.assertRaises(InvalidInput):Supervisor(replace(self.binding,fixture_instance_id=fixture.fixture_instance_id),self.client,self.service)
++        self.supervisor._evidence_failed();first=self.supervisor.poll()['failure_sequence']
++        self.supervisor._evidence_failed()
++        self.assertEqual(self.supervisor.poll()['failure_sequence'],first)
++        with self.assertRaises(InvalidInput):self.supervisor.prepare_next(Mode.GOOD)
++        self.assertEqual(self.supervisor.poll()['reset_commit_count'],1)
++
++    def test_reset_preparation_audit_and_invalidation_outside_gate(self):
++        self.verified_sidecar_fixture()
++        self.supervisor.revoke();self.clean();observed=[]
++        prepare=FixtureManager.prepare
++        def outside(name):
++            acquired=self.supervisor._lock.acquire(blocking=False)
++            self.assertTrue(acquired)
++            if acquired:self.supervisor._lock.release()
++            observed.append(name)
++        def factory(mode):outside('prepare');return prepare(mode)
++        def audit(event):outside(event['kind'])
++        def invalidate():outside('invalidate');self.client.invalidated=True
++        self.supervisor.evidence=audit;self.client.invalidate=invalidate
++        with patch.object(FixtureManager,'prepare',side_effect=factory):
++            self.supervisor.prepare_next(Mode.GOOD)
++        self.assertEqual(observed,['prepare','fixture_prepared','invalidate','fixture_committed'])
++
++    def test_postcommit_audit_write_failure_preserves_commit_fact(self):
++        self.verified_sidecar_fixture()
++        from p3_core.mock_api.core import Fixture
++        self.supervisor.revoke();self.clean()
++        def audit(event):
++            if event['kind']=='fixture_committed':raise OSError('secret')
++        self.supervisor.evidence=audit
++        with patch('p3_core.mock_api.core.Fixture',wraps=Fixture) as created:
++            with self.assertRaises(InvalidInput):self.supervisor.prepare_next(Mode.GOOD)
++            self.assertEqual(created.call_count,1)
++        report=self.supervisor.poll()
++        self.assertEqual(report['reset_commit_count'],1)
++        self.assertLess(report['reset_commit_sequence'],report['failure_sequence'])
++        self.assertFalse(report['next_fixture_available'])
++        self.assertNotIn('secret',json.dumps(report))
++
++    def test_wrong_prepared_instance_cannot_commit_or_retry(self):
++        self.verified_sidecar_fixture()
++        from p3_core.mock_api.core import Fixture
++        self.supervisor.revoke();self.clean()
++        candidate=replace(FixtureManager.prepare(Mode.GOOD),fixture_instance_id=self.binding.fixture_instance_id)
++        with patch.object(FixtureManager,'prepare',return_value=candidate) as prepared:
++            for _ in range(2):
++                with self.assertRaises(InvalidInput):self.supervisor.prepare_next(Mode.GOOD)
++            self.assertEqual(prepared.call_count,1)
++        self.assertEqual(self.supervisor.poll()['reset_commit_count'],0)
++        self.assertFalse(self.client.invalidated)
++
++    def service_fixture(self):
++        # Reuse the existing deterministic fake connection, never its listener.
++        import test_c3_preflight as helpers
++        helper=helpers.C3Tests();helper.setUp();self.addCleanup(helper.doCleanups)
++        service,connection,clock=helper.component()
++        return helper,service,connection,clock
++
++    def test_service_handoff_preserves_each_connection(self):
++        helper,service,connection,_=self.service_fixture();records=[]
++        service.attach_summary_consumer(records.append)
++        helper.handle(service,connection);helper.handle(service,type(connection)())
++        self.assertEqual(len(records),2)
++        self.assertEqual([r['summary_sequence'] for r in records],[1,2])
++        self.assertNotEqual(records[0]['connection_id'],records[1]['connection_id'])
++        self.assertEqual(records[0]['action_id'],'action_'+'b'*32)
++        with self.assertRaises(InvalidInput):service.attach_summary_consumer(records.append)
++
++    def test_blocked_summary_sink_does_not_block_revocation(self):
++        helper,service,connection,_=self.service_fixture()
++        entered=threading.Event();release=threading.Event()
++        def consume(row):entered.set();release.wait(2)
++        service.attach_summary_consumer(consume)
++        worker=threading.Thread(target=lambda:helper.handle(service,connection));worker.start()
++        try:
++            self.assertTrue(entered.wait(1));service.revoke()
++            self.assertTrue(service.lifecycle_status()['revoked'])
++            self.assertFalse(service.lifecycle_status()['clean'])
++        finally:release.set();worker.join(2)
++        self.assertFalse(worker.is_alive());self.assertTrue(service.lifecycle_status()['clean'])
++
++    def test_service_handoff_failure_prevents_next_send(self):
++        helper,service,connection,_=self.service_fixture()
++        service.attach_summary_consumer(lambda row:(_ for _ in ()).throw(OSError('SECRET_FAILURE')))
++        helper.handle(service,connection)
++        second=type(connection)();helper.handle(service,second)
++        self.assertEqual(second.sent,0);self.assertTrue(service.lifecycle_status()['failed'])
++        self.assertNotIn('SECRET_FAILURE',json.dumps(service.last_connection))
++
++    def test_cleanup_audit_must_complete_before_reset(self):
++        self.verified_sidecar_fixture()
++        self.supervisor.revoke();self.client.clean=self.service.clean=True
++        entered=threading.Event();release=threading.Event()
++        self.supervisor.evidence=lambda event:(entered.set(),release.wait(2))
++        worker=threading.Thread(target=self.supervisor.poll);worker.start()
++        try:
++            self.assertTrue(entered.wait(1))
++            with self.assertRaises(InvalidInput):self.supervisor.prepare_next(Mode.GOOD)
++            self.assertEqual(self.supervisor.poll()['state'],'STOPPING')
++        finally:release.set();worker.join(2)
++        self.assertEqual(self.supervisor.poll()['state'],'STOPPED')
++
++
++if __name__=='__main__':unittest.main()
+diff --git a/design/P3_supervisor_lifecycle.md b/design/P3_supervisor_lifecycle.md
+new file mode 100644
+index 0000000..44f8489
+--- /dev/null
++++ b/design/P3_supervisor_lifecycle.md
+@@ -0,0 +1,129 @@
++# C-3C 生命周期监督与证据协调设计
++
++状态：实现候选，等待人工代码审核。本文件不更改 ADR-001～004 的 Accepted、ADR-005 的 Proposed，也不授予网络许可。规范沿用 [RC2](../brief/P3_specification_v1.0-rc2.md)、[授权边界](../brief/P3_authorization_boundary.md) 和 [ADR-004](ADR_004_http_dispatch_and_cancellation.md)。
++
++## 最小组件与责任
++
++| 组件 | 责任与边界 |
++| --- | --- |
++| `supervision.Supervisor` | 绑定 run、fixture、授权版本、范围摘要和 generation；双端撤权、观察清理、禁止旧实例复用；没有 start、dispatch 或许可生成入口 |
++| `LifecyclePort` | 可信宿主适配现有 AuthorizedHttpRun／AuthorizedService；核对原绑定与凭据摘要，仅暴露撤权、观察、作废及动作登记 |
++| `coordination.EvidenceCoordinator` | 接收已校验服务端摘要，关联可信宿主从 Controller 读取的 action；独立 JSONL／Manifest／报告，不改客户端源记录 |
++| `preflight.authorization_preflight` | 只读材料诊断；不调用 LocalRegistry 发放快照、不改变其真实许可语义 |
++| `acceptance` | 14 项稳定用例的前置、证据与人工结果格式；无执行器、无自动 VERIFIED |
++
++复用原 Controller、Executor、FixtureManager、响应解析器和 JsonlEvidence。范围摘要覆盖精确目标、版本、预算、身份与候选集合，授权版本另行显式绑定。generation 为监督记录世代，不能替代客户端内部的派发生命周期计数。
++
++## 生命周期与锁
++
++`BOUND → STOPPING → STOPPED → RETIRED`；故障进入 `FAILED`。FAILED、RETIRED 不可恢复；STOPPED 只能准备一个新夹具，不能恢复旧运行。新夹具仍需新配置绑定、许可核验和新的 Supervisor，不继承执行权。
++
++1. 可信宿主构造匹配的两端生命周期接口；已撤权或失败对象拒绝再次绑定。普通 Planner 不取得 Supervisor／Registry 引用。
++2. `revoke()` 在监督者自己的短锁内不可逆地登记请求，然后释放锁，依次调用两端原有撤权 gate。提供两种顺序供确定性测试；不是跨进程或跨端原子事务。第一端生效至第二端生效之间的窗口必须分别观察，不能声称同时生效。
++3. 每个端点的 send 与 revoke 线性化仍由原 gate 决定。监督者不在一个组件锁内调用另一个组件，不在 gate 内等待 I/O／磁盘。已进入内核的字节不能撤回。
++4. I/O 所有者继续负责关闭。`poll()` 只观察，客户端忙时返回未清理；监督者不代替其他线程关闭资源。不完整清理保持 STOPPING；超时、时钟回退、关闭失败、观察异常或审计失败进入 FAILED。
++5. 两端撤权、清理及监督审计都完成后，若绑定协调器，还必须通过协调器完成核验才公开 STOPPED。并发 poll 不等待另一次观察；撤权审计、清理审计或 sidecar Manifest 未完成时不能重置。
++6. `prepare_next()` 先独占预约准备资格（不是 RETIRED／提交），复核两端清理并在锁外构造私有候选。完成证据复核和准备审计后，才在短锁内发布候选引用并进入 RETIRED。旧绑定失效在提交后、锁外执行。单独 invalidate 不是撤权。并发重置最多一个提交；失败需人工处置，不自动重试。
++
++清理超时默认 5 秒是监督者观察参数，独立于 RC2 检查预算，不延长 90 秒试跑预算。它不提供硬实时保证，也不会强杀 Python 线程。可信宿主必须持续调度 poll 和 I/O 所有者；本轮不提供实际网络驱动入口。
++
++## 重要取舍与重新评估
++
++选择“两个短 gate 顺序撤权＋所有者清理观察”，不引入跨端大锁。大锁可能把阻塞关闭／审计延迟传播到撤权入口，且不能撤回已发送字节。代价是存在两个生效时刻，需要分别保存和审核；真实 OS 取消延迟仍待许可后测量。
++
++选择“连接结束后同步交付有限摘要，再接纳下一连接”，不新建后台无限队列。后台队列增加丢失、溢出和 shutdown 排序问题。回调在服务 gate 外，`_handling` 保持为真，确保摘要不被覆盖。代价是慢存储会延迟下一连接及清理完成；撤权仍可生效，监督者可超时进入 FAILED，但不会假称存储线程已终止。
++
++以上为本轮待审核实现选择，未另建重复 ADR。若实际存储延迟无法满足试跑观察值、需要并发服务／跨进程监督或持久化真实性证明，应重新评估并记录 ADR；不能直接扩大现有架构。
++
++## 双端证据契约
++
++服务端新增 `handle_with_action()`，仅在完整有限请求通过原业务解析后返回 action_id。摘要包含 connection_id、action_id、接收／发送字节数、首末发送 gate 序号、撤权请求／生效时间及序号、固定原因、清理失败、单调 summary_sequence。没有原始头、Token、正文、异常文本或堆栈。
++
++可信宿主在 Controller prepare 后、下一次 I/O step 前调用 `register_actions()`。服务端摘要只与这一集合、run_id、fixture_instance_id、scope_digest、generation 绑定；这不是根据不可信响应猜测关联。不能确认的 action 标 UNKNOWN；缺失、重复冲突、序号跳跃、跨运行错配、容量超限标 EVIDENCE_INCOMPLETE。完全相同的重复交付幂等，不能增加连接数。默认 32、最大 256 条是协调记录容量，不改变检查预算。
++
++记录放在独立唯一 sidecar 目录，JSONL 的 hash 和长度、报告 hash 进入 Manifest。`evidence-check` 有界读取并核对摘要格式、序号、绑定、关联和文件一致性；它不证明来源真实性，也不能识别攻击者同时重写数据及全部哈希。真实环境的可信目录访问控制、持久化故障观察和独立复核仍必需。
++
++本轮 sidecar 固定标记 `NO_NETWORK_SIMULATION`，实际双端网络证据采集未验收；不得将它作为真实验收源。客户端 JSONL／Manifest／有限报告继续独立存在，不被合并覆写。关联成功只是 CORRELATED，不是 PASS。部分发送后为 UNKNOWN；协调报告始终 INCONCLUSIVE。保存失败触发双端撤权，未完成记录不得通过重放补齐。汇总关闭后不能追加；旧／迟到摘要拒绝。
++
++### 人工审核后的完成门槛修订
++
++协调器 `completion_status()` 与内存 CORRELATED 分离：PENDING 表示尚未结束或正在写入；UNVERIFIED 表示已结束但缺少可核验文件（包括 MemoryEvidence）；INCOMPLETE 表示关联缺口／冲突；AUDIT_FAILED 表示写入或落盘一致性核验失败；VERIFIED 仅表示本轮离线 sidecar 文件一致性核验通过，不表示来源可信或 HTTP 验收通过。
++
++`finish()` 关闭追加后，写出带 COMPLETE／INCOMPLETE 标志的报告与 Manifest。只有 JsonlEvidence 的文件被重新读取，匹配本次完成报告、哈希、运行及来源标识、完整性标志、事件顺序和关联，才可返回 VERIFIED。Manifest 与报告均必须显式含布尔 `audit_gap=false` 和 `completion=COMPLETE`；缺失、非布尔、冲突或异常均失败关闭。
++
++绑定协调器的 Supervisor 在 poll 和 prepare_next 分别检查完成状态。PENDING 继续等待且禁止重置；不完整、审计失败或不可信完成状态将失败锁存。失败通知不再仅调用幂等 revoke，而先锁存失败，再保证两端撤权已请求，因此撤权之后的新审计错误不会丢失。文件读取、写入、审计回调和端点操作均在 Supervisor 状态锁外执行；准备新实例前再次复核文件，不能只信任先前的 STOPPED。
++
++未收到摘要的已登记 action 不自动豁免。本轮没有实现由可复核 Controller 未派发证据驱动的豁免路径，故这种情况保守阻止重置并交人工处理，不伪造摘要、不重发。文件一致性读取不是原子防篡改或断电持久化保证；可信存储访问控制和真实环境的持久化观察仍是后续要求。
++
++### Fixture 重置提交点修订
++
++已确认原 FixtureManager.reset() 只生成 UUID、合成凭据和独立不可变 Fixture，没有全局当前实例、注册表写入或服务切换。新增 `FixtureManager.prepare()` 提供同一纯构造逻辑；原 reset() 保留为兼容工厂。Supervisor 不再调用 reset()，候选生成在锁外完成。准备可能分配内存、消耗随机数，但不发布实例、不改变旧 generation、不启动服务；失败时丢弃私有对象，不宣称撤回已经完成的对象分配。
++
++**正式线性化点**是 Supervisor 状态锁内的一组有限内存赋值：增加排序序号、保存提交序号／次数／实例 ID、发布 `_next_fixture`，并置 RETIRED。这里没有工厂调用、文件读写、审计回调、端点操作、等待或清理。失败通知 `_latch_failure()` 使用同一短锁，先记录首次失败序号，再置 FAILED 并撤下候选引用；重复失败保持锁存，不抹去首次序号或提交事实。
++
++| 可验证先后顺序 | 实际构造／正式提交 | 结果 |
++| --- | --- | --- |
++| 端点复核暂停时失败先生效 | 0／0 | 不作废旧绑定；旧 generation 不变；FAILED |
++| 私有候选已准备，失败先于提交生效 | 1／0 | 不发布候选、不作废旧绑定；丢弃私有候选；FAILED |
++| 准备审计写入失败 | 1／0 | 同上，禁止通过重试再准备 |
++| 提交先于失败通知生效 | 1／1 | 保留 commit_sequence < failure_sequence 和实例 ID；撤下候选；FAILED；不谎称未提交 |
++| 两线程同时准备 | 最多 1／最多 1 | 准备资格仅授予一个线程，另一线程拒绝 |
++
++排序针对“失败通知取得协调锁并生效”，不把磁盘故障实际发生时间等同于通知生效时间。通知与提交共享一个边界，比在多处读取 audit_failed 更强。外部审计、文件核验及失效操作仍在锁外；若提交后审计或失效失败，提交历史不回滚，调用者收到失败，运行不可重开。失败先于提交时在同一边界阻止发布，不依赖事后异常抵消副作用。
++
++报告新增 reset_commit_count、reset_commit_sequence、failure_sequence、committed_fixture_id、committed_generation 与 next_fixture_available；生命周期审计事件记录提交／失败序号。committed_generation 只是新候选的监督世代，不改旧绑定和 Controller 的 generation。next_fixture_available 只表示候选引用可用，**不是 HTTP 服务激活或真实许可**。提交后返回的对象依旧要通过新配置、真实许可和宿主绑定才能用于后续运行；本轮没有网络激活接口。
++
++新测试通过实际 Fixture 构造函数计数及提交计数验证上述边界，并验证构造、审计和旧绑定失效均不持 Supervisor 状态锁。原 227 项测试不变，新增 10 项，本地 237 项通过。
++
++## 只读预检与人工核验
++
++输入包括严格 HttpConfig、owner／teacher_catalog 材料元数据、fixture_binding、预算记录、撤权责任、试验范围和单独异常注入范围。材料元数据含来源／引用／摘要、角色／主体、委托引用、授权版本、范围摘要、有效期。完整格式不等于材料真实。
++
++诊断类别：MISSING、INVALID_FORMAT、CONFLICT、SOURCE_UNVERIFIED、RUN_BINDING_PENDING。可信宿主可提供只读人工复核记录查询，按材料元数据摘要查验；CLI 不提供这个参数或 approved 开关。查询成功只表示此前人工核验被观察到，仍返回 PENDING_AUTHORIZATION、execution_allowed=false；真正材料内容、委托链、只读快照及最终运行绑定必须通过原 LocalRegistry 与可信宿主流程完成。
++
++机器清单见 [14 项验收记录](../eval/P3_c3_acceptance_manifest.json)。允许的管理状态不替代 ALLOW/DENY、执行状态或 API 结论。外部结果格式检查不认证来源；离线工具永远不提升为 VERIFIED。
++
++## 离线入口
++
++设置 `PYTHONPATH=src` 后：
++
++```text
++python -m p3_core.delivery supervisor-plan
++python -m p3_core.delivery authorization-preflight material-draft.json
++python -m p3_core.delivery integration-status
++python -m p3_core.delivery evidence-check temporary-sidecar-directory
++```
++
++以上命令只读，不启动 listener 或 Executor；输入错误不回显原始内容。缺少真实材料是正常待授权状态，不是测试通过。详见 [许可清单](../eval/P3_c3_authorization_checklist.md) 和 [审核报告](../review/P3_c3_supervisor_review.md)。
++# P1/P2 补充：可信动作登记与文件核验（2026-10-22）
++
++本节补充此前生命周期设计，不改变 Fixture 准备／短锁提交、失败通知排序或 Controller 授权语义。
++
++数据流为：实际 `SimulationRun` 的独立 Controller 批准候选 → 可信宿主调用 `capture_controller()` → 在 Controller 锁下读取 action/check/attempt 的不可变元组及当前配置绑定 → 协调器保留独立内存登记根 → 接收并复制连接摘要 → 写入事件、包含动作集合及连接映射的报告、引用报告哈希及完整绑定的 Manifest → 核对文件内部一致性 → 与写入前保留的报告、登记根和原始连接映射比较。
++
++`expect()` 和 `Supervisor.register_actions()` 仅声明期望关联，不能单独产生可信登记依据。核验入口不接受 JSON 登记根、调用者自算摘要或 `trusted=true`。`capture_controller()` 只接受精确类型的实际离线 Controller，核验 run、fixture、scope、授权版本和 Controller 审计状态；只读取已 ALLOW 且属于批准候选集的动作。不改变批准规则，也不赋予网络许可。generation 是监督者绑定的生命周期代次；它与其他绑定字段一同固定在报告及 Manifest，并在每条事件和运行时原始报告之间逐一核对。
++
++三层结论明确分开：
++
++| 层次 | 本轮能力 |
++| --- | --- |
++| 文件内部一致性 | `check_sidecar()` 可返回 `CONSISTENT_OFFLINE_SIDECAR`，同时明确 `registration_status=SOURCE_UNVERIFIED`、`source_verified=false`；自洽文件不是独立信任根 |
++| 与独立离线 Controller 登记一致 | 协调器在上述内存根、原始报告及连接映射均匹配后，内部完成状态可为 `VERIFIED`；公开报告明确为 `OFFLINE_VERIFIED` |
++| 真实执行主体来源认证 | 本轮未实现；真实 HTTP 用例继续 `PENDING_AUTHORIZATION`，不能由离线登记根或 sidecar 获得真实来源认证 |
++
++Python 宿主及 Controller 内部状态是信任边界；本方案不抵抗可任意修改同进程私有字段或替换 Python 代码的攻击者。不从文件恢复信任根；进程重启后仅凭文件不能重新获得 VERIFIED。真实 `AuthorizedHttpRun` 尚无本适配器支持的独立来源路径，失败关闭，不能拿模拟 Controller 代替真实来源。
++
++sidecar 只允许 `server_summary` 动作事件，action 必须为已登记字符串，不能为 null。生命周期事件仍在 Supervisor 独立审计流中，不要求 action，也不得冒充连接摘要。每个登记动作必须恰有一个连接摘要；连接、动作、事件 ID、连续序号、完整绑定、内容及审计标志均交叉核对。此版本没有可信未派发证明适配器，因此无摘要的登记动作仍阻止切换，不伪造摘要填补。
++
++公开 `report().completion` 区分 `PENDING`、`FINALIZING`、`WRITTEN_UNVERIFIED`、`OFFLINE_VERIFIED`、`SOURCE_UNVERIFIED`、`EVIDENCE_INCOMPLETE` 和 `AUDIT_FAILED`。落盘 `COMPLETE` 仅表示文件生成阶段完成；不是公开的来源核验结论，也不改变六种真实验收管理状态。
++
++所有磁盘读取、写入及 Controller 快照读取仍在 Supervisor 短锁之外。核验失败通过已有失败通知入口锁存；提交点和通知的线性化排序保持原实现。文件篡改只有被检查时才能发现；不能据此承诺外部存储修改具有即时通知。
++
++# 无 sidecar 的清理观察与重置门槛（2026-10-22 最终补充）
++
++`EvidenceCoordinator` 未绑定时，`_evidence_status()` 返回 `MISSING`，绝不返回 VERIFIED。双端确实撤权、清理完成且没有失败时，纯生命周期观察仍可进入 STOPPED；这里的 STOPPED 只表示清理已观察完成，不代表证据核验成功或允许切换 Fixture。
++
++`prepare_next()` 仍首先要求独立核验状态为 VERIFIED。MISSING 在分配、失效旧绑定和正式提交之前拒绝；重复调用也不能绕过。不能在 STOPPED 后补绑协调器重新开放运行。已有 sidecar 的 PENDING、SOURCE_UNVERIFIED、审计失败和其他失败关闭语义不变，准备／提交分离及短锁线性化点不变。
++
++纯撤权无需 sidecar，但任何 Fixture 正式提交都需要它。人工列表、Planner 声明和单独的生命周期审计回调不能替代 Controller 登记、完整 sidecar 与落盘核验。
++
+diff --git a/eval/P3_c3_acceptance_manifest.json b/eval/P3_c3_acceptance_manifest.json
+new file mode 100644
+index 0000000..b130e63
+--- /dev/null
++++ b/eval/P3_c3_acceptance_manifest.json
+@@ -0,0 +1,711 @@
++{
++  "schema_version": "p3-c3-management-v1",
++  "network_status": "PENDING_AUTHORIZATION",
++  "allowed_statuses": [
++    "PENDING_AUTHORIZATION",
++    "READY_FOR_HUMAN_REVIEW",
++    "NOT_EXECUTED",
++    "EXECUTED_PENDING_VERIFICATION",
++    "VERIFIED",
++    "FAILED"
++  ],
++  "execution_entrypoint": null,
++  "cases": [
++    {
++      "case": "GOOD_PAIRED_CONTROLS",
++      "status": "PENDING_AUTHORIZATION",
++      "scope": "Good: six paired checks",
++      "required_permissions": {
++        "owner": "original permission/delegation chain and source review",
++        "teacher": "approved target/endpoint/identity/check catalog",
++        "binding": "exact HttpConfig scope digest, versions, fixture and credentials",
++        "exception_scope": null
++      },
++      "criteria": "Three successful legal controls and complete 401/403 denial assertions; status alone is insufficient.",
++      "observations": [
++        "both revoke-request/effective timestamps and gate sequences",
++        "first/last positive send and byte counts",
++        "owner close completion/failure and OS resource observation"
++      ],
++      "preconditions": [
++        "owner_material",
++        "teacher_catalog",
++        "source_review",
++        "scope_version_match",
++        "fixture_credential_binding",
++        "budget_record",
++        "revocation_responsibility"
++      ],
++      "offline_tests": [
++        "test_good_all_six_fixed"
++      ],
++      "evidence_required": [
++        "client_events_manifest_report",
++        "server_connection_summary",
++        "run_fixture_action_connection_binding",
++        "revocation_gate_sequences",
++        "cleanup_observation"
++      ],
++      "cannot_prove_offline": [
++        "real_permission_authenticity",
++        "OS_send_and_close",
++        "cancellation_latency",
++        "actual_target_identity",
++        "durable_dual_source_capture"
++      ],
++      "result": {
++        "executed_at": null,
++        "execution_proof": null,
++        "reviewer_record": null,
++        "verdict": null
++      }
++    },
++    {
++      "case": "AUTH_DISCLOSURE",
++      "status": "PENDING_AUTHORIZATION",
++      "scope": "AUTH: anonymous profile plus legal control",
++      "required_permissions": {
++        "owner": "original permission/delegation chain and source review",
++        "teacher": "approved target/endpoint/identity/check catalog",
++        "binding": "exact HttpConfig scope digest, versions, fixture and credentials",
++        "exception_scope": null
++      },
++      "criteria": "Paired profile control plus complete, instance-bound protected anonymous response; fragment alone is inconclusive.",
++      "observations": [
++        "both revoke-request/effective timestamps and gate sequences",
++        "first/last positive send and byte counts",
++        "owner close completion/failure and OS resource observation"
++      ],
++      "preconditions": [
++        "owner_material",
++        "teacher_catalog",
++        "source_review",
++        "scope_version_match",
++        "fixture_credential_binding",
++        "budget_record",
++        "revocation_responsibility"
++      ],
++      "offline_tests": [
++        "test_three_defects_both_strategies"
++      ],
++      "evidence_required": [
++        "client_events_manifest_report",
++        "server_connection_summary",
++        "run_fixture_action_connection_binding",
++        "revocation_gate_sequences",
++        "cleanup_observation"
++      ],
++      "cannot_prove_offline": [
++        "real_permission_authenticity",
++        "OS_send_and_close",
++        "cancellation_latency",
++        "actual_target_identity",
++        "durable_dual_source_capture"
++      ],
++      "result": {
++        "executed_at": null,
++        "execution_proof": null,
++        "reviewer_record": null,
++        "verdict": null
++      }
++    },
++    {
++      "case": "BOLA_DISCLOSURE",
++      "status": "PENDING_AUTHORIZATION",
++      "scope": "BOLA: obj-b owner control",
++      "required_permissions": {
++        "owner": "original permission/delegation chain and source review",
++        "teacher": "approved target/endpoint/identity/check catalog",
++        "binding": "exact HttpConfig scope digest, versions, fixture and credentials",
++        "exception_scope": null
++      },
++      "criteria": "Paired bob control plus complete obj-b/owner=bob assertion for alice; wrong instance/object is inconclusive.",
++      "observations": [
++        "both revoke-request/effective timestamps and gate sequences",
++        "first/last positive send and byte counts",
++        "owner close completion/failure and OS resource observation"
++      ],
++      "preconditions": [
++        "owner_material",
++        "teacher_catalog",
++        "source_review",
++        "scope_version_match",
++        "fixture_credential_binding",
++        "budget_record",
++        "revocation_responsibility"
++      ],
++      "offline_tests": [
++        "test_three_defects_both_strategies"
++      ],
++      "evidence_required": [
++        "client_events_manifest_report",
++        "server_connection_summary",
++        "run_fixture_action_connection_binding",
++        "revocation_gate_sequences",
++        "cleanup_observation"
++      ],
++      "cannot_prove_offline": [
++        "real_permission_authenticity",
++        "OS_send_and_close",
++        "cancellation_latency",
++        "actual_target_identity",
++        "durable_dual_source_capture"
++      ],
++      "result": {
++        "executed_at": null,
++        "execution_proof": null,
++        "reviewer_record": null,
++        "verdict": null
++      }
++    },
++    {
++      "case": "RBAC_DISCLOSURE",
++      "status": "PENDING_AUTHORIZATION",
++      "scope": "RBAC: admin report control",
++      "required_permissions": {
++        "owner": "original permission/delegation chain and source review",
++        "teacher": "approved target/endpoint/identity/check catalog",
++        "binding": "exact HttpConfig scope digest, versions, fixture and credentials",
++        "exception_scope": null
++      },
++      "criteria": "Paired admin control plus complete period=demo/admin audience assertion for member.",
++      "observations": [
++        "both revoke-request/effective timestamps and gate sequences",
++        "first/last positive send and byte counts",
++        "owner close completion/failure and OS resource observation"
++      ],
++      "preconditions": [
++        "owner_material",
++        "teacher_catalog",
++        "source_review",
++        "scope_version_match",
++        "fixture_credential_binding",
++        "budget_record",
++        "revocation_responsibility"
++      ],
++      "offline_tests": [
++        "test_three_defects_both_strategies"
++      ],
++      "evidence_required": [
++        "client_events_manifest_report",
++        "server_connection_summary",
++        "run_fixture_action_connection_binding",
++        "revocation_gate_sequences",
++        "cleanup_observation"
++      ],
++      "cannot_prove_offline": [
++        "real_permission_authenticity",
++        "OS_send_and_close",
++        "cancellation_latency",
++        "actual_target_identity",
++        "durable_dual_source_capture"
++      ],
++      "result": {
++        "executed_at": null,
++        "execution_proof": null,
++        "reviewer_record": null,
++        "verdict": null
++      }
++    },
++    {
++      "case": "CONNECTION_FAILURE",
++      "status": "PENDING_AUTHORIZATION",
++      "scope": "Authorized connection fault",
++      "required_permissions": {
++        "owner": "original permission/delegation chain and source review",
++        "teacher": "approved target/endpoint/identity/check catalog",
++        "binding": "exact HttpConfig scope digest, versions, fixture and credentials",
++        "exception_scope": "CONNECTION_FAILURE"
++      },
++      "criteria": "ERROR/INCONCLUSIVE; zero requests before positive send, one after partial send; no retry.",
++      "observations": [
++        "both revoke-request/effective timestamps and gate sequences",
++        "first/last positive send and byte counts",
++        "owner close completion/failure and OS resource observation"
++      ],
++      "preconditions": [
++        "owner_material",
++        "teacher_catalog",
++        "source_review",
++        "scope_version_match",
++        "fixture_credential_binding",
++        "budget_record",
++        "revocation_responsibility",
++        "explicit_exception_permission"
++      ],
++      "offline_tests": [
++        "test_read_timeout_and_transport_failure_no_raw_exception"
++      ],
++      "evidence_required": [
++        "client_events_manifest_report",
++        "server_connection_summary",
++        "run_fixture_action_connection_binding",
++        "revocation_gate_sequences",
++        "cleanup_observation"
++      ],
++      "cannot_prove_offline": [
++        "real_permission_authenticity",
++        "OS_send_and_close",
++        "cancellation_latency",
++        "actual_target_identity",
++        "durable_dual_source_capture"
++      ],
++      "result": {
++        "executed_at": null,
++        "execution_proof": null,
++        "reviewer_record": null,
++        "verdict": null
++      }
++    },
++    {
++      "case": "UNEXPECTED_STATUS",
++      "status": "PENDING_AUTHORIZATION",
++      "scope": "404/5xx/redirect; no following redirect",
++      "required_permissions": {
++        "owner": "original permission/delegation chain and source review",
++        "teacher": "approved target/endpoint/identity/check catalog",
++        "binding": "exact HttpConfig scope digest, versions, fixture and credentials",
++        "exception_scope": "UNEXPECTED_STATUS"
++      },
++      "criteria": "INCONCLUSIVE/RESPONSE_ERROR unless independently complete protected disclosure meets existing contract; never follow redirect.",
++      "observations": [
++        "both revoke-request/effective timestamps and gate sequences",
++        "first/last positive send and byte counts",
++        "owner close completion/failure and OS resource observation"
++      ],
++      "preconditions": [
++        "owner_material",
++        "teacher_catalog",
++        "source_review",
++        "scope_version_match",
++        "fixture_credential_binding",
++        "budget_record",
++        "revocation_responsibility",
++        "explicit_exception_permission"
++      ],
++      "offline_tests": [
++        "test_404_and_5xx_no_leak_are_inconclusive"
++      ],
++      "evidence_required": [
++        "client_events_manifest_report",
++        "server_connection_summary",
++        "run_fixture_action_connection_binding",
++        "revocation_gate_sequences",
++        "cleanup_observation"
++      ],
++      "cannot_prove_offline": [
++        "real_permission_authenticity",
++        "OS_send_and_close",
++        "cancellation_latency",
++        "actual_target_identity",
++        "durable_dual_source_capture"
++      ],
++      "result": {
++        "executed_at": null,
++        "execution_proof": null,
++        "reviewer_record": null,
++        "verdict": null
++      }
++    },
++    {
++      "case": "INVALID_JSON",
++      "status": "PENDING_AUTHORIZATION",
++      "scope": "Malformed JSON/UTF8/duplicates",
++      "required_permissions": {
++        "owner": "original permission/delegation chain and source review",
++        "teacher": "approved target/endpoint/identity/check catalog",
++        "binding": "exact HttpConfig scope digest, versions, fixture and credentials",
++        "exception_scope": "INVALID_JSON"
++      },
++      "criteria": "INCONCLUSIVE/RESPONSE_ERROR for invalid UTF8, duplicate keys, unknown fields or conflicting lengths; no canary override.",
++      "observations": [
++        "both revoke-request/effective timestamps and gate sequences",
++        "first/last positive send and byte counts",
++        "owner close completion/failure and OS resource observation"
++      ],
++      "preconditions": [
++        "owner_material",
++        "teacher_catalog",
++        "source_review",
++        "scope_version_match",
++        "fixture_credential_binding",
++        "budget_record",
++        "revocation_responsibility",
++        "explicit_exception_permission"
++      ],
++      "offline_tests": [
++        "test_t34_canary_cannot_rescue_malformed_framing_or_json"
++      ],
++      "evidence_required": [
++        "client_events_manifest_report",
++        "server_connection_summary",
++        "run_fixture_action_connection_binding",
++        "revocation_gate_sequences",
++        "cleanup_observation"
++      ],
++      "cannot_prove_offline": [
++        "real_permission_authenticity",
++        "OS_send_and_close",
++        "cancellation_latency",
++        "actual_target_identity",
++        "durable_dual_source_capture"
++      ],
++      "result": {
++        "executed_at": null,
++        "execution_proof": null,
++        "reviewer_record": null,
++        "verdict": null
++      }
++    },
++    {
++      "case": "TRUNCATION",
++      "status": "PENDING_AUTHORIZATION",
++      "scope": "Incomplete or oversized response",
++      "required_permissions": {
++        "owner": "original permission/delegation chain and source review",
++        "teacher": "approved target/endpoint/identity/check catalog",
++        "binding": "exact HttpConfig scope digest, versions, fixture and credentials",
++        "exception_scope": "TRUNCATION"
++      },
++      "criteria": "Preserve recognized header fact but no confirmed conclusion for incomplete body; bounded storage and explicit gap.",
++      "observations": [
++        "both revoke-request/effective timestamps and gate sequences",
++        "first/last positive send and byte counts",
++        "owner close completion/failure and OS resource observation"
++      ],
++      "preconditions": [
++        "owner_material",
++        "teacher_catalog",
++        "source_review",
++        "scope_version_match",
++        "fixture_credential_binding",
++        "budget_record",
++        "revocation_responsibility",
++        "explicit_exception_permission"
++      ],
++      "offline_tests": [
++        "test_header_fact_survives_incomplete_body_without_verdict"
++      ],
++      "evidence_required": [
++        "client_events_manifest_report",
++        "server_connection_summary",
++        "run_fixture_action_connection_binding",
++        "revocation_gate_sequences",
++        "cleanup_observation"
++      ],
++      "cannot_prove_offline": [
++        "real_permission_authenticity",
++        "OS_send_and_close",
++        "cancellation_latency",
++        "actual_target_identity",
++        "durable_dual_source_capture"
++      ],
++      "result": {
++        "executed_at": null,
++        "execution_proof": null,
++        "reviewer_record": null,
++        "verdict": null
++      }
++    },
++    {
++      "case": "TIMEOUT",
++      "status": "PENDING_AUTHORIZATION",
++      "scope": "Read/write deadline fault",
++      "required_permissions": {
++        "owner": "original permission/delegation chain and source review",
++        "teacher": "approved target/endpoint/identity/check catalog",
++        "binding": "exact HttpConfig scope digest, versions, fixture and credentials",
++        "exception_scope": "TIMEOUT"
++      },
++      "criteria": "Stop at applicable deadline; no late upgrade; retain sent count and observe cleanup latency.",
++      "observations": [
++        "both revoke-request/effective timestamps and gate sequences",
++        "first/last positive send and byte counts",
++        "owner close completion/failure and OS resource observation"
++      ],
++      "preconditions": [
++        "owner_material",
++        "teacher_catalog",
++        "source_review",
++        "scope_version_match",
++        "fixture_credential_binding",
++        "budget_record",
++        "revocation_responsibility",
++        "explicit_exception_permission"
++      ],
++      "offline_tests": [
++        "test_service_timeout_read_and_partial_write_close"
++      ],
++      "evidence_required": [
++        "client_events_manifest_report",
++        "server_connection_summary",
++        "run_fixture_action_connection_binding",
++        "revocation_gate_sequences",
++        "cleanup_observation"
++      ],
++      "cannot_prove_offline": [
++        "real_permission_authenticity",
++        "OS_send_and_close",
++        "cancellation_latency",
++        "actual_target_identity",
++        "durable_dual_source_capture"
++      ],
++      "result": {
++        "executed_at": null,
++        "execution_proof": null,
++        "reviewer_record": null,
++        "verdict": null
++      }
++    },
++    {
++      "case": "REVOKE_CONNECT",
++      "status": "PENDING_AUTHORIZATION",
++      "scope": "Revoke before/after connect",
++      "required_permissions": {
++        "owner": "original permission/delegation chain and source review",
++        "teacher": "approved target/endpoint/identity/check catalog",
++        "binding": "exact HttpConfig scope digest, versions, fixture and credentials",
++        "exception_scope": "REVOKE_CONNECT"
++      },
++      "criteria": "No positive send after effective revoke; connect alone counts zero; cleanup without reconnect.",
++      "observations": [
++        "both revoke-request/effective timestamps and gate sequences",
++        "first/last positive send and byte counts",
++        "owner close completion/failure and OS resource observation"
++      ],
++      "preconditions": [
++        "owner_material",
++        "teacher_catalog",
++        "source_review",
++        "scope_version_match",
++        "fixture_credential_binding",
++        "budget_record",
++        "revocation_responsibility",
++        "explicit_exception_permission"
++      ],
++      "offline_tests": [
++        "test_t27_connect_then_revoke_before_first_send"
++      ],
++      "evidence_required": [
++        "client_events_manifest_report",
++        "server_connection_summary",
++        "run_fixture_action_connection_binding",
++        "revocation_gate_sequences",
++        "cleanup_observation"
++      ],
++      "cannot_prove_offline": [
++        "real_permission_authenticity",
++        "OS_send_and_close",
++        "cancellation_latency",
++        "actual_target_identity",
++        "durable_dual_source_capture"
++      ],
++      "result": {
++        "executed_at": null,
++        "execution_proof": null,
++        "reviewer_record": null,
++        "verdict": null
++      }
++    },
++    {
++      "case": "REVOKE_FIRST_SEND",
++      "status": "PENDING_AUTHORIZATION",
++      "scope": "Both gate orderings",
++      "required_permissions": {
++        "owner": "original permission/delegation chain and source review",
++        "teacher": "approved target/endpoint/identity/check catalog",
++        "binding": "exact HttpConfig scope digest, versions, fixture and credentials",
++        "exception_scope": "REVOKE_FIRST_SEND"
++      },
++      "criteria": "Exercise both gate orders; first positive send counts once, revoke winning prevents send; bytes cannot be recalled.",
++      "observations": [
++        "both revoke-request/effective timestamps and gate sequences",
++        "first/last positive send and byte counts",
++        "owner close completion/failure and OS resource observation"
++      ],
++      "preconditions": [
++        "owner_material",
++        "teacher_catalog",
++        "source_review",
++        "scope_version_match",
++        "fixture_credential_binding",
++        "budget_record",
++        "revocation_responsibility",
++        "explicit_exception_permission"
++      ],
++      "offline_tests": [
++        "test_service_send_and_revoke_have_total_gate_order"
++      ],
++      "evidence_required": [
++        "client_events_manifest_report",
++        "server_connection_summary",
++        "run_fixture_action_connection_binding",
++        "revocation_gate_sequences",
++        "cleanup_observation"
++      ],
++      "cannot_prove_offline": [
++        "real_permission_authenticity",
++        "OS_send_and_close",
++        "cancellation_latency",
++        "actual_target_identity",
++        "durable_dual_source_capture"
++      ],
++      "result": {
++        "executed_at": null,
++        "execution_proof": null,
++        "reviewer_record": null,
++        "verdict": null
++      }
++    },
++    {
++      "case": "REVOKE_PARTIAL_SEND",
++      "status": "PENDING_AUTHORIZATION",
++      "scope": "Revoke after partial positive send",
++      "required_permissions": {
++        "owner": "original permission/delegation chain and source review",
++        "teacher": "approved target/endpoint/identity/check catalog",
++        "binding": "exact HttpConfig scope digest, versions, fixture and credentials",
++        "exception_scope": "REVOKE_PARTIAL_SEND"
++      },
++      "criteria": "No continued write after effective revoke; retain one send count, unknown unfinished result and explicit close failure.",
++      "observations": [
++        "both revoke-request/effective timestamps and gate sequences",
++        "first/last positive send and byte counts",
++        "owner close completion/failure and OS resource observation"
++      ],
++      "preconditions": [
++        "owner_material",
++        "teacher_catalog",
++        "source_review",
++        "scope_version_match",
++        "fixture_credential_binding",
++        "budget_record",
++        "revocation_responsibility",
++        "explicit_exception_permission"
++      ],
++      "offline_tests": [
++        "test_service_partial_send_then_effective_revoke"
++      ],
++      "evidence_required": [
++        "client_events_manifest_report",
++        "server_connection_summary",
++        "run_fixture_action_connection_binding",
++        "revocation_gate_sequences",
++        "cleanup_observation"
++      ],
++      "cannot_prove_offline": [
++        "real_permission_authenticity",
++        "OS_send_and_close",
++        "cancellation_latency",
++        "actual_target_identity",
++        "durable_dual_source_capture"
++      ],
++      "result": {
++        "executed_at": null,
++        "execution_proof": null,
++        "reviewer_record": null,
++        "verdict": null
++      }
++    },
++    {
++      "case": "LATE_RESPONSE",
++      "status": "PENDING_AUTHORIZATION",
++      "scope": "Terminal late response and stale instance",
++      "required_permissions": {
++        "owner": "original permission/delegation chain and source review",
++        "teacher": "approved target/endpoint/identity/check catalog",
++        "binding": "exact HttpConfig scope digest, versions, fixture and credentials",
++        "exception_scope": "LATE_RESPONSE"
++      },
++      "criteria": "No terminal resurrection or stale instance/credential confirmation.",
++      "observations": [
++        "both revoke-request/effective timestamps and gate sequences",
++        "first/last positive send and byte counts",
++        "owner close completion/failure and OS resource observation"
++      ],
++      "preconditions": [
++        "owner_material",
++        "teacher_catalog",
++        "source_review",
++        "scope_version_match",
++        "fixture_credential_binding",
++        "budget_record",
++        "revocation_responsibility",
++        "explicit_exception_permission"
++      ],
++      "offline_tests": [
++        "test_late_response_during_read_cannot_upgrade"
++      ],
++      "evidence_required": [
++        "client_events_manifest_report",
++        "server_connection_summary",
++        "run_fixture_action_connection_binding",
++        "revocation_gate_sequences",
++        "cleanup_observation"
++      ],
++      "cannot_prove_offline": [
++        "real_permission_authenticity",
++        "OS_send_and_close",
++        "cancellation_latency",
++        "actual_target_identity",
++        "durable_dual_source_capture"
++      ],
++      "result": {
++        "executed_at": null,
++        "execution_proof": null,
++        "reviewer_record": null,
++        "verdict": null
++      }
++    },
++    {
++      "case": "AUDIT_FAILURE",
++      "status": "PENDING_AUTHORIZATION",
++      "scope": "Before/after send evidence failure",
++      "required_permissions": {
++        "owner": "original permission/delegation chain and source review",
++        "teacher": "approved target/endpoint/identity/check catalog",
++        "binding": "exact HttpConfig scope digest, versions, fixture and credentials",
++        "exception_scope": "AUDIT_FAILURE"
++      },
++      "criteria": "Stop new dispatch; no confirmation from unpersisted evidence; recover unknown prefix without replay.",
++      "observations": [
++        "both revoke-request/effective timestamps and gate sequences",
++        "first/last positive send and byte counts",
++        "owner close completion/failure and OS resource observation"
++      ],
++      "preconditions": [
++        "owner_material",
++        "teacher_catalog",
++        "source_review",
++        "scope_version_match",
++        "fixture_credential_binding",
++        "budget_record",
++        "revocation_responsibility",
++        "explicit_exception_permission"
++      ],
++      "offline_tests": [
++        "test_audit_failure_cannot_confirm_response"
++      ],
++      "evidence_required": [
++        "client_events_manifest_report",
++        "server_connection_summary",
++        "run_fixture_action_connection_binding",
++        "revocation_gate_sequences",
++        "cleanup_observation"
++      ],
++      "cannot_prove_offline": [
++        "real_permission_authenticity",
++        "OS_send_and_close",
++        "cancellation_latency",
++        "actual_target_identity",
++        "durable_dual_source_capture"
++      ],
++      "result": {
++        "executed_at": null,
++        "execution_proof": null,
++        "reviewer_record": null,
++        "verdict": null
++      }
++    }
++  ]
++}
+diff --git a/review/P3_c3_supervisor_review.md b/review/P3_c3_supervisor_review.md
+new file mode 100644
+index 0000000..c48c06a
+--- /dev/null
++++ b/review/P3_c3_supervisor_review.md
+@@ -0,0 +1,182 @@
++# C-3C 可信监督者与双端证据协调审核报告
++
++日期：2026-10-21。实际仓库：`D:\project\-P3-Security-Testing-Agent`。基线 HEAD：`3199b3f9a447cc15548523c995548f139cf8bc18`。本轮仅离线开发，等待人工代码审核；未 Commit／Push，未执行实际 HTTP、DNS、socket 或服务监听。本报告不是正式课程或真实网络验收报告。
++
++## 最新修订：重置提交点竞态
++
++本次在 227 项基线上新增 10 项确定性测试，全量 **237 项通过**。工作区累计 16 个变更文件，新增修改的原有文件是 `src/p3_core/mock_api/core.py`；此前全部工作保留。以下 15 文件、217／227 项等文字保留为此前阶段记录，以本节为当前结果。
++
++原问题：prepare_next 提前预约 RETIRED，然后在端点复核后无条件调用 reset；失败通知即使已锁存，也只能在创建之后抛异常。修复前新增测试明确出现实际 Fixture 构造 1 次而预期 0 次；52 项 Supervisor 测试为 3 failures／4 errors（部分新测试等待新状态字段和准备接口）。独立审核的 `independent-review-race.json` 同样记录旧实现 reset 调用 1 次。
++
++修复：确认 FixtureManager 无全局活动实例后，提取锁外的纯候选工厂 prepare，保留原 reset 兼容接口。Supervisor 将准备资格与正式提交分离；提交和可信失败通知共享短状态锁，以递增序号给出唯一先后顺序。提交边界只有内存引用与元数据赋值。所有构造、文件校验、外部审计和旧绑定失效都在锁外。
++
++失败先赢时正式提交数为 0；候选若已在锁外生成，明确计作一次私有构造而非一次激活，不作废旧绑定。提交先赢时记录提交事实，后续失败进入 FAILED、撤下候选且禁止重试，不能清除 audit_failed 或声称已提交对象不存在。报告和可用审计事件记录 commit／failure 序号。完整先后顺序表见 [生命周期设计](../design/P3_supervisor_lifecycle.md)。
++
++10 项新增回归覆盖：端点复核屏障失败（实际构造 0／提交 0）、候选准备后失败（1／0）、提交先赢后失败（1／1）、双线程最多一次构造／提交、准备审计失败（1／0）、端点检查异常（0／0）、旧 generation／错实例／重复失败、锁外操作验证、提交后审计写入失败（1／1）、错误准备实例拒绝且不可重试。原 227 项测试与断言保持。
++
++修复后按原独立审核步骤再次使用真实 JsonlEvidence 临时目录、篡改 Manifest.audit_gap、端点 Event 屏障复现：completion=AUDIT_FAILED，实际 Fixture 构造 0 次，兼容 reset 调用 0 次，正式提交 0 次，旧绑定未失效，旧 generation=1，最终 FAILED。结果保存在 `reset-commit-race-after.json`。
++
++当前全量日志为 `unittest-final.txt`；测试发现和执行全程阻断 socket／DNS。`reset-commit-before.txt` 保留修复前失败，`reset-commit-after.txt` 记录阶段回归通过；最终全量包含新增的所有测试。RC2、ADR、CI、16 份历史 Evidence 哈希未变，14 项真实用例仍 PENDING_AUTHORIZATION，暂存区为空，无 Commit／Push。
++
++本次建议提交范围在原代码组增加 mock_api/core.py（代码与测试共 10 文件，文档与清单共 6 文件）；建议 Summary：`fix: linearize fixture publication with audit failure notifications`。本轮未执行提交。
++
++残余限制：真实网络许可、可信材料来源、实际 OS 清理与延迟仍未验收；私有候选分配不等于服务激活；文件完整性检查不提供对恶意并发改写磁盘的原子保证。所有失败都会保留事实，不通过回滚 Fixture 构造或重放请求修补。
++
++## 人工审核阻断问题修复
++
++在原 15 个未提交变更文件上，仅继续修改 supervision.py、coordination.py、test_c3_supervisor.py、本报告和生命周期设计，保留其他修改与所有未跟踪文件。
++
++问题一根因：Supervisor 原先只检查资源清理，未消费协调器的持久化完成状态；协调器失败只回调 revoke，已发出撤权时幂等返回会遗漏新失败。现新增独立完成状态，poll 与 prepare_next 均要求绑定 sidecar 完成并重读核验；失败先锁存再撤权，不恢复 FAILED／RETIRED，不重复请求端点撤权。MemoryEvidence 不构成持久化证明；摘要缺失也不能推断“未派发”。没有新增豁免、重放或许可入口。
++
++问题二根因：check_sidecar 原先只检查报告 audit_gap，漏检 Manifest。现两者均要求显式布尔 false、COMPLETE 完成标志及一致的运行／来源；保留原哈希、事件序号、连接与 action 检查。缺失、类型错误、不一致及读取异常都返回 EVIDENCE_INCOMPLETE。核验只证明离线一致性，不证明来源真实性。
++
++先加入回归测试，修复前 42 项 Supervisor 测试出现 12 个失败（包括 subTest），复现审核问题；修复后再补报告标志、Manifest 写入失败及锁外核验检查。**当前全量 227 项通过：原 217 项保留，本次新增 10 项；C-3C 新测试共 45 项。** 下文 217／35 是首次交付的历史结果。
++
++回归覆盖：缺摘要且双端清理、撤权后 emit／finish 失败、Manifest 写入中阻止重置及完成后允许、内存完成不算核验、STOPPED 后文件篡改、Manifest 审计标志和来源／完成标志、报告审计标志即使重算哈希仍拒绝，以及核验不持 Supervisor 状态锁。
++
++最终验证：整个 unittest 过程阻断 socket 与 DNS；16 份历史 Evidence、RC2、ADR、CI 哈希不变；14 项真实用例仍 PENDING_AUTHORIZATION；暂存区为空。未派发动作的 Controller 证明豁免尚未实现，缺摘要时保守阻止重置；真实存储持久性、来源核验、OS 行为仍未验收。
++
++审核输出目录保留 `blocking-regression-before.txt`，更新 `unittest-final.txt`、`validation.json`、`git-summary.txt` 和包含全部新增文件的 `P3-c3-supervisor-review.diff`。原建议提交分组不变，本轮未执行提交。
++
++## 交付与变更清单
++
++修改 7 个文件：
++
++- `src/p3_core/http/live.py`：只读、非阻塞生命周期观察，不代替 I/O 所有者关闭资源。
++- `src/p3_core/mock_api/adapter.py`：在原有限解析成功后返回已校验 action_id，旧 bytes 接口兼容。
++- `src/p3_core/mock_api/service.py`：连接摘要交付回调、递增摘要序号、清理／审计观察；发送／撤权短 gate 保留。
++- `src/p3_core/delivery.py`：四个离线只读检查命令，没有网络执行入口。
++- `README.md`：当前候选状态、设计与审核链接。
++- `eval/P3_c3_authorization_checklist.md`：保留原许可范围，补充离线摘要接口进展及机器清单。
++- `eval/P3_requirement_traceability.md`：C-3C 增量映射，保留原表与历史数量。
++
++新增 8 个文件：
++
++- [supervision.py](../src/p3_core/supervision.py)：不可重开的监督状态机与可信宿主接口。
++- [coordination.py](../src/p3_core/coordination.py)：有界独立 sidecar、关联／缺失检查、失败回调。
++- [preflight.py](../src/p3_core/preflight.py)：只读材料诊断，始终不授予执行权。
++- [acceptance.py](../src/p3_core/acceptance.py)：14 项计划与人工结果格式。
++- [test_c3_supervisor.py](../tests/test_c3_supervisor.py)：35 项确定性无网络测试。
++- [生命周期设计](../design/P3_supervisor_lifecycle.md)：状态、锁、接口、取舍与失败规则。
++- [机器清单](../eval/P3_c3_acceptance_manifest.json)：14 项稳定名称、范围、前置、离线关联、证据要求、判定与待授权状态。
++- 本审核报告。
++
++未修改 Python Controller、HTTP machine、LocalRegistry、RC2、CI、历史 Evidence 或 ADR 正文与状态。历史三份未跟踪 Evidence 继续保持未跟踪，不纳入交付差异。
++
++## 核心设计与人工审核重点
++
++监督者只协调生命周期：绑定精确 run／fixture／范围摘要／授权版本／generation，顺序请求两个已有 gate 撤权，然后观察所有者清理。没有许可生成、网络启动、重放或替代 Controller 的入口。失败后不能恢复，旧运行不能改绑为新运行。两端确认清理且监督审计完成后才能准备新夹具；单独 invalidate 不算撤权。
++
++需要人工重点审查三项设计：
++
++1. 双端撤权采用两个独立生效点，没有跨端原子性；监督者锁不跨组件调用。真实试跑必须分别核对两个 gate 及其间窗口，不能宣称已发字节可撤回。
++2. 摘要同步交付在服务 gate 外完成，并在交付结束前阻止后续连接替换记录。慢／挂起的存储会阻止后续连接及清理完成，但不阻止 revoke 生效；默认清理观察超时为 5 秒，仅是工程参数，不是 RC2 预算变更或实测接受值。
++3. 新 sidecar 仅用于本轮离线生命周期模拟，固定 NO_NETWORK_SIMULATION。真实端到端可信采集与来源确认仍需后续宿主驱动审核，不能直接把它的 CORRELATED 用作真实用例通过证明。
++
++ADR-001～004 保持 Accepted；ADR-005 保持 Proposed。本轮取舍写入设计文件等待审核，没有自动修改任何已接受架构决策。
++
++## 证据与失败规则
++
++服务端摘要关联 connection／action，可信宿主再附加 run／fixture／generation／scope。action 从 Controller 的已允许动作集合登记，不接受 Planner 自称授权。摘要仅含固定标识、字节计数、首末发送序号、撤权请求／生效信息、原因码、清理标志与递增序号。
++
++客户端记录与 sidecar 分别保存。完全相同重复交付幂等；错配、覆盖造成的序号缺口、丢失、重复冲突、关闭失败或审计故障标记 UNKNOWN／EVIDENCE_INCOMPLETE。部分发送后不推断成功，协调报告始终 INCONCLUSIVE。连接结束时尚未发生的撤权字段为 null，不事后伪造；未来真实验收须另保留两端生命周期观察。
++
++临时 JSONL／Manifest／报告采用唯一目录与哈希关联；本轮不写历史 evidence 目录。完整性检查不等同真实性证明。文件及哈希一并被替换、存储未落盘、进程崩溃后的 I/O 所有者状态，仍需真实环境独立核验。没有自动重试或补发。
++
++## 授权流程与 14 项验收
++
++预检区分 MISSING、INVALID_FORMAT、CONFLICT、SOURCE_UNVERIFIED、RUN_BINDING_PENDING。齐全 JSON、approved_by、active=true 或测试替身都不能产生执行权。只读可信查询即使观察到既有人工核验记录，也仍返回 PENDING_AUTHORIZATION；最终许可保持原 LocalRegistry 语义。
++
++当前仍缺：目标所有者／正式受托者原始许可和委托链，教师目标与测试目录原始记录、可信核验者及来源证明，实际实例／凭据／精确配置版本绑定，预算与撤权责任记录，异常注入单独许可，以及实际 OS 资源／延迟接受条件。工程审核不替代这些许可。
++
++14 项均保持 PENDING_AUTHORIZATION，结果字段为空。支持六种管理状态，但只读工具不自动提升到 VERIFIED；外部结果格式校验也不认证来源。原 [真实集成状态文件](../eval/P3_http_integration_status.json) 未修改。
++
++## 测试结果与失败记录
++
++标准复现命令：
++
++```powershell
++$env:PYTHONPATH = 'src'
++$env:PYTHONDONTWRITEBYTECODE = '1'
++python -m unittest discover -s tests -v
++```
++
++本地结果：**217 项全部通过，原 182 项继续通过，新增 35 项**。最终额外在整个测试发现和执行期间统一阻断 socket、create_connection、getaddrinfo、gethostbyname、gethostbyname_ex；所有连接与时序测试使用替身，不发实际 HTTP。
++
++新增覆盖双端撤权顺序与同时请求、清理／审计竞争、关闭失败、超时、旧绑定、重置竞争、摘要覆盖／错配／重复／丢失、部分发送未知、落盘后篡改、敏感字符串拒绝、许可材料不足和只读 CLI。服务回调阻塞时单独线程仍能完成撤权。原 182 项测试与断言未删改。
++
++首次执行 213 项时出现 1 个新增测试错误：测试调用 AuthorizedHttpRun 时把 keyword-only 参数写成位置参数。仅修正测试构造方法后通过；随后补 4 项服务交付与清理审计竞争测试，总数 217。无安全断言降级或跳过。文档初次链接检查报告本审核文件尚未创建，交付前创建后复查。
++
++完整日志、验证摘要、基线哈希与完整 Git 差异放在本次任务输出目录 `D:\codex\2026-10-12\referenced-chatgpt-conversation-this-is-an\outputs\c3-supervisor`，不混入运行 Evidence 或 Git 暂存区。
++
++## 需求覆盖与未完成范围
++
++| 状态 | 范围 |
++| --- | --- |
++| 本轮离线实现与测试完成 | REQ-001／002／007～012 的许可与监督子场景；REQ-014～017 证据子场景；REQ-018 夹具生命周期；REQ-019 只读工具 |
++| 部分完成 | 双端真实采集的静态接口与验收计划；取消／清理仅证明模拟调用顺序 |
++| 未执行 | REQ-013 真实响应获取；所有 14 项 HTTP 集成；真实 OS 资源关闭、调度和延迟；REQ-021 真实策略实验；正式课程验收 |
++
++未变更 RC2 的 22 个需求编号、要求强度、三计数、预算、NO_NEW_EVIDENCE 或撤权不变量。协调记录数量不是 request_count，fake 发送不是实际请求。已有 36 次离线策略实验未重跑或改写。
++
++## 提交建议与停止点
++
++建议人工审核后分两批：
++
++- 代码与测试 9 个文件：4 个修改源码、4 个新增组件、1 个测试文件。Summary：`feat: add offline lifecycle supervision and evidence coordination`。
++- 文档与清单 6 个文件：README、设计、许可清单、追踪表、机器清单、审核报告。Summary：`docs: prepare C3 supervised integration acceptance review`。
++
++本轮不执行提交或推送。真实运行仍受许可和目录阻塞；这些阻塞没有被示例字段或离线测试解除。完成交付后停止，等待人工代码审核。
++# 最新增量审核材料：可信 action 登记 P1 与报告状态 P2（2026-10-22）
++
++本节取代下文历史轮次中的最新测试数量描述，历史说明保留。当前仍为未提交候选成果，等待人工代码审核；没有 Commit、Push 或真实 HTTP 操作。
++
++## 根因与修复
++
++P1：原核验只核对文件长度、哈希、序号及部分绑定，未将事件 action 与原始批准动作、原始连接映射对应。修改 action 并重算哈希后仍能通过。修复分两层：报告显式保存预期动作集合及完整最小连接映射，Manifest 引用报告哈希和 run/fixture/generation/scope/授权版本；每条事件使用封闭类型规则并核对全部映射。运行时再与落盘前保留的原始报告和实际离线 Controller 登记快照比较，而不是信任 sidecar 自己提供的摘要。
++
++`capture_controller()` 从精确类型 `SimulationRun` 的批准槽读取 action/check/attempt，验证 run、fixture、scope、版本与审计状态。普通列表、Planner 声明、摘要或完整的自洽文件都不构成独立信任根。`check_sidecar()` 的结构一致结论始终带 `SOURCE_UNVERIFIED` 与 `source_verified=false`。没有 Controller 根时协调器不会 VERIFIED，Supervisor 不会提交 Fixture。真实执行主体认证仍未实现；不能将本轮离线 Controller 的登记核验解释为真实授权或网络验收。
++
++P2：公开报告原来固定返回 PENDING。现区分未完成、写入后待核验、离线核验完成、来源未核验、证据缺口和审计失败。公开成功状态明确为 `OFFLINE_VERIFIED`；真实验收六种状态及 API INCONCLUSIVE 语义均不变。
++
++未派发动作目前没有可信非执行证明的适配路径，保守阻止 Fixture 切换；没有通过伪造服务端摘要补齐。无 action 的合法生命周期事件只存在于独立 Supervisor 审计流，不允许其作为 sidecar 动作事件。
++
++## 本轮实际修改
++
++- `src/p3_core/coordination.py`：Controller 登记快照、原始映射、落盘交叉核验、报告状态。
++- `src/p3_core/supervision.py`：只澄清登记接口的信任说明；未改动准备、提交或失败通知代码。
++- `tests/test_c3_registration.py`：新增 20 项回归，包含实际落盘改写及重算哈希。
++- `tests/test_c3_supervisor.py`：保留全部 55 项旧测试和断言；其中三个成功核验场景改用真实离线 Controller 批准动作，替代手填 action 的旧夹具。
++- `design/P3_supervisor_lifecycle.md`：补充数据流、信任边界、失败关闭及公开状态。
++- 本审核报告。
++
++## 验证与失败记录
++
++修复前四项最小回归全部失败：null action、未登记 action、缺少 Controller 根仍放行 Fixture、完成后报告仍 PENDING。修复后新增 20 项通过，全量 **257 项通过（原 237 + 20）**；无 skipped、expected failure 或隐藏失败。中间新增测试误读 Controller 的计数器字段导致一次 KeyError，已改为现有 `counts` 接口；没有修改产品计数逻辑或削弱断言。
++
++原独立审核的 12 种确定性时序按原断言重跑全部通过，仅将成功路径的手工 action 夹具替换为实际离线 Controller 根。记录包含实际 Fixture 构造次数、正式提交次数、代次、失败／提交序号和旧绑定失效状态。测试发现及执行全程阻断 socket、连接及 DNS，所有模拟请求与实际 request_count 分离。
++
++交付文件位于任务输出目录 `D:\codex\2026-10-12\referenced-chatgpt-conversation-this-is-an\outputs\c3-supervisor`：`registration-before.txt`（修复前失败），`unittest-final.txt`（全量日志），`registration-reset-races.json`（12 时序），`validation.json`（保护与链接检查），`P3-c3-supervisor-review.diff`（含全部新增文件的完整差异），`git-summary.txt`（实际清单）。
++
++RC2、ADR-001～005、CI 与 16 份历史 Evidence 的基线哈希一致。14 项真实验收继续 PENDING_AUTHORIZATION。CLI 没有增加网络或信任升级入口。暂存区为空，三份历史未跟踪 Evidence 保持未跟踪并排除在完整差异之外。
++
++## 剩余风险与人工审核重点
++
++内存登记根依赖可信 Python 宿主，不能防御恶意宿主改写私有状态；没有持久化来源认证，重启后仅有文件必须重新保持 SOURCE_UNVERIFIED。真实 Controller／服务端来源适配、可信未派发证明、实际许可及教师目录仍待落实。本轮不能证明真实 OS I/O、资源关闭与网络撤权行为。
++
++请重点复核离线根与真实许可的区分、完整文件替换仍被原始报告拒绝，以及重置提交机制没有改变。建议人工批准后将本节六个文件与此前未提交 C-3C 文件一并纳入审核范围；可使用提交说明 `fix: bind offline sidecar verification to controller registrations`。本轮不执行提交。
++
++# 最终定点修复：缺失 sidecar 不得提交 Fixture
++
++最新结果：**258 项 unittest 全部通过，原 12 种确定性重置竞争时序全部通过**。无 skipped、expected failure 或隐藏失败。下文 257 项等为前轮历史记录。
++
++本轮 P1 根因是 `_evidence_status()` 将未绑定协调器直接当作 VERIFIED。最小回归使用 FakePort、双端清理和实际 Fixture 工厂计数，在旧实现上失败；修复后反复 prepare_next 均拒绝，工厂调用和正式提交次数均为 0，旧绑定不失效。
++
++修复仅将缺失协调器返回值改为 MISSING，并明确允许纯清理观察在 MISSING 时进入 STOPPED。STOPPED 不等于证据完成：原 prepare_next 的 VERIFIED 门槛会在任何 Fixture 分配前拒绝。没有增加例外开关、许可入口或改变已绑定 sidecar 的核验要求。
++
++本轮修改四个文件：`src/p3_core/supervision.py`、`tests/test_c3_supervisor.py`、`design/P3_supervisor_lifecycle.md`、本报告。新增 1 项最小回归；13 项原先无 sidecar 的重置／竞争测试改用实际离线 Controller 批准、独立登记快照、临时 JSONL/Manifest 和完成核验，原断言保持。原 257 项均继续通过。
++
++任务输出目录中的 `missing-sidecar-before.txt` 保存修复前失败，`missing-sidecar-after.txt` 保存最小回归通过；`unittest-final.txt` 是全量日志，`registration-reset-races.json` 是 12 种时序记录，`P3-c3-supervisor-review.diff` 包含全部未提交 C-3C 新增文件。
++
++测试发现和执行期间阻断 socket、连接及 DNS。28 个受保护文件哈希不变（包括 16 份历史 Evidence、RC2、ADR 和 CI）；14 项真实集成继续 PENDING_AUTHORIZATION。Controller 及真实许可未改动，暂存区为空，未 Commit 或 Push。候选修复等待人工复核，不代表真实网络或正式课程验收通过。
++

@@ -1,0 +1,45 @@
+{
+  "schema_version": "p3-evaluation-v1",
+  "evaluator_version": "1.0",
+  "rule_id": "P3-EVAL-DENY-001",
+  "status": "INSUFFICIENT_EVIDENCE",
+  "evidence_directory": "D:\\project\\-P3-Security-Testing-Agent\\evidence\\course_ch03\\eval_20261028_01\\artifacts\\run_e2b938e432d044e69427e50f2b1a9aaf",
+  "subject_run_id": null,
+  "provenance": "UNVERIFIED_INPUT",
+  "evidence_level": "LOCAL_OFFLINE_RECORD_INTERNAL_CONSISTENCY",
+  "checked_artifacts": [
+    {
+      "name": "manifest.json",
+      "bytes": 443,
+      "sha256": "2b1ab15f15e922ef8f6526b1e27916d95ce7b9b191eea8d97989f62a9d9744db"
+    },
+    {
+      "name": "report.json",
+      "bytes": 7099,
+      "sha256": "25bd1c156b05e4199ad8c43c761880195cf0e7208794c26f1b3a68871b7876f2"
+    },
+    {
+      "name": "events.jsonl",
+      "bytes": 22736,
+      "sha256": "9b927ffffced03e8c2fd42bf3e6d697271678ef8628be0a0a62f127796e9c68b"
+    }
+  ],
+  "observed_facts": {},
+  "evidence_references": [],
+  "limitations": [
+    "Only the unique recorded NOT_APPROVED_CANDIDATE denial is evaluated.",
+    "No independent proof of original input, permission, source authenticity or historical execution version.",
+    "Absence of recorded model dispatch is not proof of no OS/network send.",
+    "No real API verdict, formal course grade or peer reproduction."
+  ],
+  "missing_evidence": [
+    "MISSING_REPORT_SHA256"
+  ],
+  "suggested_next_check": [
+    "Obtain an intact, attributable client artifact set and unique target registration; preserve current originals."
+  ],
+  "human_signoff": "pending",
+  "score": null,
+  "approval_verified": false,
+  "source_authenticated": false
+}

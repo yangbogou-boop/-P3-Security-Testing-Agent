@@ -1,0 +1,37 @@
+{
+  "branch": "main",
+  "baseline": "3199b3f9a447cc15548523c995548f139cf8bc18",
+  "commits": [
+    {
+      "sha": "767b15e9fd5178b13c392a6b326bd6b67f72407a",
+      "summary": "feat: add offline supervision and trusted evidence coordination",
+      "files": [
+        "src/p3_core/acceptance.py",
+        "src/p3_core/coordination.py",
+        "src/p3_core/delivery.py",
+        "src/p3_core/http/live.py",
+        "src/p3_core/mock_api/adapter.py",
+        "src/p3_core/mock_api/core.py",
+        "src/p3_core/mock_api/service.py",
+        "src/p3_core/preflight.py",
+        "src/p3_core/supervision.py",
+        "tests/test_c3_registration.py",
+        "tests/test_c3_supervisor.py"
+      ]
+    },
+    {
+      "sha": "8e56767b1840c5e5626302ebdabdc8020c216bc6",
+      "summary": "docs: finalize C3 offline supervision acceptance review",
+      "files": [
+        "README.md",
+        "design/P3_supervisor_lifecycle.md",
+        "eval/P3_c3_acceptance_manifest.json",
+        "eval/P3_c3_authorization_checklist.md",
+        "eval/P3_requirement_traceability.md",
+        "review/P3_c3_supervisor_review.md"
+      ]
+    }
+  ],
+  "status": "?? evidence/traces/RUN_1791610197.json\n?? evidence/traces/RUN_INVALID_1791610197_planner.json\n?? evidence/traces/RUN_VALID_1791610197_planner.json",
+  "push": false
+}

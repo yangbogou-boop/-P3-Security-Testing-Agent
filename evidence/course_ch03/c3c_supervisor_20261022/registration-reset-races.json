@@ -1,0 +1,303 @@
+[
+  {
+    "case": 1,
+    "name": "failure_before_preparation",
+    "event_order": [
+      "revocation_requested",
+      "cleanup_observed",
+      "failure_requested",
+      "failure_effective"
+    ],
+    "actual_constructions": 0,
+    "commit_count": 0,
+    "global_manager_changes": 0,
+    "actual_http_activations": 0,
+    "old_client_invalidated": false,
+    "old_service_invalidated": false,
+    "old_generation": 1,
+    "failure_sequence": 1,
+    "commit_sequence": null,
+    "final_state": "FAILED",
+    "result": [
+      "OLD_RUN_NOT_CLEAN"
+    ],
+    "passed": true
+  },
+  {
+    "case": 2,
+    "name": "failure_at_endpoint_recheck",
+    "event_order": [
+      "revocation_requested",
+      "cleanup_observed",
+      "failure_requested",
+      "failure_effective"
+    ],
+    "actual_constructions": 0,
+    "commit_count": 0,
+    "global_manager_changes": 0,
+    "actual_http_activations": 0,
+    "old_client_invalidated": false,
+    "old_service_invalidated": false,
+    "old_generation": 1,
+    "failure_sequence": 1,
+    "commit_sequence": null,
+    "final_state": "FAILED",
+    "result": [
+      "RESET_FAILED"
+    ],
+    "passed": true
+  },
+  {
+    "case": 3,
+    "name": "failure_during_private_preparation",
+    "event_order": [
+      "revocation_requested",
+      "cleanup_observed",
+      "failure_requested",
+      "failure_effective",
+      "private_fixture_constructed",
+      "fixture_prepared"
+    ],
+    "actual_constructions": 1,
+    "commit_count": 0,
+    "global_manager_changes": 0,
+    "actual_http_activations": 0,
+    "old_client_invalidated": false,
+    "old_service_invalidated": false,
+    "old_generation": 1,
+    "failure_sequence": 1,
+    "commit_sequence": null,
+    "final_state": "FAILED",
+    "result": [
+      "RESET_FAILED"
+    ],
+    "passed": true
+  },
+  {
+    "case": 4,
+    "name": "failure_after_preparation_before_commit",
+    "event_order": [
+      "revocation_requested",
+      "cleanup_observed",
+      "private_fixture_constructed",
+      "fixture_prepared",
+      "failure_requested",
+      "failure_effective"
+    ],
+    "actual_constructions": 1,
+    "commit_count": 0,
+    "global_manager_changes": 0,
+    "actual_http_activations": 0,
+    "old_client_invalidated": false,
+    "old_service_invalidated": false,
+    "old_generation": 1,
+    "failure_sequence": 1,
+    "commit_sequence": null,
+    "final_state": "FAILED",
+    "result": [
+      "RESET_FAILED"
+    ],
+    "passed": true
+  },
+  {
+    "case": 5,
+    "name": "failure_requested_inside_commit_gate",
+    "event_order": [
+      "revocation_requested",
+      "cleanup_observed",
+      "private_fixture_constructed",
+      "fixture_prepared",
+      "commit_gate_held",
+      "failure_requested",
+      "fixture_committed",
+      "failure_effective"
+    ],
+    "actual_constructions": 1,
+    "commit_count": 1,
+    "global_manager_changes": 0,
+    "actual_http_activations": 0,
+    "old_client_invalidated": true,
+    "old_service_invalidated": true,
+    "old_generation": 1,
+    "failure_sequence": 2,
+    "commit_sequence": 1,
+    "final_state": "FAILED",
+    "result": [
+      "RETURNED"
+    ],
+    "passed": true
+  },
+  {
+    "case": 6,
+    "name": "failure_immediately_after_commit",
+    "event_order": [
+      "revocation_requested",
+      "cleanup_observed",
+      "private_fixture_constructed",
+      "fixture_prepared",
+      "fixture_committed",
+      "failure_requested",
+      "failure_effective"
+    ],
+    "actual_constructions": 1,
+    "commit_count": 1,
+    "global_manager_changes": 0,
+    "actual_http_activations": 0,
+    "old_client_invalidated": true,
+    "old_service_invalidated": true,
+    "old_generation": 1,
+    "failure_sequence": 2,
+    "commit_sequence": 1,
+    "final_state": "FAILED",
+    "result": [
+      "RESET_FAILED"
+    ],
+    "passed": true
+  },
+  {
+    "case": 7,
+    "name": "cleanup_complete_summary_missing",
+    "event_order": [
+      "revocation_requested",
+      "cleanup_observed",
+      "cleanup_observed"
+    ],
+    "actual_constructions": 0,
+    "commit_count": 0,
+    "global_manager_changes": 0,
+    "actual_http_activations": 0,
+    "old_client_invalidated": false,
+    "old_service_invalidated": false,
+    "old_generation": 1,
+    "failure_sequence": null,
+    "commit_sequence": null,
+    "final_state": "STOPPING",
+    "result": [
+      "EVIDENCE_NOT_COMPLETE"
+    ],
+    "passed": true
+  },
+  {
+    "case": 8,
+    "name": "manifest_written_finish_and_verification_pending",
+    "event_order": [
+      "revocation_requested",
+      "cleanup_observed",
+      "manifest_written_unverified",
+      "cleanup_observed"
+    ],
+    "actual_constructions": 0,
+    "commit_count": 0,
+    "global_manager_changes": 0,
+    "actual_http_activations": 0,
+    "old_client_invalidated": false,
+    "old_service_invalidated": false,
+    "old_generation": 1,
+    "failure_sequence": null,
+    "commit_sequence": null,
+    "final_state": "STOPPED",
+    "result": [
+      "EVIDENCE_NOT_COMPLETE"
+    ],
+    "passed": true
+  },
+  {
+    "case": 9,
+    "name": "previously_verified_manifest_audit_fault",
+    "event_order": [
+      "revocation_requested",
+      "cleanup_observed",
+      "AUDIT_FAILED"
+    ],
+    "actual_constructions": 0,
+    "commit_count": 0,
+    "global_manager_changes": 0,
+    "actual_http_activations": 0,
+    "old_client_invalidated": false,
+    "old_service_invalidated": false,
+    "old_generation": 1,
+    "failure_sequence": 1,
+    "commit_sequence": null,
+    "final_state": "FAILED",
+    "result": [
+      "EVIDENCE_NOT_COMPLETE"
+    ],
+    "passed": true
+  },
+  {
+    "case": 10,
+    "name": "two_concurrent_preparers",
+    "event_order": [
+      "revocation_requested",
+      "cleanup_observed",
+      "private_fixture_constructed",
+      "fixture_prepared",
+      "fixture_committed"
+    ],
+    "actual_constructions": 1,
+    "commit_count": 1,
+    "global_manager_changes": 0,
+    "actual_http_activations": 0,
+    "old_client_invalidated": true,
+    "old_service_invalidated": true,
+    "old_generation": 1,
+    "failure_sequence": null,
+    "commit_sequence": 1,
+    "final_state": "RETIRED",
+    "result": [
+      "OLD_RUN_NOT_CLEAN",
+      "RETURNED"
+    ],
+    "passed": true
+  },
+  {
+    "case": 11,
+    "name": "retry_after_preparation_failure",
+    "event_order": [
+      "revocation_requested",
+      "cleanup_observed"
+    ],
+    "actual_constructions": 0,
+    "commit_count": 0,
+    "global_manager_changes": 0,
+    "actual_http_activations": 0,
+    "old_client_invalidated": false,
+    "old_service_invalidated": false,
+    "old_generation": 1,
+    "failure_sequence": 1,
+    "commit_sequence": null,
+    "final_state": "FAILED",
+    "result": [
+      "RESET_FAILED",
+      "OLD_RUN_NOT_CLEAN"
+    ],
+    "passed": true
+  },
+  {
+    "case": 12,
+    "name": "old_instance_event_after_switch",
+    "event_order": [
+      "revocation_requested",
+      "cleanup_observed",
+      "private_fixture_constructed",
+      "fixture_prepared",
+      "fixture_committed",
+      "EVIDENCE_INCOMPLETE"
+    ],
+    "actual_constructions": 1,
+    "commit_count": 1,
+    "global_manager_changes": 0,
+    "actual_http_activations": 0,
+    "old_client_invalidated": true,
+    "old_service_invalidated": true,
+    "old_generation": 1,
+    "failure_sequence": 2,
+    "commit_sequence": 1,
+    "final_state": "FAILED",
+    "result": [
+      "RETURNED",
+      "EVIDENCE_NOT_COMPLETE"
+    ],
+    "passed": true
+  }
+]

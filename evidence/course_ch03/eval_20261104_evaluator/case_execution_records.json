@@ -1,0 +1,247 @@
+[
+  {
+    "case": "DENY_K1",
+    "source": "HISTORICAL_PRODUCT_RECORD",
+    "input": "D:\\project\\-P3-Security-Testing-Agent\\evidence\\course_ch03\\eval_20261028_02\\artifacts\\run_ce4b0027ae024f05a72d81173c9f05e2",
+    "argv": [
+      "--run",
+      "D:\\project\\-P3-Security-Testing-Agent\\evidence\\course_ch03\\eval_20261028_02\\artifacts\\run_ce4b0027ae024f05a72d81173c9f05e2",
+      "--rule",
+      "P3-EVAL-DENY-001"
+    ],
+    "exit_code": 0,
+    "expected": "PASS",
+    "actual": "PASS",
+    "matches": true,
+    "input_hashes_before": {
+      "events.jsonl": "a99b2ec71b534f4602bf59b7b7dc07387b078c1e0ee81fb7214e46217963791d",
+      "manifest.json": "17fe533cfc7b81a87555cf4b19e57ed5d792ba85ffc5e7137ca1aba724326ac4",
+      "report.json": "bd41995bb5a384b754b15bcfa1747378c6e2ede3c15ac513b48c027ce02d86a2"
+    },
+    "input_unchanged": true,
+    "verify_run": {
+      "integrity": "VERIFIED",
+      "run_id": "run_ce4b0027ae024f05a72d81173c9f05e2",
+      "provenance": "NO_NETWORK_SIMULATION",
+      "approval_verified": false,
+      "appended_bytes": 0
+    }
+  },
+  {
+    "case": "DENY_K2",
+    "source": "SYNTHETIC_CALIBRATION_FROM_EXISTING_TEST_HELPER",
+    "input": "D:\\codex\\P3_final_delivery_pack_20261102\\P3_evaluator_demo_20261104\\calibration_inputs\\DENY_K2",
+    "argv": [
+      "--run",
+      "D:\\codex\\P3_final_delivery_pack_20261102\\P3_evaluator_demo_20261104\\calibration_inputs\\DENY_K2",
+      "--rule",
+      "P3-EVAL-DENY-001"
+    ],
+    "exit_code": 0,
+    "expected": "FAIL",
+    "actual": "FAIL",
+    "matches": true,
+    "input_hashes_before": {
+      "events.jsonl": "e3006909c3666956718a5d127d8d94fbbc0e28f03c194d32cc6a936126b3acef",
+      "manifest.json": "f0e2e2e3014093c36eae52b1bb2352efb9c9d5ec1b6d5269d4cd4f52a06cdfcb",
+      "report.json": "1dc4453c969bc33cc5c292e05804d7a9099d1eea6c1bf2b67e7b72323ad4d978"
+    },
+    "input_unchanged": true,
+    "verify_run": {
+      "integrity": "VERIFIED",
+      "run_id": "run_00000000000000000000000000000001",
+      "provenance": "NO_NETWORK_SIMULATION",
+      "approval_verified": false,
+      "appended_bytes": 0
+    }
+  },
+  {
+    "case": "DENY_K3",
+    "source": "HISTORICAL_PRODUCT_RECORD",
+    "input": "D:\\project\\-P3-Security-Testing-Agent\\evidence\\course_ch03\\eval_20261028_01\\artifacts\\run_e2b938e432d044e69427e50f2b1a9aaf",
+    "argv": [
+      "--run",
+      "D:\\project\\-P3-Security-Testing-Agent\\evidence\\course_ch03\\eval_20261028_01\\artifacts\\run_e2b938e432d044e69427e50f2b1a9aaf",
+      "--rule",
+      "P3-EVAL-DENY-001"
+    ],
+    "exit_code": 0,
+    "expected": "INSUFFICIENT_EVIDENCE",
+    "actual": "INSUFFICIENT_EVIDENCE",
+    "matches": true,
+    "input_hashes_before": {
+      "events.jsonl": "9b927ffffced03e8c2fd42bf3e6d697271678ef8628be0a0a62f127796e9c68b",
+      "manifest.json": "2b1ab15f15e922ef8f6526b1e27916d95ce7b9b191eea8d97989f62a9d9744db",
+      "report.json": "25bd1c156b05e4199ad8c43c761880195cf0e7208794c26f1b3a68871b7876f2"
+    },
+    "input_unchanged": true,
+    "verify_run": {
+      "integrity": "INCOMPLETE_OR_INVALID",
+      "approval_verified": false
+    }
+  },
+  {
+    "case": "BUDGET_K1",
+    "source": "SYNTHETIC_CALIBRATION_FROM_EXISTING_TEST_HELPER",
+    "input": "D:\\codex\\P3_final_delivery_pack_20261102\\P3_evaluator_demo_20261104\\calibration_inputs\\BUDGET_K1",
+    "argv": [
+      "--run",
+      "D:\\codex\\P3_final_delivery_pack_20261102\\P3_evaluator_demo_20261104\\calibration_inputs\\BUDGET_K1",
+      "--rule",
+      "P3-EVAL-BUDGET-001"
+    ],
+    "exit_code": 0,
+    "expected": "PASS",
+    "actual": "PASS",
+    "matches": true,
+    "input_hashes_before": {
+      "events.jsonl": "7da452d730b151d98d987416ae6e844eeac39ed7090f59409c14cb0d62cf9644",
+      "manifest.json": "e10586bbf658f49dbbd54ae4d765607b3d8ce8e2e1a9ba4816ccff5690edb50a",
+      "report.json": "d85eb5ffa94bf2adebed73ea8028e3095c8fe683a8c867a08005c06f2922ac99"
+    },
+    "input_unchanged": true,
+    "verify_run": {
+      "integrity": "VERIFIED",
+      "run_id": "run_00000000000000000000000000000001",
+      "provenance": "NO_NETWORK_SIMULATION",
+      "approval_verified": false,
+      "appended_bytes": 0
+    }
+  },
+  {
+    "case": "BUDGET_K2",
+    "source": "SYNTHETIC_CALIBRATION_FROM_EXISTING_TEST_HELPER",
+    "input": "D:\\codex\\P3_final_delivery_pack_20261102\\P3_evaluator_demo_20261104\\calibration_inputs\\BUDGET_K2",
+    "argv": [
+      "--run",
+      "D:\\codex\\P3_final_delivery_pack_20261102\\P3_evaluator_demo_20261104\\calibration_inputs\\BUDGET_K2",
+      "--rule",
+      "P3-EVAL-BUDGET-001"
+    ],
+    "exit_code": 0,
+    "expected": "FAIL",
+    "actual": "FAIL",
+    "matches": true,
+    "input_hashes_before": {
+      "events.jsonl": "a60a9cf04d45027b3b5cee6b04a2da3e6366d8a5118006a333c63e87f6ba5a1f",
+      "manifest.json": "2f786a4b240c3ad44abdc060bfc3410a5282bcad9964f6af2901b77765658e81",
+      "report.json": "ff41a268e71c2452706b56d2f853642403ded265c5fec57df80fb718e1b5f499"
+    },
+    "input_unchanged": true,
+    "verify_run": {
+      "integrity": "VERIFIED",
+      "run_id": "run_00000000000000000000000000000001",
+      "provenance": "NO_NETWORK_SIMULATION",
+      "approval_verified": false,
+      "appended_bytes": 0
+    }
+  },
+  {
+    "case": "BUDGET_K3",
+    "source": "SYNTHETIC_CALIBRATION_FROM_EXISTING_TEST_HELPER",
+    "input": "D:\\codex\\P3_final_delivery_pack_20261102\\P3_evaluator_demo_20261104\\calibration_inputs\\BUDGET_K3",
+    "argv": [
+      "--run",
+      "D:\\codex\\P3_final_delivery_pack_20261102\\P3_evaluator_demo_20261104\\calibration_inputs\\BUDGET_K3",
+      "--rule",
+      "P3-EVAL-BUDGET-001"
+    ],
+    "exit_code": 0,
+    "expected": "INSUFFICIENT_EVIDENCE",
+    "actual": "INSUFFICIENT_EVIDENCE",
+    "matches": true,
+    "input_hashes_before": {
+      "events.jsonl": "7da452d730b151d98d987416ae6e844eeac39ed7090f59409c14cb0d62cf9644",
+      "report.json": "d85eb5ffa94bf2adebed73ea8028e3095c8fe683a8c867a08005c06f2922ac99"
+    },
+    "input_unchanged": true,
+    "verify_run": {
+      "integrity": "INCOMPLETE_OR_INVALID",
+      "approval_verified": false
+    }
+  },
+  {
+    "case": "REVOKE_K1",
+    "source": "SYNTHETIC_CALIBRATION_FROM_EXISTING_TEST_HELPER",
+    "input": "D:\\codex\\P3_final_delivery_pack_20261102\\P3_evaluator_demo_20261104\\calibration_inputs\\REVOKE_K1",
+    "argv": [
+      "--run",
+      "D:\\codex\\P3_final_delivery_pack_20261102\\P3_evaluator_demo_20261104\\calibration_inputs\\REVOKE_K1",
+      "--rule",
+      "P3-EVAL-REVOKE-001"
+    ],
+    "exit_code": 0,
+    "expected": "PASS",
+    "actual": "PASS",
+    "matches": true,
+    "input_hashes_before": {
+      "events.jsonl": "d8dfbb66216c61033f55f12e78cd1eca4299d23e767b0faa5806dfacbed7a573",
+      "manifest.json": "a5bb612ae6c4108b02dba7c1d6ba419b329827d94870fd9eeb417c8c01e77d47",
+      "report.json": "95fa5c08c83d1dc726c640fcfffa69035d9f53930557ba5317af87f8c754159b"
+    },
+    "input_unchanged": true,
+    "verify_run": {
+      "integrity": "VERIFIED",
+      "run_id": "run_00000000000000000000000000000001",
+      "provenance": "NO_NETWORK_SIMULATION",
+      "approval_verified": false,
+      "appended_bytes": 0
+    }
+  },
+  {
+    "case": "REVOKE_K2",
+    "source": "SYNTHETIC_CALIBRATION_FROM_EXISTING_TEST_HELPER",
+    "input": "D:\\codex\\P3_final_delivery_pack_20261102\\P3_evaluator_demo_20261104\\calibration_inputs\\REVOKE_K2",
+    "argv": [
+      "--run",
+      "D:\\codex\\P3_final_delivery_pack_20261102\\P3_evaluator_demo_20261104\\calibration_inputs\\REVOKE_K2",
+      "--rule",
+      "P3-EVAL-REVOKE-001"
+    ],
+    "exit_code": 0,
+    "expected": "FAIL",
+    "actual": "FAIL",
+    "matches": true,
+    "input_hashes_before": {
+      "events.jsonl": "758c06391a46bc1d3a8b7b4bd7d7d1d10c20d2cce4f2f9d9e45cd8b8e55bcabd",
+      "manifest.json": "b0aa04f42081a2559f1c26c2958a8dbeafbbc8909b68b648a1bb2693354db951",
+      "report.json": "942d58548c5a7df69576804dddf3f7153a9d412a8c93e1af7506cb58a24e62c5"
+    },
+    "input_unchanged": true,
+    "verify_run": {
+      "integrity": "VERIFIED",
+      "run_id": "run_00000000000000000000000000000001",
+      "provenance": "NO_NETWORK_SIMULATION",
+      "approval_verified": false,
+      "appended_bytes": 0
+    }
+  },
+  {
+    "case": "REVOKE_K3",
+    "source": "SYNTHETIC_CALIBRATION_FROM_EXISTING_TEST_HELPER",
+    "input": "D:\\codex\\P3_final_delivery_pack_20261102\\P3_evaluator_demo_20261104\\calibration_inputs\\REVOKE_K3",
+    "argv": [
+      "--run",
+      "D:\\codex\\P3_final_delivery_pack_20261102\\P3_evaluator_demo_20261104\\calibration_inputs\\REVOKE_K3",
+      "--rule",
+      "P3-EVAL-REVOKE-001"
+    ],
+    "exit_code": 0,
+    "expected": "INSUFFICIENT_EVIDENCE",
+    "actual": "INSUFFICIENT_EVIDENCE",
+    "matches": true,
+    "input_hashes_before": {
+      "events.jsonl": "d8dfbb66216c61033f55f12e78cd1eca4299d23e767b0faa5806dfacbed7a573",
+      "manifest.json": "ddf48ef34d916a0b4d8c141583e2a4cbf59c01e5029bcaefef12518399fa98b0",
+      "report.json": "63bded0e69cb91339ef8a05616aca54d09a40d5be56662e5bbadfbe902ccc0ea"
+    },
+    "input_unchanged": true,
+    "verify_run": {
+      "integrity": "VERIFIED",
+      "run_id": "run_00000000000000000000000000000001",
+      "provenance": "NO_NETWORK_SIMULATION",
+      "approval_verified": false,
+      "appended_bytes": 0
+    }
+  }
+]

@@ -1,0 +1,19 @@
+{
+  "test_exit_code": 0,
+  "protected_file_count": 28,
+  "protected_changed": [],
+  "evidence_file_count": 16,
+  "broken_links": [],
+  "source_ast": "PASS",
+  "acceptance_manifest": "14 PENDING_AUTHORIZATION; matches generator and stable names",
+  "network": "socket and DNS blocked across suite; no real HTTP execution",
+  "head": "767b15e9fd5178b13c392a6b326bd6b67f72407a",
+  "staged": [
+    "README.md",
+    "design/P3_supervisor_lifecycle.md",
+    "eval/P3_c3_acceptance_manifest.json",
+    "eval/P3_c3_authorization_checklist.md",
+    "eval/P3_requirement_traceability.md",
+    "review/P3_c3_supervisor_review.md"
+  ]
+}

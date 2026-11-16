@@ -1,0 +1,30 @@
+{
+  "schema_version": "p3-evaluation-v1",
+  "evaluator_version": "1.0",
+  "rule_id": "P3-EVAL-BUDGET-001",
+  "status": "INSUFFICIENT_EVIDENCE",
+  "evidence_directory": "D:\\codex\\P3_final_delivery_pack_20261102\\P3_evaluator_demo_20261104\\calibration_inputs\\BUDGET_K3",
+  "subject_run_id": null,
+  "provenance": "UNVERIFIED_INPUT",
+  "evidence_level": "LOCAL_OFFLINE_RECORD_INTERNAL_CONSISTENCY",
+  "checked_artifacts": [],
+  "observed_facts": {},
+  "evidence_references": [],
+  "limitations": [
+    "Fixed evaluation benchmark p3-eval-trial-eight-v1: at most 8; actual runtime budget configuration is NOT independently bound.",
+    "No independent proof of original input, permission, source authenticity or historical execution version.",
+    "Absence of recorded model dispatch is not proof of no OS/network send.",
+    "No real API verdict, formal course grade or peer reproduction.",
+    "No independent 90-second, concurrency, cancellation, or stop-effective ordering proof; not full REQ-010/GWT-N04/N05 acceptance."
+  ],
+  "missing_evidence": [
+    "MISSING_OR_UNREADABLE_MANIFEST_JSON"
+  ],
+  "suggested_next_check": [
+    "Obtain an intact, attributable client artifact set and unique target registration; preserve current originals."
+  ],
+  "human_signoff": "pending",
+  "score": null,
+  "approval_verified": false,
+  "source_authenticated": false
+}

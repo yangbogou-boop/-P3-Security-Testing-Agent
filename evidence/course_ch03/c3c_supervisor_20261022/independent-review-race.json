@@ -1,0 +1,10 @@
+{
+  "completion_before_reset": "AUDIT_FAILED",
+  "audit_failed_before_reset": true,
+  "fixture_reset_calls": 1,
+  "client_invalidated": true,
+  "caller_result": [
+    "RESET_FAILED"
+  ],
+  "final_state": "FAILED"
+}

@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "--run",
+    "D:\\project\\-P3-Security-Testing-Agent\\evidence\\course_ch03\\eval_20261028_02\\artifacts\\run_ce4b0027ae024f05a72d81173c9f05e2",
+    "--all",
+    "--format",
+    "text"
+  ],
+  "exit_code": 0
+}

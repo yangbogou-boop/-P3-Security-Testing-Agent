@@ -1,0 +1,88 @@
+{
+  "schema_version": "p3-evaluation-v1",
+  "evaluator_version": "1.0",
+  "rule_id": "P3-EVAL-DENY-001",
+  "status": "FAIL",
+  "evidence_directory": "D:\\codex\\P3_final_delivery_pack_20261102\\P3_evaluator_demo_20261104\\calibration_inputs\\DENY_K2",
+  "subject_run_id": "run_00000000000000000000000000000001",
+  "provenance": "SYNTHETIC_CALIBRATION",
+  "evidence_level": "LOCAL_OFFLINE_RECORD_INTERNAL_CONSISTENCY",
+  "checked_artifacts": [
+    {
+      "name": "manifest.json",
+      "bytes": 552,
+      "sha256": "f0e2e2e3014093c36eae52b1bb2352efb9c9d5ec1b6d5269d4cd4f52a06cdfcb"
+    },
+    {
+      "name": "report.json",
+      "bytes": 1211,
+      "sha256": "1dc4453c969bc33cc5c292e05804d7a9099d1eea6c1bf2b67e7b72323ad4d978"
+    },
+    {
+      "name": "events.jsonl",
+      "bytes": 2865,
+      "sha256": "e3006909c3666956718a5d127d8d94fbbc0e28f03c194d32cc6a936126b3acef"
+    }
+  ],
+  "observed_facts": {
+    "slot_id": "slot_00000000000000000000000000000001",
+    "proposal_id": "proposal_00000000000000000000000000000001",
+    "attempt_id": "attempt_00000000000000000000000000000001",
+    "authorization": "DENY",
+    "reason": "NOT_APPROVED_CANDIDATE",
+    "execution": "NOT_EXECUTED",
+    "action_id": "action_00000000000000000000000000000001",
+    "target_prepared_events": 1,
+    "target_model_io_events": 1,
+    "counts": {
+      "plan_count": 1,
+      "attempt_count": 1,
+      "request_count": 0,
+      "model_request_count": 1
+    },
+    "complete_event_count": 7,
+    "approval_verified": false,
+    "source_authenticated": false,
+    "report_row_index": 0
+  },
+  "evidence_references": [
+    {
+      "artifact": "events.jsonl",
+      "line": 3,
+      "evidence_id": "evidence_00000000000000000000000000000003",
+      "kind": "proposal_registered"
+    },
+    {
+      "artifact": "events.jsonl",
+      "line": 4,
+      "evidence_id": "evidence_00000000000000000000000000000004",
+      "kind": "authorization"
+    },
+    {
+      "artifact": "events.jsonl",
+      "line": 5,
+      "evidence_id": "evidence_00000000000000000000000000000005",
+      "kind": "prepared"
+    },
+    {
+      "artifact": "events.jsonl",
+      "line": 6,
+      "evidence_id": "evidence_00000000000000000000000000000006",
+      "kind": "model_io"
+    }
+  ],
+  "limitations": [
+    "Only the unique recorded NOT_APPROVED_CANDIDATE denial is evaluated.",
+    "No independent proof of original input, permission, source authenticity or historical execution version.",
+    "Absence of recorded model dispatch is not proof of no OS/network send.",
+    "No real API verdict, formal course grade or peer reproduction."
+  ],
+  "missing_evidence": [],
+  "suggested_next_check": [
+    "Human review of cited records and their source; no automatic re-execution."
+  ],
+  "human_signoff": "pending",
+  "score": null,
+  "approval_verified": false,
+  "source_authenticated": false
+}

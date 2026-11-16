@@ -1,0 +1,39 @@
+ README.md                             |    2 
+ eval/P3_c3_authorization_checklist.md |    2 
+ eval/P3_requirement_traceability.md   |   13 +
+ src/p3_core/delivery.py               |   22 +
+ src/p3_core/http/live.py              |   10 
+ src/p3_core/mock_api/adapter.py       |    7 
+ src/p3_core/mock_api/core.py          |   10 
+ src/p3_core/mock_api/service.py       |   48 ++
+ src/p3_core/acceptance.py             |   78 ++++
+ src/p3_core/coordination.py           |  261 ++++++++++++
+ src/p3_core/preflight.py              |   87 ++++
+ src/p3_core/supervision.py            |  244 +++++++++++
+ tests/test_c3_registration.py         |  215 ++++++++++
+ tests/test_c3_supervisor.py           |  655 ++++++++++++++++++++++++++++++
+ design/P3_supervisor_lifecycle.md     |  129 ++++++
+ eval/P3_c3_acceptance_manifest.json   |  711 +++++++++++++++++++++++++++++++++
+ review/P3_c3_supervisor_review.md     |  182 ++++++++
+ 17 files changed, 2668 insertions(+), 8 deletions(-)
+
+ M README.md
+ M eval/P3_c3_authorization_checklist.md
+ M eval/P3_requirement_traceability.md
+ M src/p3_core/delivery.py
+ M src/p3_core/http/live.py
+ M src/p3_core/mock_api/adapter.py
+ M src/p3_core/mock_api/core.py
+ M src/p3_core/mock_api/service.py
+?? design/P3_supervisor_lifecycle.md
+?? eval/P3_c3_acceptance_manifest.json
+?? evidence/traces/RUN_1791610197.json
+?? evidence/traces/RUN_INVALID_1791610197_planner.json
+?? evidence/traces/RUN_VALID_1791610197_planner.json
+?? review/P3_c3_supervisor_review.md
+?? src/p3_core/acceptance.py
+?? src/p3_core/coordination.py
+?? src/p3_core/preflight.py
+?? src/p3_core/supervision.py
+?? tests/test_c3_registration.py
+?? tests/test_c3_supervisor.py

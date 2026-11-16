@@ -1,0 +1,6 @@
+test_missing_sidecar_never_creates_or_commits_fixture (test_c3_supervisor.SupervisorTests) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+OK

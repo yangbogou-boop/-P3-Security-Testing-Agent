@@ -1,0 +1,14 @@
+test_missing_sidecar_never_creates_or_commits_fixture (test_c3_supervisor.SupervisorTests) ... FAIL
+
+======================================================================
+FAIL: test_missing_sidecar_never_creates_or_commits_fixture (test_c3_supervisor.SupervisorTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\project\-P3-Security-Testing-Agent\tests\test_c3_supervisor.py", line 69, in test_missing_sidecar_never_creates_or_commits_fixture
+    with self.assertRaises(InvalidInput):self.supervisor.prepare_next(Mode.GOOD)
+AssertionError: InvalidInput not raised
+
+----------------------------------------------------------------------
+Ran 1 test in 0.002s
+
+FAILED (failures=1)

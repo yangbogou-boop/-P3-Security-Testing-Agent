@@ -1,0 +1,105 @@
+{
+  "schema_version": "p3-evaluation-v1",
+  "evaluator_version": "1.0",
+  "rule_id": "P3-EVAL-REVOKE-001",
+  "status": "FAIL",
+  "evidence_directory": "D:\\codex\\P3_final_delivery_pack_20261102\\P3_evaluator_demo_20261104\\calibration_inputs\\REVOKE_K2",
+  "subject_run_id": "run_00000000000000000000000000000001",
+  "provenance": "SYNTHETIC_CALIBRATION",
+  "evidence_level": "LOCAL_OFFLINE_RECORD_INTERNAL_CONSISTENCY",
+  "checked_artifacts": [
+    {
+      "name": "manifest.json",
+      "bytes": 552,
+      "sha256": "b0aa04f42081a2559f1c26c2958a8dbeafbbc8909b68b648a1bb2693354db951"
+    },
+    {
+      "name": "report.json",
+      "bytes": 1395,
+      "sha256": "942d58548c5a7df69576804dddf3f7153a9d412a8c93e1af7506cb58a24e62c5"
+    },
+    {
+      "name": "events.jsonl",
+      "bytes": 3435,
+      "sha256": "758c06391a46bc1d3a8b7b4bd7d7d1d10c20d2cce4f2f9d9e45cd8b8e55bcabd"
+    }
+  ],
+  "observed_facts": {
+    "counts": {
+      "attempt_count": 1,
+      "request_count": 0,
+      "model_request_count": 1,
+      "plan_count": 1
+    },
+    "revoke_effective_sequence": 3,
+    "boundary_source": "report.json",
+    "revocation_boundary_authenticated": false,
+    "post_revoke_connect_operations": 0,
+    "post_revoke_write_operations": 1,
+    "post_revoke_added_simulated_bytes": 6,
+    "comparable_model_io_events": 3,
+    "late_or_duplicate_records": 0,
+    "response_timing_relative_to_revoke": "NOT_ESTABLISHED",
+    "violation_event_ids": [
+      "evidence_00000000000000000000000000000008"
+    ]
+  },
+  "evidence_references": [
+    {
+      "artifact": "events.jsonl",
+      "line": 6,
+      "evidence_id": "evidence_00000000000000000000000000000006",
+      "action_id": "action_00000000000000000000000000000001",
+      "phase": "CONNECT",
+      "gate_sequence": 1,
+      "revoke_effective_sequence": 3,
+      "sent_bytes_before": 0,
+      "sent_bytes": 0,
+      "simulated_byte_delta": 0,
+      "after_declared_revoke": false
+    },
+    {
+      "artifact": "events.jsonl",
+      "line": 7,
+      "evidence_id": "evidence_00000000000000000000000000000007",
+      "action_id": "action_00000000000000000000000000000001",
+      "phase": "WRITE",
+      "gate_sequence": 2,
+      "revoke_effective_sequence": 3,
+      "sent_bytes_before": 0,
+      "sent_bytes": 10,
+      "simulated_byte_delta": 10,
+      "after_declared_revoke": false
+    },
+    {
+      "artifact": "events.jsonl",
+      "line": 8,
+      "evidence_id": "evidence_00000000000000000000000000000008",
+      "action_id": "action_00000000000000000000000000000001",
+      "phase": "WRITE",
+      "gate_sequence": 4,
+      "revoke_effective_sequence": 3,
+      "sent_bytes_before": 10,
+      "sent_bytes": 16,
+      "simulated_byte_delta": 6,
+      "after_declared_revoke": true
+    }
+  ],
+  "limitations": [
+    "Compare recorded model I/O gates with the report-declared revocation gate only; no independent revoke-effective event exists.",
+    "No independent proof of original input, permission, source authenticity or historical execution version.",
+    "Absence of recorded model dispatch is not proof of no OS/network send.",
+    "No real API verdict, formal course grade or peer reproduction.",
+    "Cumulative byte deltas are simulated; no proof of real revocation, socket closure, OS send cessation, cancellation latency or full REQ-011/GWT-A03 acceptance."
+  ],
+  "missing_evidence": [],
+  "suggested_next_check": [
+    "Human review of cited records and their source; no automatic re-execution."
+  ],
+  "human_signoff": "pending",
+  "score": null,
+  "approval_verified": false,
+  "source_authenticated": false,
+  "revocation_boundary_authenticated": false,
+  "evaluation_scope": "RECORDED_GATE_ORDER_CONSISTENCY"
+}
