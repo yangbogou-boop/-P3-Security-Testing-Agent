@@ -57,6 +57,18 @@ class RemainingTests(unittest.TestCase):
         self.assertEqual(len(set(r['order'])),6)
         self.assertNotEqual(r['order'],run_scenario()['order'])
 
+    def test_stopped_experiment_coverage_uses_full_candidate_set(self):
+        for strategy in ('fixed', 'dynamic'):
+            with self.subTest(strategy=strategy):
+                result = run_scenario(strategy=strategy, fault='timeout')
+                self.assertEqual(result['report']['state'], 'STOPPED')
+                self.assertEqual(result['metrics']['coverage']['numerator'], 0)
+                self.assertEqual(result['metrics']['coverage']['denominator'], len(self.cfg.candidates))
+                contract = result['experiment_contract']
+                self.assertEqual(contract['candidates'], self.cfg.candidate_version)
+                self.assertEqual(contract['matrix'], self.cfg.matrix_version)
+                self.assertEqual(contract['fixture'], self.cfg.fixture_version)
+
     def test_three_defects_both_strategies(self):
         for mode in ('auth','bola','rbac'):
             for strategy in ('fixed','dynamic'):

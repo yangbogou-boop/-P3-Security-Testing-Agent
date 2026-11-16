@@ -2,9 +2,10 @@
 
 P3 是面向软件验收阶段的黑盒授权安全测试 Agent；当前推荐产品为有限离线模拟与独立只读证据评价。
 
-## 权威入口与模块地图
+## 开发导航与模块定位
 
-- [RC2](brief/P3_specification_v1.0-rc2.md)、[授权边界](brief/P3_authorization_boundary.md)、[治理](brief/P3_decision_governance.md)：需求、执行范围与工程决策；[GWT](eval/P3_GWT_scenarios.md)定义验收，不是运行证明。design/ 中保留 ADR 历史，区分 Accepted 和 Proposed。
+从[项目文档索引](docs/INDEX.md)查找当前规格、设计、验收与历史记录。
+
 - `src/p3_core/planner.py`、`controller.py`：原离线 Planner 与独立授权、预算、停止；`dispatch.py`、`evidence.py`：假派发与审计。拒绝审计优先查看这些模块及 `tests/test_core.py`。
 - `src/p3_core/http/machine.py`、`protocol.py`、`audit.py`：受控 HTTP 模型状态机、响应判定、完整性核验；对应 `tests/test_http_core.py`。`http/strategies.py` 为固定／动态选择。
 - `src/p3_core/mock_api/`、`trusted_host.py`、`supervision.py`、`coordination.py`：合成夹具、离线宿主、生命周期及证据协调。`http/live.py`、`mock_api/service.py` 含真实传输组件，代码存在不构成执行许可。
@@ -27,6 +28,7 @@ $env:PYTHONDONTWRITEBYTECODE = '1'
 python -m unittest discover -s tests -v
 python -m p3_core.delivery --help
 python -m p3_core.evaluator --help
+python tools/check_doc_links.py
 ```
 
 推荐产品入口 `python -m p3_core.delivery` 需要子命令，例如：

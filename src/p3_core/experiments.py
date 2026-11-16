@@ -96,7 +96,7 @@ def run_scenario(mode='good',strategy='fixed',*,output=None,fault=None):
     true_failure={'auth':'HTTP-N-AUTH','bola':'HTTP-N-BOLA','rbac':'HTTP-N-RBAC'}.get(mode)
     confirmed=[r for r in report['checks'] if r['simulated_conclusion'] in ('PASS','FAIL')]
     failures=[r['check_id'] for r in report['checks'] if r['simulated_conclusion']=='FAIL']
-    metrics=dict(coverage=dict(numerator=len(confirmed),denominator=6),
+    metrics=dict(coverage=dict(numerator=len(confirmed),denominator=len(run.config.candidates)),
         detected=dict(numerator=int(true_failure in failures) if true_failure else 0,denominator=int(true_failure is not None),
                       applicable=true_failure is not None),
         false_confirmations=sum(x!=true_failure for x in failures),
@@ -112,7 +112,8 @@ def run_scenario(mode='good',strategy='fixed',*,output=None,fault=None):
     return dict(provenance='NO_NETWORK_SIMULATION',network_status='PENDING_AUTHORIZATION',
         mode=mode,strategy=strategy,fault=fault,order=order,metrics=metrics,report=report,
         integrity=verify_run(Path(output)/run.run_id) if output is not None else None,
-        experiment_contract=dict(candidates='six-v1',matrix='p3-matrix-v1',fixture='synthetic-v1',
+        experiment_contract=dict(candidates=raw['candidate_version'],matrix=raw['matrix_version'],
+                                 fixture=raw['fixture_version'],
                                  budget=raw['budget'],objective='all six checks with controls',
                                  reset='fresh isolated equivalent fixture and synthetic approval per run'))
 
