@@ -103,3 +103,93 @@ class OfflineSummaryTests(unittest.TestCase):
         with patch('p3_core.delivery.run_scenario',side_effect=AssertionError('NO_RUN')):
             with contextlib.redirect_stdout(io.StringIO()):
                 self.assertEqual(main(['offline','--run',str(path)]),0)
+
+
+class ReviewedSummaryTests(unittest.TestCase):
+    """A V2 record must never be summarised on generic integrity alone."""
+
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        for name in ('socket', 'create_connection', 'getaddrinfo', 'gethostbyname'):
+            guard = patch.object(socket, name, side_effect=AssertionError('NETWORK_FORBIDDEN'))
+            guard.start()
+            self.addCleanup(guard.stop)
+
+    def reviewed_case(self):
+        from p3_core.evidence import JsonlEvidence
+        from p3_core.http.audit import BoundedEvidence
+        from p3_core.http.catalog_fixture import CatalogFixture
+        from p3_core.http.reviewed_contract import _bind_reviewed_contract
+        from p3_core.http.reviewed_runtime import ReviewedOfflineRun
+        from p3_core.http.reviewed_snapshot import build_snapshot
+        try:
+            from tests.test_catalog_fixture import make_contract_document, reviewed_inputs
+        except Exception:  # pragma: no cover
+            from test_catalog_fixture import make_contract_document, reviewed_inputs
+        fixture = CatalogFixture('documents')
+        document = make_contract_document('documents', fixture)
+        binding, review, registry = reviewed_inputs(document, fixture.instance_id())
+        snapshot = build_snapshot(
+            _bind_reviewed_contract(review, registry=registry, now=10, **binding), fixture)
+        run = ReviewedOfflineRun(snapshot, fixture,
+                                 evidence=BoundedEvidence(JsonlEvidence(self.root)),
+                                 credentials=fixture.credentials())
+        run.start()
+        for check_id in ('CAT-C-DOC-A-READER', 'CAT-N-DOC-B-READER',
+                         'CAT-C-DOC-B-OWNER', 'CAT-N-DOC-A-ANON'):
+            run.submit_id(check_id)
+        for _ in range(40):
+            run.step()
+        report = run.finalize()
+        return self.root / report['run_id'], report
+
+    def test_v2_is_not_reported_complete(self):
+        path, report = self.reviewed_case()
+        self.assertEqual(report['mode'], 'reviewed-offline-simulation')
+        summary = summarize(path)
+        self.assertNotEqual(summary['status'], 'COMPLETE')
+        self.assertEqual(summary['status'], 'V2_EVIDENCE_CONSISTENT')
+        self.assertFalse(summary['approval_verified'])
+        self.assertFalse(summary['source_authenticated'])
+        self.assertFalse(summary['reviewed_evidence']['runtime_authorisation_verified'])
+
+    def test_v2_inconsistent_counts_is_flagged(self):
+        import hashlib
+        import json
+        path, report = self.reviewed_case()
+        report['reviewed_counts']['dispatch_accepted_count'] += 1
+        canonical = json.dumps(report, sort_keys=True, ensure_ascii=False,
+                               allow_nan=False).encode('utf-8')
+        (path / 'report.json').write_text(
+            json.dumps(report, sort_keys=True, ensure_ascii=False), encoding='utf-8')
+        manifest = json.loads((path / 'manifest.json').read_text(encoding='utf-8'))
+        manifest['report_sha256'] = hashlib.sha256(canonical).hexdigest()
+        (path / 'manifest.json').write_text(json.dumps(manifest), encoding='utf-8')
+        self.assertEqual(summarize(path)['status'], 'V2_EVIDENCE_INCONSISTENT')
+
+    def test_v1_summary_has_no_reviewed_evidence_branch(self):
+        result = run_scenario('good', output=self.root)
+        path = self.root / result['report']['run_id']
+        summary = summarize(path)
+        self.assertEqual(summary['status'], 'COMPLETE')
+        self.assertNotIn('reviewed_evidence', summary)
+
+    def test_v2_double_field_removal_is_still_gated(self):
+        """Removing mode *and* reviewed_counts must not turn V2 into V1 COMPLETE."""
+        import hashlib
+        import json
+        path, report = self.reviewed_case()
+        report['mode'] = 'http-local-simulation'
+        report.pop('reviewed_counts')
+        canonical = json.dumps(report, sort_keys=True, ensure_ascii=False,
+                               allow_nan=False).encode('utf-8')
+        (path / 'report.json').write_text(
+            json.dumps(report, sort_keys=True, ensure_ascii=False), encoding='utf-8')
+        manifest = json.loads((path / 'manifest.json').read_text(encoding='utf-8'))
+        manifest['report_sha256'] = hashlib.sha256(canonical).hexdigest()
+        (path / 'manifest.json').write_text(json.dumps(manifest), encoding='utf-8')
+        summary = summarize(path)
+        self.assertNotEqual(summary['status'], 'COMPLETE')
+        self.assertEqual(summary['status'], 'INSUFFICIENT_EVIDENCE')

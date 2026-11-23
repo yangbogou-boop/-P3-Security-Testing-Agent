@@ -647,3 +647,134 @@ class ReviewedRuntimeTests(unittest.TestCase):
         verdicts = [r['simulated_conclusion'] for r in report['checks']]
         self.assertNotIn('PASS', verdicts)
         self.assertNotIn('FAIL', verdicts)
+
+    # -- 3B-1: cancellation is idempotent and counted once ------------------
+    def test_stop_between_poll_and_accept_cancels_once(self):
+        """Deterministic interleaving: poll() sees a valid licence, the accept
+        checkpoint sees an expired one, so _stop_locked cancels the prepared slot
+        and _accept then re-enters the same slot."""
+        import inspect
+        holder = {'expire_in_accept': False}
+
+        def wall_clock():
+            if holder['expire_in_accept'] and any(
+                    frame.function == '_accept' for frame in inspect.stack()):
+                return holder['valid_until'] + 1
+            return 100.0
+
+        run, _, snapshot = bound(wall_clock=wall_clock)
+        holder['valid_until'] = snapshot.valid_until
+        run.start()
+        run.submit_id(ALLOW)
+        run.step()   # authorize
+        run.step()   # prepare
+        self.assertEqual(run.reviewed_counts()['prepared_count'], 1)
+        holder['expire_in_accept'] = True
+        run.step()   # poll passes, accept checkpoint fails, re-entry must not double count
+        counts = run.reviewed_counts()
+        self.assertEqual(counts['dispatch_accepted_count'], 0)
+        self.assertEqual(counts['dispatch_cancelled_count'], 1)
+        self.assertEqual(counts['prepared_count'], 1)
+        cancel_events = [e for e in run.evidence.events
+                         if e['kind'] == 'reviewed_dispatch_cancelled']
+        self.assertEqual(len(cancel_events), 1)
+        self.assertEqual(len({e['slot_id'] for e in cancel_events}), 1)
+        self.assertEqual(run.check_invariants(), [])
+        self.assertEqual(run.reason, 'AUTHORIZATION_INVALID')
+
+    def test_cancelled_slot_cannot_be_cancelled_twice(self):
+        run, _, _ = bound()
+        run.start()
+        run.submit_id(ALLOW)
+        run.step()   # authorize
+        run.step()   # prepare
+        slot = run._slots[0]
+        run._revoked = True          # stop lands inside the poll->accept window
+        run._accept(slot)            # _stop_locked cancels, then accept re-enters
+        counts = run.reviewed_counts()
+        self.assertEqual(counts['dispatch_cancelled_count'], 1)
+        self.assertEqual(slot.phase, 'CANCELLED')
+        self.assertEqual(sum(1 for e in run.evidence.events
+                             if e['kind'] == 'reviewed_dispatch_cancelled'), 1)
+        self.assertEqual(run.check_invariants(), [])
+        # A second entry must be a pure no-op.
+        run._accept(slot)
+        self.assertEqual(run.reviewed_counts()['dispatch_cancelled_count'], 1)
+
+    def test_accepted_slot_is_never_cancelled(self):
+        run, _, _ = bound()
+        run.start()
+        run.submit_id(ALLOW)
+        for _ in range(3):
+            run.step()   # authorize, prepare, accept
+        slot = run._slots[0]
+        self.assertEqual(slot.phase, 'ACCEPTED')
+        self.assertFalse(run._cancel_slot_locked(slot, 'SHOULD_NOT_HAPPEN'))
+        self.assertEqual(slot.phase, 'ACCEPTED')
+        self.assertEqual(run.reviewed_counts()['dispatch_cancelled_count'], 0)
+
+    def test_audit_failure_does_not_duplicate_cancel(self):
+        sink = _FailingSink(fail_after=3)   # authorization event persists, prepared fails
+        run, _, _ = bound(evidence=BoundedEvidence(sink))
+        run.start()
+        run.submit_id(ALLOW)
+        run.step()   # authorize
+        run.step()   # prepare -> its event fails, audit gap stops the run
+        counts = run.reviewed_counts()
+        self.assertTrue(run.report()['audit_gap'])
+        self.assertEqual(counts['dispatch_accepted_count'], 0)
+        self.assertLessEqual(counts['dispatch_cancelled_count'], counts['prepared_count'])
+        self.assertEqual(run.check_invariants(), [])
+
+    def test_cancel_invariant_holds_on_every_stop_path(self):
+        # revoked before authorize
+        run, _, _ = bound()
+        run.start()
+        run.revoke()
+        run.step()
+        self.assertEqual(run.check_invariants(), [])
+        # revoked after prepare
+        run, _, _ = bound()
+        run.start()
+        run.submit_id(ALLOW)
+        run.step(); run.step()
+        run.revoke(); run.step()
+        self.assertEqual(run.check_invariants(), [])
+        # revoked after accept
+        run, _, _ = bound()
+        run.start()
+        run.submit_id(ALLOW)
+        for _ in range(3):
+            run.step()
+        run.revoke(); run.step()
+        self.assertEqual(run.check_invariants(), [])
+        # completed
+        run, _, _ = bound()
+        run.start()
+        run.submit_id(ALLOW)
+        for _ in range(8):
+            run.step()
+        run.finalize()
+        self.assertEqual(run.check_invariants(), [])
+
+    def test_both_scenarios_complete_all_candidates_after_fix(self):
+        for scenario, ids in (
+                ('documents', ['CAT-C-DOC-A-READER', 'CAT-N-DOC-B-READER',
+                               'CAT-C-DOC-B-OWNER', 'CAT-N-DOC-A-ANON']),
+                ('directories', ['CAT-C-DIR-A-VIEWER', 'CAT-N-DIR-B-VIEWER',
+                                 'CAT-C-DIR-B-OWNER'])):
+            run, _, _ = bound(scenario)
+            run.start()
+            for check_id in ids:
+                self.assertTrue(run.submit_id(check_id))
+            for _ in range(30):
+                run.step()
+            report = run.finalize()
+            counts = report['reviewed_counts']
+            self.assertEqual(report['state'], 'COMPLETED')
+            self.assertEqual(counts['dispatch_cancelled_count'], 0)
+            self.assertEqual(counts['dispatch_accepted_count'], len(ids))
+            self.assertEqual(counts['fixture_handled_count'], len(ids))
+            self.assertEqual(run.check_invariants(), [])
+            self.assertTrue(all(row['simulated_conclusion'] == 'PASS'
+                                for row in report['checks']))

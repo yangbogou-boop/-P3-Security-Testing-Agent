@@ -194,11 +194,26 @@ class ReviewedOfflineRun:
                                contract_id=self._snapshot.contract_id,
                                fixture_instance_id=self._snapshot.fixture_instance_id))
 
+    def _cancel_slot_locked(self, slot, reason):
+        """Cancel a prepared-but-not-accepted slot at most once (single exit).
+
+        ``CANCELLED``/``ACCEPTED``/``DONE`` are terminal for this transition, so a
+        second cancellation attempt from another path cannot double count or emit a
+        second event.  The event itself is emitted outside the gate by the drain.
+        """
+        if slot.phase in ('CANCELLED', 'ACCEPTED', 'DONE'):
+            return False
+        slot.phase = 'CANCELLED'
+        self._counters['dispatch_cancelled_count'] += 1
+        self._cancelled_slots.append((slot.slot_id, slot.action_id, reason))
+        return True
+
     def _drain_stop_events(self):
         """Emit events for deliveries cancelled/aborted at stop time (outside the gate)."""
         while self._cancelled_slots:
-            slot_id = self._cancelled_slots.pop(0)
-            self._emit('reviewed_dispatch_cancelled', slot_id=slot_id, reason=self.reason)
+            slot_id, action_id, reason = self._cancelled_slots.pop(0)
+            self._emit('reviewed_dispatch_cancelled', slot_id=slot_id,
+                       action_id=action_id, reason=reason or self.reason)
         while self._aborted_tickets:
             action_id, dispatch_seq = self._aborted_tickets.pop(0)
             self._emit('reviewed_delivery_aborted', action_id=action_id,
@@ -238,9 +253,7 @@ class ReviewedOfflineRun:
         # A prepared request that never reached the ledger is cancelled, never dispatched.
         for row in self._slots:
             if row.phase == 'PREPARED':
-                row.phase = 'CANCELLED'
-                self._counters['dispatch_cancelled_count'] += 1
-                self._cancelled_slots.append(row.slot_id)
+                self._cancel_slot_locked(row, reasons[0])
         # An accepted delivery that was not consumed can never be consumed now;
         # the acceptance itself is never rewritten.
         self._abort_ticket_locked()
@@ -466,12 +479,10 @@ class ReviewedOfflineRun:
                 self._counters['dispatch_accepted_count'] += 1
                 accepted = True
             if cancelled:
-                self._counters['dispatch_cancelled_count'] += 1
-                slot.phase = 'CANCELLED'
+                # Idempotent: _stop_locked may already have cancelled this slot.
+                self._cancel_slot_locked(slot, self.reason or 'DISPATCH_CANCELLED')
         if not accepted:
             self._drain_stop_events()
-            self._emit('reviewed_dispatch_cancelled', slot_id=slot.slot_id,
-                       action_id=slot.action_id, reason=self.reason)
             return False
         return bool(self._emit('reviewed_dispatch_accepted', slot_id=slot.slot_id,
                                action_id=slot.action_id, dispatch_seq=seq,
@@ -636,6 +647,10 @@ class ReviewedOfflineRun:
             problems.append('consumed>accepted')
         if counters['dispatch_accepted_count'] > counters['prepared_count']:
             problems.append('accepted>prepared')
+        if (counters['dispatch_accepted_count'] + counters['dispatch_cancelled_count']
+                > counters['prepared_count']):
+            # A prepared slot ends in at most one of {accepted, cancelled}.
+            problems.append('accepted+cancelled>prepared')
         if counters['prepared_count'] > counters['authorized_count']:
             problems.append('prepared>authorized')
         if (counters['authorization_decisions']

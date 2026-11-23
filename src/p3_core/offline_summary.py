@@ -4,6 +4,58 @@ from pathlib import Path
 from .evaluator import local_directory, read_snapshot, strict_json
 from .http.audit import verify_run
 
+REVIEWED_MODE = 'reviewed-offline-simulation'
+REVIEWED_MARKERS = ('reviewed_counts', 'resource_fingerprint', 'evidence_complete',
+                    'unpersisted_event_kinds', 'fixture_content_sha256')
+
+
+def _looks_reviewed(report, rows, events):
+    """Classify V2 evidence by structure, never by a single mutable field.
+
+    Removing ``mode`` (or ``mode`` plus ``reviewed_counts``) must not downgrade a
+    V2 record to V1: the event kinds and the V2-only row field are also decisive.
+    """
+    if report.get('mode') == REVIEWED_MODE:
+        return True
+    if any(name in report for name in REVIEWED_MARKERS):
+        return True
+    if any(str(event.get('kind', '')).startswith('reviewed_') for event in events):
+        return True
+    return any(isinstance(row, dict) and 'dispatch_seq' in row for row in rows)
+
+
+def _reviewed_summary(out, directory):
+    """V2 evidence is never summarised on generic integrity alone.
+
+    The independent verifier must agree before anything better than
+    ``INSUFFICIENT_EVIDENCE`` is shown, and even then the status only claims that
+    the stored evidence is internally consistent.
+    """
+    try:
+        from .http.reviewed_evidence import verify as verify_reviewed
+        checked = verify_reviewed(directory)
+    except Exception:
+        out['status'] = 'V2_UNVERIFIED'
+        out['reviewed_evidence'] = None
+        return out
+    out['reviewed_evidence'] = dict(
+        consistent=checked.get('consistent'), axes=checked.get('axes'),
+        gaps=checked.get('gaps'), violations=checked.get('violations'),
+        approval_verified=False, source_authenticated=False,
+        runtime_authorisation_verified=False)
+    out['approval_verified'] = False
+    out['source_authenticated'] = False
+    axes = checked.get('axes') or {}
+    if checked.get('consistent'):
+        out['status'] = 'V2_EVIDENCE_CONSISTENT'
+    elif (axes.get('file_integrity') != 'VERIFIED'
+          or axes.get('evidence_completeness') != 'COMPLETE'):
+        out['status'] = 'INSUFFICIENT_EVIDENCE'
+    else:
+        out['status'] = 'V2_EVIDENCE_INCONSISTENT'
+    return out
+
+
 def output_directory(value):
     # Validate existing ancestors before creating a new local output directory.
     raw = str(value)
@@ -59,6 +111,8 @@ def summarize(directory):
                 or r.get('authorization') not in ('ALLOW','DENY','NOT_EVALUATED')
                 or r.get('execution') not in ('NOT_EXECUTED','EXECUTED','ERROR','TIMEOUT') for r in rows): return out
         out.update(provenance=report['provenance'], integrity=checked, report=report)
+        if _looks_reviewed(report, rows, events):
+            return _reviewed_summary(out, directory)
         valid = [r for r in rows if r.get('simulated_conclusion') in ('PASS', 'FAIL')]
         out['status'] = ('SAFETY_STOP' if report.get('state') == 'STOPPED' else
                          'NO_VALID_TESTS' if not valid else
