@@ -204,6 +204,30 @@ class OfflineHost:
         return result
 
 
+def build_reviewed_offline_run(review, fixture, *, registry, now,
+                               registry_ref, authorization_id, authorization_version,
+                               evidence=None):
+    """Trusted-host entry for a reviewed V2 offline run.
+
+    Verifies the reviewed contract, the review material origin, the registry
+    scope, the fixture identity/version/content digest, the reviewed matrix and
+    the response rules before any run exists.  This entry deliberately has no
+    network, listener or CLI switch; it only assembles an authorised offline
+    context.
+    """
+    from .http.reviewed_contract import _bind_reviewed_contract
+    from .http.reviewed_runtime import ReviewedOfflineRun
+    from .http.reviewed_snapshot import build_snapshot
+
+    binding = _bind_reviewed_contract(
+        review, registry=registry, now=now, registry_ref=registry_ref,
+        authorization_id=authorization_id, authorization_version=authorization_version,
+        fixture_instance_id=fixture.instance_id())
+    snapshot = build_snapshot(binding, fixture)
+    return ReviewedOfflineRun(snapshot, fixture, evidence=evidence,
+                              credentials=fixture.credentials())
+
+
 def main():
     parser=argparse.ArgumentParser(description='Offline simulation only; no network permission')
     parser.add_argument('--output', required=True)
