@@ -6,10 +6,11 @@ from .http.audit import verify_run
 
 REVIEWED_MODE = 'reviewed-offline-simulation'
 REVIEWED_MARKERS = ('reviewed_counts', 'resource_fingerprint', 'evidence_complete',
-                    'unpersisted_event_kinds', 'fixture_content_sha256')
+                    'unpersisted_event_kinds', 'fixture_content_sha256', 'reviewed_scope',
+                    'evidence_version')
 
 
-def _looks_reviewed(report, rows, events):
+def _looks_reviewed(report, manifest, rows, events):
     """Classify V2 evidence by structure, never by a single mutable field.
 
     Removing ``mode`` (or ``mode`` plus ``reviewed_counts``) must not downgrade a
@@ -18,6 +19,8 @@ def _looks_reviewed(report, rows, events):
     if report.get('mode') == REVIEWED_MODE:
         return True
     if any(name in report for name in REVIEWED_MARKERS):
+        return True
+    if 'reviewed_scope_sha256' in manifest or 'evidence_version' in manifest:
         return True
     if any(str(event.get('kind', '')).startswith('reviewed_') for event in events):
         return True
@@ -111,7 +114,7 @@ def summarize(directory):
                 or r.get('authorization') not in ('ALLOW','DENY','NOT_EVALUATED')
                 or r.get('execution') not in ('NOT_EXECUTED','EXECUTED','ERROR','TIMEOUT') for r in rows): return out
         out.update(provenance=report['provenance'], integrity=checked, report=report)
-        if _looks_reviewed(report, rows, events):
+        if _looks_reviewed(report, manifest, rows, events):
             return _reviewed_summary(out, directory)
         valid = [r for r in rows if r.get('simulated_conclusion') in ('PASS', 'FAIL')]
         out['status'] = ('SAFETY_STOP' if report.get('state') == 'STOPPED' else

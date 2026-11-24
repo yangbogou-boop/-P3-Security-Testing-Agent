@@ -8,18 +8,26 @@ import threading
 import unittest
 from pathlib import Path
 
-from p3_core.evidence import JsonlEvidence
+from p3_core.evidence import JsonlEvidence, MemoryEvidence
 from p3_core.http.audit import BoundedEvidence, verify_run
 from p3_core.http.catalog_fixture import CatalogFixture
-from p3_core.http.reviewed_contract import _bind_reviewed_contract
-from p3_core.http.reviewed_runtime import COUNTER_KEYS, ReviewedOfflineRun
+from p3_core.http.reviewed_contract import (
+    _bind_reviewed_contract, parse_contract, review_scope_digest,
+)
+from p3_core.http.reviewed_runtime import (
+    COUNTER_KEYS, EVIDENCE_VERSION, ReviewedOfflineRun,
+)
 from p3_core.http.reviewed_snapshot import build_snapshot
 from p3_core.models import InvalidInput
 
 try:
-    from tests.test_catalog_fixture import make_contract_document, reviewed_inputs
+    from tests.test_catalog_fixture import (
+        encode, make_contract_document, material, reviewed_inputs,
+    )
 except Exception:  # pragma: no cover - discovery imports modules as top level
-    from test_catalog_fixture import make_contract_document, reviewed_inputs
+    from test_catalog_fixture import (
+        encode, make_contract_document, material, reviewed_inputs,
+    )
 
 ALLOW = 'CAT-C-DOC-A-READER'
 DENY = 'CAT-N-DOC-B-READER'
@@ -406,7 +414,7 @@ class ReviewedRuntimeTests(unittest.TestCase):
                         kinds.index('reviewed_delivery_aborted'))
 
     def test_accept_event_failure_aborts_ticket_safely(self):
-        sink = _FailingSink(fail_after=4)  # acceptance counter commits, its event fails
+        sink = _FailingSink(fail_after=5)  # acceptance counter commits, its event fails
         run, _, _ = bound(evidence=BoundedEvidence(sink))
         run.start()
         run.submit_id(ALLOW)
@@ -530,7 +538,7 @@ class ReviewedRuntimeTests(unittest.TestCase):
 
     # -- post-review remediation: audit honesty and request cleanup ---------
     def test_audit_failure_has_no_fabricated_persisted_events(self):
-        sink = _FailingSink(fail_after=4)
+        sink = _FailingSink(fail_after=5)   # acceptance event fails after its counter
         run, _, _ = bound(evidence=BoundedEvidence(sink))
         run.start()
         run.submit_id(ALLOW)
@@ -714,7 +722,7 @@ class ReviewedRuntimeTests(unittest.TestCase):
         self.assertEqual(run.reviewed_counts()['dispatch_cancelled_count'], 0)
 
     def test_audit_failure_does_not_duplicate_cancel(self):
-        sink = _FailingSink(fail_after=3)   # authorization event persists, prepared fails
+        sink = _FailingSink(fail_after=4)   # authorization event persists, prepared fails
         run, _, _ = bound(evidence=BoundedEvidence(sink))
         run.start()
         run.submit_id(ALLOW)
@@ -778,3 +786,127 @@ class ReviewedRuntimeTests(unittest.TestCase):
             self.assertEqual(run.check_invariants(), [])
             self.assertTrue(all(row['simulated_conclusion'] == 'PASS'
                                 for row in report['checks']))
+
+    # -- 3B-2A: reviewed scope binding --------------------------------------
+    def test_scope_binding_event_matches_snapshot(self):
+        run, fixture, snapshot = bound()
+        self.assertTrue(run.start())
+        events = [event for event in run.evidence.events
+                  if event['kind'] == 'reviewed_scope_binding']
+        self.assertEqual(len(events), 1)
+        event = events[0]
+        self.assertEqual(event['evidence_version'], EVIDENCE_VERSION)
+        self.assertEqual(event['snapshot_id'], snapshot.snapshot_id)
+        self.assertEqual(event['contract_id'], snapshot.contract_id)
+        self.assertEqual(event['contract_version'], snapshot.contract_version)
+        self.assertEqual(event['contract_digest'], snapshot.contract_digest)
+        self.assertEqual(event['scope_digest'], snapshot.scope_digest)
+        self.assertEqual(event['fixture_id'], snapshot.fixture_id)
+        self.assertEqual(event['fixture_version'], snapshot.fixture_version)
+        self.assertEqual(event['fixture_content_sha256'],
+                         snapshot.fixture_content_sha256)
+        self.assertEqual(event['fixture_instance_id'], snapshot.fixture_instance_id)
+        self.assertEqual(event['budget_version'], snapshot.budget_version)
+        self.assertEqual(event['max_checks'], snapshot.max_checks)
+        self.assertEqual(event['logical_timeout_seconds'],
+                         snapshot.logical_timeout_seconds)
+        self.assertEqual(event['concurrency'], 1)
+        self.assertEqual(event['candidates'], sorted(snapshot.candidate_ids()))
+        self.assertEqual(len(event['candidates']), 4)
+        for credential in fixture.credentials().values():
+            self.assertNotIn(credential, repr(event))
+            self.assertNotIn(credential, repr(run.report()['reviewed_scope']))
+
+    def test_scope_binding_for_directories(self):
+        run, _, snapshot = bound('directories')
+        self.assertTrue(run.start())
+        report = run.report()
+        self.assertEqual(report['evidence_version'], EVIDENCE_VERSION)
+        self.assertEqual(report['reviewed_scope']['candidates'],
+                         sorted(snapshot.candidate_ids()))
+        self.assertEqual(len(report['reviewed_scope']['candidates']), 3)
+
+    def test_budget_below_candidates_rejects_extra_proposals(self):
+        run, _, snapshot = bound('documents',
+                                 mutate=lambda doc: doc['budget'].update(max_checks=2))
+        self.assertTrue(run.start())
+        results = [run.submit_id(check_id)
+                   for check_id in (ALLOW, DENY, CONTROL, ANON)]
+        self.assertEqual(results, [True, True, False, False])
+        self.assertEqual(run.state, 'STOPPED')
+        self.assertEqual(run.reason, 'BUDGET_EXHAUSTED')
+        report = run.report()
+        self.assertEqual(report['counts']['plan_count'], 2)
+        # The reviewed universe is unchanged by the budget.
+        self.assertEqual(report['reviewed_scope']['candidates'],
+                         sorted(snapshot.candidate_ids()))
+        self.assertEqual(report['reviewed_scope']['max_checks'], 2)
+
+    def test_budget_equal_to_candidates(self):
+        run, _, _ = bound('documents',
+                          mutate=lambda doc: doc['budget'].update(max_checks=4))
+        self.assertTrue(run.start())
+        for check_id in (ALLOW, DENY, CONTROL, ANON):
+            self.assertTrue(run.submit_id(check_id))
+        self.assertEqual(run.reviewed_counts()['proposal_rejected_count'], 0)
+
+    def test_budget_above_candidates_is_not_inferred(self):
+        run, _, snapshot = bound('documents',
+                                 mutate=lambda doc: doc['budget'].update(max_checks=8))
+        self.assertTrue(run.start())
+        for check_id in (ALLOW, DENY, CONTROL, ANON):
+            self.assertTrue(run.submit_id(check_id))
+        report = run.report()
+        self.assertEqual(report['reviewed_scope']['max_checks'], 8)
+        self.assertEqual(len(report['reviewed_scope']['candidates']), 4)
+        self.assertNotEqual(report['reviewed_scope']['max_checks'],
+                            len(report['reviewed_scope']['candidates']))
+
+    def test_scope_event_precedes_every_proposal(self):
+        run, _, _ = bound()
+        self.assertTrue(run.start())
+        self.assertTrue(run.submit_id(ALLOW))
+        kinds = [event['kind'] for event in run.evidence.events]
+        self.assertEqual(kinds[:3], ['reviewed_started', 'reviewed_scope_binding',
+                                     'reviewed_proposal_registered'])
+
+    def test_scope_event_failure_stops_before_dispatch(self):
+        sink = _FailingSink(fail_after=1)   # started persists, scope binding fails
+        run, _, _ = bound(evidence=BoundedEvidence(sink))
+        self.assertFalse(run.start())
+        self.assertEqual(run.state, 'STOPPED')
+        self.assertEqual(run.reason, 'AUDIT_ERROR')
+        self.assertFalse(run.submit_id(ALLOW))
+        self.assertEqual(run.reviewed_counts()['dispatch_accepted_count'], 0)
+        self.assertEqual(run.reviewed_counts()['fixture_started_count'], 0)
+
+    def test_reentrant_evidence_sink_cannot_submit_before_scope_persists(self):
+        results = []
+
+        class ReentrantSink(MemoryEvidence):
+            def emit(self, event):
+                if event['kind'] == 'reviewed_scope_binding':
+                    results.append(run.submit_id(ALLOW))
+                    run.step()
+                super().emit(event)
+
+        run, _, _ = bound(evidence=ReentrantSink())
+        self.assertTrue(run.start())
+        self.assertEqual(results, [False])
+        self.assertEqual(run.counts['plan_count'], 0)
+        self.assertEqual(run.reviewed_counts()['dispatch_accepted_count'], 0)
+        self.assertTrue(run.submit_id(ALLOW))
+
+    def test_budget_change_requires_new_review_scope(self):
+        fixture = CatalogFixture('documents')
+        document = make_contract_document('documents', fixture)
+        binding, review, registry = reviewed_inputs(document, fixture.instance_id())
+        stale_scope = review_scope_digest(parse_contract(encode(document)), **binding)
+        changed = make_contract_document('documents', fixture)
+        changed['budget']['max_checks'] = 2
+        self.assertNotEqual(
+            review_scope_digest(parse_contract(encode(changed)), **binding),
+            stale_scope)
+        stale_review = material('review', 'contract-review', encode(changed), stale_scope)
+        with self.assertRaises(InvalidInput):
+            _bind_reviewed_contract(stale_review, registry=registry, now=10, **binding)

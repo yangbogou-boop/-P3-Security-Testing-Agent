@@ -26,6 +26,8 @@ import time
 from ..evidence import MemoryEvidence, Redactor, unique_id
 from ..models import InvalidInput
 from .audit import BoundedEvidence
+from .contract import digest
+from .reviewed_contract import MAX_ROWS
 from .reviewed_protocol import build_request_v2, evaluate_v2, parse_response_v2, projection_v2
 from .reviewed_snapshot import ReviewedRunSnapshot
 
@@ -38,6 +40,9 @@ COUNTER_KEYS = (
 )
 
 REAL_NETWORK_NOT_MEASURED = 'NOT_MEASURED'
+# Evidence format version.  Bumping it means the scope-binding event and the
+# report block must change together; the verifier rejects a mixed version.
+EVIDENCE_VERSION = 'p3-reviewed-evidence-v2'
 
 
 @dataclass
@@ -102,6 +107,7 @@ class ReviewedOfflineRun:
         self._aborted_tickets = []
         self._unpersisted_facts = []
         self._audit_gap = False
+        self._scope_persisted = False
         self._finalized = False
         self._t0 = self._last = self._permit_deadline = None
         self._credentials = dict(credentials or {})
@@ -162,6 +168,33 @@ class ReviewedOfflineRun:
             raise InvalidInput('FIXTURE_BINDING_MISMATCH')
         return True
 
+    def _scope_facts(self):
+        """Bounded, reviewed run scope taken only from the immutable snapshot.
+
+        Nothing here can be raised or rewritten by the caller: every value is a
+        reviewed fact the snapshot already carried (budget, digests, candidate ids).
+        """
+        snapshot = self._snapshot
+        candidates = sorted(snapshot.candidate_ids())
+        if len(candidates) > MAX_ROWS:
+            raise InvalidInput('SCOPE_CANDIDATE_LIMIT')
+        return dict(
+            evidence_version=EVIDENCE_VERSION,
+            snapshot_id=snapshot.snapshot_id,
+            contract_id=snapshot.contract_id,
+            contract_version=snapshot.contract_version,
+            contract_digest=snapshot.contract_digest,
+            scope_digest=snapshot.scope_digest,
+            fixture_id=snapshot.fixture_id,
+            fixture_version=snapshot.fixture_version,
+            fixture_content_sha256=snapshot.fixture_content_sha256,
+            fixture_instance_id=snapshot.fixture_instance_id,
+            budget_version=snapshot.budget_version,
+            max_checks=snapshot.max_checks,
+            logical_timeout_seconds=snapshot.logical_timeout_seconds,
+            concurrency=snapshot.concurrency,
+            candidates=candidates)
+
     def start(self):
         with self._lock:
             if self.state != 'READY':
@@ -190,9 +223,14 @@ class ReviewedOfflineRun:
                 self.state = 'RUNNING'
                 self._t0 = self._last = self.clock()
                 self._permit_deadline = self._t0 + (self._snapshot.valid_until - wall)
-        return bool(self._emit('reviewed_started', snapshot_id=self._snapshot.snapshot_id,
-                               contract_id=self._snapshot.contract_id,
-                               fixture_instance_id=self._snapshot.fixture_instance_id))
+            if self._emit('reviewed_started', snapshot_id=self._snapshot.snapshot_id,
+                          contract_id=self._snapshot.contract_id,
+                          fixture_instance_id=self._snapshot.fixture_instance_id) is None:
+                return False
+            # A reentrant sink still cannot submit or step until this record persists.
+            self._scope_persisted = self._emit(
+                'reviewed_scope_binding', **self._scope_facts()) is not None
+            return self._scope_persisted and self.state == 'RUNNING'
 
     def _cancel_slot_locked(self, slot, reason):
         """Cancel a prepared-but-not-accepted slot at most once (single exit).
@@ -330,6 +368,8 @@ class ReviewedOfflineRun:
     def submit_id(self, check_id):
         """Planner submits candidate IDs only; unknown IDs become DENY, never authority."""
         with self._lock:
+            if self.state == 'RUNNING' and not self._scope_persisted:
+                return False
             if self.state != 'RUNNING':
                 self._emit('reviewed_proposal_rejected', reason='NOT_RUNNING')
                 return False
@@ -364,6 +404,8 @@ class ReviewedOfflineRun:
     def step(self, transport=None):
         """One non-blocking step owned by a single thread. ``transport`` is unused."""
         with self._lock:
+            if self.state == 'RUNNING' and not self._scope_persisted:
+                return
             if self._owner is None:
                 self._owner = get_ident()
             if self._owner != get_ident():
@@ -693,6 +735,8 @@ class ReviewedOfflineRun:
                 checks=rows, audit_gap=self._audit_gap,
                 evidence_complete=not self._audit_gap,
                 unpersisted_event_kinds=list(self._unpersisted_facts),
+                evidence_version=EVIDENCE_VERSION,
+                reviewed_scope=self._scope_facts(),
                 snapshot_id=self._snapshot.snapshot_id,
                 contract_id=self._snapshot.contract_id,
                 contract_version=self._snapshot.contract_version,
@@ -724,6 +768,8 @@ class ReviewedOfflineRun:
                 manifest = dict(run_id=self.run_id, provenance=self.provenance,
                                 counts=report['counts'], audit_gap=self._audit_gap,
                                 evidence_complete=report['evidence_complete'],
+                                evidence_version=EVIDENCE_VERSION,
+                                reviewed_scope_sha256=digest(report['reviewed_scope']),
                                 snapshot_id=self._snapshot.snapshot_id,
                                 contract_digest=self._snapshot.contract_digest,
                                 fixture_content_sha256=self._snapshot.fixture_content_sha256)

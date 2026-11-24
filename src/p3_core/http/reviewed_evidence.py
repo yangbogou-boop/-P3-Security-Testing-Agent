@@ -34,6 +34,15 @@ from ..evaluator import (
 SCHEMA_VERSION = 'p3-reviewed-evidence-v1'
 MODE = 'reviewed-offline-simulation'
 PROVENANCE = 'NO_NETWORK_SIMULATION'
+# Scope-binding format added in 3B-2A.  Evidence without it is 3B-1 format and its
+# budget/candidate facts are NOT_CHECKABLE, never assumed.
+EVIDENCE_VERSION = 'p3-reviewed-evidence-v2'
+CANDIDATE_LIMIT = 64
+SCOPE_IDENTITY_KEYS = ('snapshot_id', 'contract_id', 'contract_version',
+                       'contract_digest', 'scope_digest', 'fixture_id',
+                       'fixture_version', 'fixture_content_sha256', 'fixture_instance_id')
+SCOPE_KEYS = ('evidence_version', *SCOPE_IDENTITY_KEYS, 'budget_version',
+              'max_checks', 'logical_timeout_seconds', 'concurrency', 'candidates')
 
 COMMON = frozenset(('mode', 'provenance', 'run_id', 'evidence_id', 'sequence',
                     'kind', 'counts'))
@@ -46,6 +55,7 @@ COUNTERS = (
 )
 EVENT_FIELDS = {
     'reviewed_started': {'snapshot_id', 'contract_id', 'fixture_instance_id'},
+    'reviewed_scope_binding': set(SCOPE_KEYS),
     'reviewed_preflight_rejected': {'reason'},
     'reviewed_proposal_registered': {'slot_id', 'proposal_id', 'candidate', 'known'},
     'reviewed_proposal_rejected': {'reason'},
@@ -71,6 +81,11 @@ EVENT_FIELDS = {
 }
 RESULT_COUNTS = frozenset(('plan_count', 'attempt_count', 'request_count',
                            'model_request_count'))
+# Fields the runner adds only for some rejection reasons (duplicate / budget carry
+# the candidate; NOT_RUNNING and INVALID_PROPOSAL do not).
+EVENT_OPTIONAL = {
+    'reviewed_proposal_rejected': {'candidate'},
+}
 REPORT_REQUIRED = frozenset((
     'run_id', 'mode', 'provenance', 'state', 'reason', 'stop_conditions', 'counts',
     'reviewed_counts', 'checks', 'audit_gap', 'evidence_complete',
@@ -93,9 +108,11 @@ AXIS_GOOD = {
     'contract_association': 'CONSISTENT',
     'provenance': 'NO_NETWORK_SIMULATION',
 }
+# The scope axis has a third, non-blocking state: 3B-1 evidence never persisted the
+# reviewed budget or candidate universe, so it must stay NOT_CHECKABLE rather than
+# silently reinterpreting old evidence as failing.
+SCOPE_NOT_CHECKABLE = 'NOT_CHECKABLE'
 LIMITATIONS = (
-    'UNPERSISTED_BUDGET: the report does not carry max_checks/budget_version, so '
-    '"stayed within the reviewed budget" cannot be proven from evidence alone.',
     'NO_WALL_CLOCK: events carry no timestamps, so no local duration can be derived.',
     'AUTHORISATION_NOT_VERIFIED: review material and approval are not part of the '
     'artifacts; approval and runtime authorisation remain unverified.',
@@ -104,6 +121,11 @@ LIMITATIONS = (
 )
 _HASH = re.compile(r'[0-9a-f]{64}')
 _ID = re.compile(r'[a-z]+_[0-9a-f]{32}')
+_SCOPE_IDENTIFIER = re.compile(r'[A-Za-z0-9_.-]{1,80}')
+
+
+def _valid_identifier(value):
+    return type(value) is str and _SCOPE_IDENTIFIER.fullmatch(value) is not None
 
 
 def _blank(reason):
@@ -113,6 +135,7 @@ def _blank(reason):
                           counter_consistency='NOT_CHECKABLE',
                           delivery_association='NOT_CHECKABLE',
                           contract_association='NOT_CHECKABLE',
+                          scope_binding_consistency='NOT_CHECKABLE',
                           provenance='UNKNOWN'),
                 gaps=[reason], violations=[], counts_replayed={}, counts_reported={},
                 counts_mismatch={}, approval_verified=False,
@@ -176,6 +199,8 @@ def _completeness_axis(report, manifest, events):
     if any(event.get('kind') not in EVENT_FIELDS for event in events):
         gaps.append('UNKNOWN_EVENT_KIND')
     if any(set(event) != COMMON | EVENT_FIELDS.get(event.get('kind'), set())
+           and set(event) != (COMMON | EVENT_FIELDS.get(event.get('kind'), set())
+                              | EVENT_OPTIONAL.get(event.get('kind'), set()))
            for event in events):
         gaps.append('INVALID_EVENT_FIELDS')
     if any(event.get('provenance') != report.get('provenance') for event in events):
@@ -475,6 +500,174 @@ def _contract(report, events):
     return ('MISMATCH' if gaps else 'CONSISTENT'), gaps
 
 
+def _scope_candidates(report, events, candidates):
+    """Reconstruct approved candidate sets and verify their relation to report rows."""
+    approved = set(candidates)
+    slots, prepared, accepted, decisions = {}, {}, {}, {}
+    submitted, authorized, processed = set(), set(), set()
+    violations = set()
+    for event in events:
+        kind = event['kind']
+        slot_id, action_id = event.get('slot_id'), event.get('action_id')
+        candidate = event.get('candidate')
+        if kind == 'reviewed_proposal_registered':
+            known = type(candidate) is str and candidate in approved
+            if event['known'] is not known:
+                violations.add('CANDIDATE_KNOWN_MISMATCH')
+            slots[slot_id] = (event['proposal_id'], candidate if known else None)
+            if known:
+                if candidate in submitted:
+                    violations.add('CANDIDATE_SUBMITTED_TWICE')
+                submitted.add(candidate)
+        elif kind == 'reviewed_authorization':
+            registered = slots.get(slot_id, (None, None))[1]
+            if (event['decision'] == 'ALLOW') != (registered is not None):
+                violations.add('CANDIDATE_AUTHORIZATION_MISMATCH')
+            if registered is not None:
+                if candidate != registered:
+                    violations.add('CANDIDATE_EVENT_MISMATCH')
+                if event['decision'] == 'ALLOW':
+                    authorized.add(registered)
+        elif kind in ('reviewed_prepared', 'reviewed_dispatch_accepted'):
+            registered = slots.get(slot_id, (None, None))[1]
+            if registered is None or registered not in authorized:
+                violations.add('CANDIDATE_NOT_AUTHORIZED')
+                continue
+            if kind == 'reviewed_prepared':
+                if candidate != registered:
+                    violations.add('CANDIDATE_EVENT_MISMATCH')
+                prepared[action_id] = registered
+            elif prepared.get(action_id) == registered:
+                accepted[action_id] = registered
+        elif kind in ('reviewed_assertion', 'reviewed_control_resolution'):
+            if action_id not in accepted:
+                violations.add('CANDIDATE_ASSERTION_WITHOUT_DISPATCH')
+                continue
+            registered = accepted[action_id]
+            conclusion = event['simulated_conclusion']
+            if conclusion not in ('PASS', 'FAIL', 'INCONCLUSIVE'):
+                violations.add('CANDIDATE_CONCLUSION_INVALID')
+            if kind == 'reviewed_assertion':
+                if registered in processed:
+                    violations.add('CANDIDATE_ASSERTION_REPEATED')
+                processed.add(registered)
+            elif registered not in processed:
+                violations.add('CANDIDATE_CONTROL_WITHOUT_ASSERTION')
+            decisions[registered] = (event['assertion'], conclusion)
+
+    seen_slots = set()
+    for row in report['checks']:
+        slot_id = row['slot_id']
+        if slot_id in seen_slots or slot_id not in slots:
+            violations.add('CANDIDATE_ROW_SLOT_MISMATCH')
+        seen_slots.add(slot_id)
+        proposal_id, registered = slots.get(slot_id, (None, None))
+        check_id = row['check_id']
+        if check_id is not None and (type(check_id) is not str or check_id not in approved):
+            violations.add('CANDIDATE_NOT_REVIEWED')
+        if (row['proposal_id'], check_id) != (proposal_id, registered):
+            violations.add('CANDIDATE_ROW_MISMATCH')
+        if registered is not None:
+            if row['processed'] is not (registered in processed):
+                violations.add('CANDIDATE_PROCESSED_MISMATCH')
+            if registered in decisions:
+                if ((row['assertion'], row['simulated_conclusion']) != decisions[registered]
+                        or accepted.get(row['action_id']) != registered):
+                    violations.add('CANDIDATE_CONCLUSION_MISMATCH')
+            elif row['simulated_conclusion'] != 'INCONCLUSIVE':
+                violations.add('CANDIDATE_CONCLUSION_WITHOUT_ASSERTION')
+        elif row['simulated_conclusion'] != 'INCONCLUSIVE':
+            violations.add('UNREVIEWED_CANDIDATE_CONCLUSION')
+    if seen_slots != set(slots):
+        violations.add('CANDIDATE_ROW_SLOT_MISMATCH')
+    unperformed = approved - processed
+    reported = report['unperformed_approved_candidates']
+    if (type(reported) is not list or any(type(value) is not str for value in reported)
+            or len(set(reported)) != len(reported) or set(reported) != unperformed):
+        violations.add('CANDIDATE_UNPERFORMED_MISMATCH')
+    phases = dict(reviewed=approved, submitted=submitted, authorized=authorized,
+                  prepared=set(prepared.values()),
+                  dispatch_accepted=set(accepted.values()), processed=processed, unperformed=unperformed,
+                  decided={candidate for candidate in processed
+                           if decisions[candidate][1] in ('PASS', 'FAIL')})
+    return violations, {name: sorted(values) for name, values in phases.items()}
+
+
+def _scope(report, manifest, events, complete):
+    """Cross-check the scope block, startup event and manifest's local seal."""
+    violations = []
+    block = report.get('reviewed_scope')
+    scope_events = [(index, event) for index, event in enumerate(events)
+                    if event['kind'] == 'reviewed_scope_binding']
+    marked = ('evidence_version' in report or 'reviewed_scope' in report
+              or 'evidence_version' in manifest or 'reviewed_scope_sha256' in manifest
+              or scope_events)
+    if not marked:
+        return SCOPE_NOT_CHECKABLE, violations, ['SCOPE_BINDING_ABSENT'], {}
+    if (report.get('evidence_version') != EVIDENCE_VERSION
+            or manifest.get('evidence_version') != EVIDENCE_VERSION):
+        violations.append('EVIDENCE_VERSION_MISMATCH')
+    if type(block) is not dict:
+        return 'MISMATCH', violations + ['SCOPE_BLOCK_MISSING'], [], {}
+    if len(scope_events) != 1:
+        code = 'SCOPE_BINDING_REPEATED' if scope_events else 'SCOPE_BINDING_MISSING'
+        return 'MISMATCH', violations + [code], [], {}
+    index, event = scope_events[0]
+    if (index == 0 or events[index - 1]['kind'] != 'reviewed_started'
+            or any(e['kind'] != 'reviewed_proposal_rejected' or e['reason'] != 'NOT_RUNNING'
+                   for e in events[:index - 1])):
+        violations.append('SCOPE_BINDING_ORDER')
+    if set(block) != set(SCOPE_KEYS):
+        violations.append('SCOPE_FIELDS_INVALID')
+    if block.get('evidence_version') != EVIDENCE_VERSION or event.get('evidence_version') != EVIDENCE_VERSION:
+        violations.append('EVIDENCE_VERSION_MISMATCH')
+    if any(type(event.get(key)) is not type(block.get(key)) or event.get(key) != block.get(key)
+           for key in SCOPE_KEYS):
+        violations.append('SCOPE_FIELD_MISMATCH')
+    for key in SCOPE_IDENTITY_KEYS:
+        if block.get(key) != report.get(key) or event.get(key) != report.get(key):
+            violations.append('SCOPE_' + key.upper() + '_MISMATCH')
+    for key in ('contract_id', 'contract_version', 'fixture_id', 'fixture_version',
+                'fixture_instance_id'):
+        if not _valid_identifier(block.get(key)):
+            violations.append('SCOPE_IDENTITY_INVALID')
+    canonical = json.dumps(block, sort_keys=True, separators=(',', ':'),
+                           allow_nan=False).encode('utf-8')
+    if manifest.get('reviewed_scope_sha256') != hashlib.sha256(canonical).hexdigest():
+        violations.append('SCOPE_MANIFEST_HASH_MISMATCH')
+    for key in ('snapshot_id', 'contract_digest', 'fixture_content_sha256'):
+        if manifest.get(key) != report[key]:
+            violations.append('SCOPE_MANIFEST_IDENTITY_MISMATCH')
+
+    max_checks = block.get('max_checks')
+    timeout = block.get('logical_timeout_seconds')
+    concurrency = block.get('concurrency')
+    if (not _valid_identifier(block.get('budget_version'))
+            or type(max_checks) is not int or not 1 <= max_checks <= CANDIDATE_LIMIT
+            or type(timeout) not in (int, float) or not 0 < timeout <= 3600
+            or type(concurrency) is not int or concurrency != 1):
+        violations.append('BUDGET_INVALID')
+    registrations = sum(event['kind'] == 'reviewed_proposal_registered' for event in events)
+    if type(max_checks) is int and max(len(report['checks']), registrations) > max_checks:
+        violations.append('BUDGET_EXCEEDED')
+
+    candidates = block.get('candidates')
+    phases = {}
+    if type(candidates) is not list or not 0 < len(candidates) <= CANDIDATE_LIMIT:
+        violations.append('CANDIDATE_UNIVERSE_INVALID')
+    elif any(not _valid_identifier(value) for value in candidates):
+        violations.append('CANDIDATE_INVALID')
+    else:
+        if len(set(candidates)) != len(candidates):
+            violations.append('CANDIDATE_DUPLICATE')
+        if candidates != sorted(candidates):
+            violations.append('CANDIDATE_ORDER')
+        if complete:
+            candidate_violations, phases = _scope_candidates(report, events, candidates)
+            violations.extend(candidate_violations)
+    return ('MISMATCH' if violations else 'CONSISTENT'), sorted(set(violations)), [], phases
+
+
 def _provenance(report, manifest, events):
     gaps = []
     if report.get('provenance') != PROVENANCE or manifest.get('provenance') != PROVENANCE:
@@ -555,25 +748,41 @@ def verify(directory):
         contract, contract_gaps = _contract(report, events)
         result['axes']['contract_association'] = contract
         result['gaps'].extend(contract_gaps)
+        scope_state, scope_violations, scope_notes, phases = _scope(
+            report, manifest, events, completeness == 'COMPLETE')
+        result['axes']['scope_binding_consistency'] = scope_state
+        result['violations'].extend(scope_violations)
+        result['scope_notes'] = scope_notes
         provenance, provenance_gaps = _provenance(report, manifest, events)
         result['axes']['provenance'] = provenance
         result['gaps'].extend(provenance_gaps)
-        result['consistent'] = all(result['axes'][name] == good
-                                   for name, good in AXIS_GOOD.items())
+        result['consistent'] = (
+            all(result['axes'][name] == good for name, good in AXIS_GOOD.items())
+            and scope_state in ('CONSISTENT', SCOPE_NOT_CHECKABLE))
+        if result['consistent'] and phases:
+            result['candidate_lifecycle'] = phases
         result['unverifiable'] = [
             dict(item='contract_digest / scope_digest authenticity',
-                 missing='no persisted event binds these digests; only the report '
-                         'hash protects them from tampering'),
+                 missing='no independent review material; only internal consistency '
+                         'between report, scope block and scope event is proven'),
             dict(item='fixture_content_sha256 authenticity',
-                 missing='no persisted event binds the fixture digest'),
-            dict(item='authorised budget',
-                 missing='report lacks max_checks and budget_version'),
-            dict(item='reviewed candidate universe',
-                 missing='report lists only unperformed candidates; the reviewed '
-                         'set is reconstructed from rows + that list'),
+                 missing='bound internally to the scope event, but no external '
+                         'authority attests the digest'),
+            dict(item='external review and execution permission',
+                 missing='approval material is not part of the artifacts'),
             dict(item='wall-clock duration',
                  missing='events carry no timestamps'),
         ]
+        if scope_state == SCOPE_NOT_CHECKABLE:
+            result['unverifiable'].append(
+                dict(item='authorised budget',
+                     missing='3B-1 evidence has no reviewed_scope; budget_version, '
+                             'max_checks, logical_timeout_seconds and concurrency '
+                             'cannot be reconstructed'))
+            result['unverifiable'].append(
+                dict(item='reviewed candidate universe',
+                     missing='3B-1 evidence lists no reviewed candidates; coverage '
+                             'must not be computed from report rows alone'))
         if not strict:
             result['unverifiable'].append(
                 dict(item='event counter transitions',
@@ -591,5 +800,5 @@ def verify(directory):
 
 
 def is_consistent(result):
-    """True only when every axis is in its good state."""
+    """Apply the consistency result, including the legacy scope exception."""
     return bool(result.get('consistent')) and not result.get('gaps')
