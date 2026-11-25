@@ -70,3 +70,18 @@ python -m unittest discover -s tests -v
 ## 交付与 Git
 
 提交前展示实际修改范围、静态／运行验证结果及未完成事项。人工审核不由 Agent 代签。只有另行明确授权时才显式暂存批准文件、检查暂存区并 Commit；Push 单独确认授权，不使用 add .／add -A 或强推掩盖范围。保存基线和未提交工作，不自动推进下一阶段。
+
+## 6B-4 可用性证据与执行边界
+
+以 7178dbb 为静态核对基线。根目录已有 [AGENTS.md](../AGENTS.md)，旧文档里未发现该文件的说法按原稿时点读取。下表记录文档、入口和现有证据的对应关系。
+
+| 入口与用途 | 可定位依据及版本／环境 | 可移植性与保护边界 | 6B-4 状态 |
+| --- | --- | --- | --- |
+| AGENTS、文档索引及链接检查 | [AGENTS](../AGENTS.md)、[项目索引](INDEX.md)、[check_doc_links.py](../tools/check_doc_links.py)。本轮 Windows Python 3.9.12，执行 python -I -S -B tools/check_doc_links.py --all | 从仓库根目录执行；检查本地链接。 | 本轮实际执行；见[实施报告](../review/P3_6b4_implementation_report.md) |
+| AGENTS 中 unittest 发现入口 | [CI 工作流](../.github/workflows/ci_runner.yml)、[tests](../tests/)、[原有 F2 回归说明](../review/P3_reviewed_metrics_v1_acceptance.md) | PYTHONPATH 使用仓库相对 src。普通发现命令不自带全程网络拦截。 | NOT_REEXECUTED |
+| 推荐离线 CLI 与摘要 | [usage](P3_offline_delivery.md)、[delivery.py](../src/p3_core/delivery.py)、[离线摘要测试](../tests/test_offline_summary.py) | 使用已有本地合成材料或独立输出目录，仓库相对入口可查。 | NOT_REEXECUTED |
+| V1 只读评价 | [评价手册](P3_minimal_evaluator.md)、[9 次历史调用](../evidence/course_ch03/eval_20261104_evaluator/case_execution_records.json)、[运行档案](../evidence/course_ch03/eval_20261104_evaluator/README.md)。2026-11-04，5a6e81a 及当时文件状态，Windows Python 3.9.12。 | 历史 argv 的私有绝对路径只用来识别上下文；便携输入按仓库归档相对路径定位。 | NOT_REEXECUTED |
+| R01 首次与整改后守卫 | [首次命令](../evidence/course_ch03/eval_20261028_01/execution_command.txt)、[整改后命令](../evidence/course_ch03/eval_20261028_02/execution_command.txt)、[六行工作表](../eval/P3_evaluation_observability_card.md) | 历史包装记录声明导入和发现前安装 Python 级限制，原始路径不作为当前先决条件。 | NOT_REEXECUTED |
+| V2 F2 受守卫回归 | [F2 ZIP](https://chatgpt.com/library?file_id=libfile_41409366e0988191b974741848a9d4f6&account_id=personal) 中 guards/guarded-windows.py、logs/terminal.log、logs/full.log。执行为 711550a 基线加审核补丁，源码内容与 7178dbb 对应，Windows Python 3.9.12。第三轮另有 Windows 独立实测 625 项。 | 外部包装先于导入和发现自检 socket、地址解析与外部进程。历史包装含工作目录／缓存参数，需要适配实际环境。未发现仓库内统一等价入口或独立 OS 层证明。 | NOT_REEXECUTED |
+
+红线 8 的本轮核查结论是文档导航、本地证据和历史受守卫运行能够定位；第三方干净环境可用性、守卫移植及真实人工签署仍待核验。Python 进程内保护不证明 OS 未派发。课程范围和权责见[治理登记](../brief/P3_decision_governance.md)。本轮无外部目标访问。

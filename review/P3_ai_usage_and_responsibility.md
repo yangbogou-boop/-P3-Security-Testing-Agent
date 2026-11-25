@@ -49,3 +49,17 @@
 3. 按既有 A 类流程取得目录、契约、预算冻结及正式验收所需材料；目标所有者许可独立取得。一般技术选择不增加教师审批。
 4. 第三／四章原始证据归档、成本计量与伙伴独立复现另轮开展；伙伴状态 NOT_YET_REPRODUCED_BY_PEER。
 5. 未派发独立证明仍 UNAVAILABLE；技术文档审核不改变此结论，也不赋予真实执行权限。
+
+## 6B-4 披露增量与人工确认
+
+基线 7178dbb。已按可定位记录整理以下辅助范围。完整 AI 调用记录尚未核验。Token 总量、调用次数、历史费用和逐文件 AI 作者比例均未核实，留待掌握原始记录的人确认。
+
+| 活动 | 已有记录支持的辅助内容 | 当前可核查出处 |
+| --- | --- | --- |
+| 需求与设计整理 | 辅助澄清需求、GWT、文档组织、V2 范围绑定评审 | [RC2](../brief/P3_specification_v1.0-rc2.md)、[范围设计](P3_reviewed_scope_binding_design_review.md) |
+| 实现辅助与测试编写 | V2 离线证据校验、指标实现，以及相应断言和离线回归测试 | [证据设计](P3_reviewed_evidence_v2_design_review.md)、[指标实现](../src/p3_core/http/reviewed_metrics.py)、[指标测试](../tests/test_reviewed_metrics.py) |
+| 自动化执行 | 既有 Windows 受守卫测试及历史 CLI 评价展示，由 Codex 辅助执行 | [评价原始记录](../evidence/course_ch03/eval_20261104_evaluator/README.md)、[F2 验收记录](P3_reviewed_metrics_v1_acceptance.md) |
+| 独立审核辅助与 F1/F2 整改 | 两轮 NEEDS_FIX、针对已知反例的修正、第三轮技术复验；实验与现场人工复核仍分别登记 | [F1/F2 验收历史](P3_reviewed_metrics_v1_acceptance.md)、[F2 归档](https://chatgpt.com/library?file_id=libfile_41409366e0988191b974741848a9d4f6&account_id=personal) |
+| 资料归档及课程材料整理 | 辅助生成索引、校准口径表和本轮 22 项证据矩阵；旧原件保持原样 | [证据索引](../eval/P3_experiment_evidence_index.md)、[验收矩阵](../eval/P3_acceptance_matrix_6b4.md) |
+
+负责人承担最终工程决策与正式交付责任。Codex 技术审核作为 AI 辅助记录；真人同行审查、D7 签署、P1 独立复现、教师正式批准分别由实际主体完成。本轮未取得这些新增记录。AS-01～05 的原始内容保留在上表，实际责任仍为 PENDING_OWNER_CONFIRMATION，可在 [人工工作表](P3_6b4_human_review_worksheet.md) 回填人、验证门槛和凭据。

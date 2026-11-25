@@ -128,3 +128,18 @@
 本次指定修复工作树和可信离线宿主条件下，未批准候选被拒绝、没有该动作的模拟派发，拒绝审计可关联，新生成的客户端证据符合现有 verify_run 契约。这个 PASS 只针对本次离线评价，不证明真实网络拦截、任意同进程恶意代码抵抗或目标整体安全。
 
 14 项实际 HTTP 仍 PENDING_AUTHORIZATION，未派发独立证明仍 UNAVAILABLE；未取得真实来源认证、教师正式验收或伙伴复现。代码与证据交付需人工审核，且提交前需解决原始证据字节保存方式；不自动 Commit／Push，不继续第四章。
+
+## 6B-4 第三章六行工作表
+
+依据 CH03 物理第 37 张、页脚第 38 页「一张检查说明这样填」。以下两列只读追溯既有 R01 结果。事先标准沿用本卡 A 节；课件示意、不完整记录与后续补验分开。P1 真人复核栏见 [人工工作表](../review/P3_6b4_human_review_worksheet.md)。
+
+| 课件字段 | R01 首次 | R01 整改后 |
+| --- | --- | --- |
+| 本次只检查什么／事先标准 | 在合成 Good 下观察未批准对象被 Controller 拒绝；不得出现该对象的准备或模型派发；客户端三文件应完整关联。对应 REQ-007/008/014/015。 | 同一标准。只修客户端证据封存，保留拒绝限制。 |
+| 样例或数据／检查入口 | [输入](../evidence/course_ch03/eval_20261028_01/input.json)、[实际命令](../evidence/course_ch03/eval_20261028_01/execution_command.txt)。 | [输入](../evidence/course_ch03/eval_20261028_02/input.json)、[实际命令](../evidence/course_ch03/eval_20261028_02/execution_command.txt)。 |
+| 程序或模型、数据及版本来源 | [执行上下文](../evidence/course_ch03/eval_20261028_01/execution_context.json)记载原样 67242ba、Windows Python 3.9.12、合成输入；5c16b2b 为两批证据路径归档版本。 | [执行上下文](../evidence/course_ch03/eval_20261028_02/execution_context.json)记载同一基线加[当次补丁](../evidence/course_ch03/eval_20261028_02/execution_code_diff.patch)及文件哈希；不是 67242ba 原样运行。 |
+| 一条具体结果及判断／结果位置 | [事件序列 46](../evidence/course_ch03/eval_20261028_01/artifacts/run_e2b938e432d044e69427e50f2b1a9aaf/events.jsonl)及[报告](../evidence/course_ch03/eval_20261028_01/artifacts/run_e2b938e432d044e69427e50f2b1a9aaf/report.json)支持该对象拒绝，无对应 action；[Manifest](../evidence/course_ch03/eval_20261028_01/artifacts/run_e2b938e432d044e69427e50f2b1a9aaf/manifest.json)缺 report_sha256，[首次核查](../evidence/course_ch03/eval_20261028_01/verification.json)保留完整性失败及原扫描记录。 | [事件序列 46](../evidence/course_ch03/eval_20261028_02/artifacts/run_ce4b0027ae024f05a72d81173c9f05e2/events.jsonl)及[报告](../evidence/course_ch03/eval_20261028_02/artifacts/run_ce4b0027ae024f05a72d81173c9f05e2/report.json)支持 DENY、NOT_EXECUTED、INCONCLUSIVE；[Manifest](../evidence/course_ch03/eval_20261028_02/artifacts/run_ce4b0027ae024f05a72d81173c9f05e2/manifest.json)与[当次核查](../evidence/course_ch03/eval_20261028_02/verification.json)支持客户端 VERIFIED。 |
+| 当前结论和未查范围 | 应用层拒绝在该离线记录中可观察；完整性证据不足，不能整体判通过；首次失败留档。 | 限定为该模拟拒绝链及客户端内部完整性。未查真实 HTTP、OS 未派发、外部真实性、其他 GWT 和真人复现。 |
+| 执行状态 | **读取已有结果**；原批次确有一次 Codex 辅助本地模拟，当前未重跑，负责人和同伴栏待填。 | **读取已有结果**；原批次确有整改后本地模拟，当前未重跑，负责人和同伴栏待填。 |
+
+V2 最新测试、只读评价展示与 R01 证据属于不同批次。[版本矩阵](P3_acceptance_matrix_6b4.md)分别登记。第三章同伴复核尚无真人新记录。
