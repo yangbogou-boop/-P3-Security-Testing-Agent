@@ -683,7 +683,190 @@ def _provenance(report, manifest, events):
     return ('UNKNOWN' if gaps else PROVENANCE), gaps
 
 
-def verify(directory):
+# Decisive assertion pairs from reviewed_protocol.evaluate_v2. The persisted
+# projection proves status and response shape, but contains no control candidate ID.
+_DECISIVE_ASSERTIONS = {
+    'AUTHORIZED_CONTENT': ('PASS', (200,)),
+    'REFUSAL_WITH_CONTROL': ('PASS', (401, 403)),
+    'CONFIRMED_DISCLOSURE': ('FAIL', (200,)),
+    'CONFIRMED_OVERDENIAL': ('FAIL', (401, 403)),
+}
+_STOP_REASONS = (
+    'REVOKED', 'AUTHORIZATION_INVALID', 'RUNTIME_ERROR', 'AUDIT_ERROR',
+    'PREPARE_ERROR', 'FIXTURE_BINDING_MISMATCH', 'DISPATCH_OVERLAP_REJECTED',
+    'FIXTURE_ERROR', 'BUDGET_EXHAUSTED', 'TIMEOUT',
+)
+
+
+_CONCLUSION_ISSUE_PRIORITY = (
+    'ASSERTION_CONCLUSION_CONFLICT',
+    'FINAL_CONCLUSIONS_UNVERIFIED',
+    'CONTROL_EVIDENCE_UNVERIFIED',
+)
+
+
+def _valid_conclusion_projection(response):
+    # ResponseParser emits a three-digit integer or no status for an invalid response.
+    status = response['status']
+    valid = response['response_valid']
+    complete = response['assertions_complete']
+    fields = response['response_fields']
+    if type(valid) is not bool or type(complete) is not bool:
+        return False
+    if not (status is None and not valid) and not (type(status) is int and 100 <= status <= 599):
+        return False
+    if not complete:
+        return fields is None
+    return valid and type(fields) is dict and all(
+        type(key) is str and type(value) is str for key, value in fields.items())
+
+
+def _assertion_issue(response, assertion, conclusion):
+    if response is None or type(assertion) is not str or response['assertion'] != assertion:
+        return 'FINAL_CONCLUSIONS_UNVERIFIED'
+    decisive = _DECISIVE_ASSERTIONS.get(assertion)
+    expected = decisive[0] if decisive is not None else 'INCONCLUSIVE'
+    if conclusion != expected:
+        return 'ASSERTION_CONCLUSION_CONFLICT'
+    if not _valid_conclusion_projection(response):
+        return 'FINAL_CONCLUSIONS_UNVERIFIED'
+    if decisive is None:
+        return None
+    status = response['status']
+    # The protocol also recognizes a correlated disclosure in a server error.
+    server_disclosure = (assertion == 'CONFIRMED_DISCLOSURE'
+                         and type(status) is int and 500 <= status <= 599)
+    if response['response_valid'] is not True or (status not in decisive[1] and not server_disclosure):
+        return 'FINAL_CONCLUSIONS_UNVERIFIED'
+    if assertion != 'CONFIRMED_OVERDENIAL' and response['assertions_complete'] is not True:
+        return 'FINAL_CONCLUSIONS_UNVERIFIED'
+    return None
+
+
+def _stop_reason_issue(report, event):
+    reason = event['reason']
+    if reason not in _STOP_REASONS or report['state'] != 'STOPPED':
+        return 'STOP_REASON_UNVERIFIED'
+    conditions = report['stop_conditions']
+    if type(conditions) is not list or not conditions or reason != conditions[0]:
+        return 'STOP_REASON_CONFLICT' if conditions else 'STOP_REASON_UNVERIFIED'
+    revoke = report['revoke_sequence']
+    if event['kind'] == 'reviewed_delivery_aborted':
+        revoke = event['revoke_seq']
+        if type(revoke) is int and (
+                type(event['dispatch_seq']) is not int or revoke <= event['dispatch_seq']):
+            return 'STOP_REASON_CONFLICT'
+    if revoke is not None:
+        if type(revoke) is not int or revoke <= 0:
+            return 'STOP_REASON_UNVERIFIED'
+        # A present, associated revocation outranks other stop conditions.
+        return None if reason == 'REVOKED' else 'STOP_REASON_CONFLICT'
+    if reason == 'REVOKED':
+        return 'STOP_REASON_UNVERIFIED'
+    if report['reason'] != reason:
+        return 'STOP_REASON_CONFLICT' if report['reason'] in _STOP_REASONS else 'STOP_REASON_UNVERIFIED'
+    return None
+
+
+def _verified_metric_facts(report, events, accepted, lifecycle):
+    """Project facts from the already validated snapshot; never open another file."""
+    slots = 0
+    actions, action_slots, started, handled = {}, {}, set(), {}
+    responses, final, pending, stop_events = {}, {}, {}, {}
+    last_positive = 0
+    conclusion_issues = set()
+    handling_bound = True
+    for position, event in enumerate(events, 1):
+        kind = event['kind']
+        action = event.get('action_id')
+        if kind == 'reviewed_proposal_registered':
+            slots += 1
+        elif kind == 'reviewed_prepared':
+            actions[action] = event['candidate']
+            action_slots[action] = event['slot_id']
+        elif kind in ('reviewed_fixture_started', 'reviewed_fixture_handled'):
+            if action not in accepted or event['dispatch_seq'] != accepted[action]:
+                handling_bound = False
+            if kind == 'reviewed_fixture_started':
+                started.add(action)
+            elif action in started and action in actions:
+                handled[action] = actions[action]
+            else:
+                handling_bound = False
+        elif kind == 'reviewed_response_evidence':
+            if action not in handled or action in responses:
+                conclusion_issues.add('FINAL_CONCLUSIONS_UNVERIFIED')
+            responses[action] = event
+        elif kind == 'reviewed_assertion':
+            assertion = event['assertion']
+            conclusion = event['simulated_conclusion']
+            issue = _assertion_issue(responses.get(action), assertion, conclusion)
+            if assertion == 'REFUSAL_WITH_CONTROL' and not last_positive:
+                issue = issue or 'CONTROL_EVIDENCE_UNVERIFIED'
+            if issue is not None:
+                conclusion_issues.add(issue)
+            elif assertion == 'AUTHORIZED_CONTENT':
+                last_positive = position
+            elif assertion == 'MISSING_CONTROL':
+                response = responses[action]
+                if response['status'] in (401, 403) and response['assertions_complete'] is True:
+                    pending[action] = position
+            final[action] = conclusion
+        elif kind == 'reviewed_control_resolution':
+            # The runtime only re-evaluates a pending denial after its positive
+            # control passes. Exact control identity is not persisted in V2.
+            if (action not in pending or event['assertion'] != 'REFUSAL_WITH_CONTROL'
+                    or event['simulated_conclusion'] != 'PASS'
+                    or last_positive <= pending[action]):
+                conclusion_issues.add('CONTROL_EVIDENCE_UNVERIFIED')
+            pending.pop(action, None)
+            final[action] = event['simulated_conclusion']
+        elif kind in ('reviewed_dispatch_cancelled', 'reviewed_delivery_aborted'):
+            slot = event.get('slot_id', action_slots.get(action))
+            stop_events.setdefault(slot, []).append(event)
+
+    reasons, unlinked, stop_issue = {}, 0, None
+    for transitions in stop_events.values():
+        event = transitions[0]
+        issue = (_stop_reason_issue(report, event) if len(transitions) == 1
+                 else 'STOP_REASON_CONFLICT')
+        if issue:
+            unlinked += 1
+            if stop_issue != 'STOP_REASON_CONFLICT':
+                stop_issue = issue
+        else:
+            reason = event['reason']
+            reasons[reason] = reasons.get(reason, 0) + 1
+    facts = dict(registered_slots=slots, stop_reasons=reasons,
+                 unverified_reason_events=unlinked,
+                 unverified_report_reason=(report['reason'] is not None
+                                           and report['reason'] not in tuple(reasons)))
+    if stop_issue:
+        facts['stop_reason_issue'] = stop_issue
+    if handling_bound:
+        facts['handled_actions'] = len(handled)
+    if not lifecycle:
+        return facts
+
+    facts['max_checks'] = report['reviewed_scope']['max_checks']
+    if handling_bound:
+        facts['handled_candidates'] = sorted(set(handled.values()))
+    processed = set(lifecycle['processed'])
+    if (not handling_bound or not final.keys() <= handled.keys() or len(final) != len(processed)
+            or {handled[action] for action in final} != processed):
+        conclusion_issues.add('FINAL_CONCLUSIONS_UNVERIFIED')
+    if conclusion_issues:
+        ordered = [issue for issue in _CONCLUSION_ISSUE_PRIORITY if issue in conclusion_issues]
+        facts['final_conclusion_issue'] = ordered[0]
+        facts['final_conclusion_issues'] = ordered
+    else:
+        facts['final_conclusions'] = {
+            label: sum(outcome == label for outcome in final.values())
+            for label in ('PASS', 'FAIL', 'INCONCLUSIVE')}
+    return facts
+
+
+def verify(directory, *, include_facts=False):
     """Verify one V2 evidence directory. Returns a multi-axis result; never raises."""
     try:
         _, blobs, report, manifest, events = _load(directory)
@@ -709,6 +892,8 @@ def verify(directory):
         completeness, gaps = _completeness_axis(report, manifest, events)
         result['axes']['evidence_completeness'] = completeness
         result['gaps'].extend(gaps)
+        if include_facts:
+            result['audit_gap'] = 'AUDIT_GAP' in gaps
         strict = (report.get('audit_gap') is False
                   and manifest.get('audit_gap') is False
                   and report.get('evidence_complete') is True
@@ -761,6 +946,8 @@ def verify(directory):
             and scope_state in ('CONSISTENT', SCOPE_NOT_CHECKABLE))
         if result['consistent'] and phases:
             result['candidate_lifecycle'] = phases
+        if include_facts and result['consistent'] and appended == 0:
+            result['verified_facts'] = _verified_metric_facts(report, events, accepted_seq, phases)
         result['unverifiable'] = [
             dict(item='contract_digest / scope_digest authenticity',
                  missing='no independent review material; only internal consistency '
