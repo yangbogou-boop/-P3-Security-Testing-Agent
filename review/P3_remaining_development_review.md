@@ -36,6 +36,8 @@
 - `src/p3_core/delivery.py`：仅离线 CLI，不提供真实运行许可开关。
 - `tests/test_remaining.py`：31 项新增测试，含多个 subTest。
 - `design/ADR_005_deterministic_strategy_comparison.md`：Proposed，推荐保留固定，等待负责人审核。
+
+原 Proposed 为撰写时点快照。第 3 行的等待代码审核、没有提交或推送是 2026-10-19 工作区快照。该轮策略与证据交付见 `30c98db`；原审核建议和正式验收限制仍按其适用范围阅读。历史数量见[历史测试数量及版本对账](../eval/P3_experiment_evidence_index.md#历史测试数量及版本对账)。现行状态见[现行 ADR-005](../design/ADR_005_deterministic_strategy_comparison.md)及[正式接受记录](P3_adr005_acceptance_20261116.md)，2026-11-16 Accepted，仅限内部离线模拟工程基线。教师批准和正式课程验收仍有独立条件。
 - `docs/P3_offline_delivery.md`：复现方法、接口、许可流程和真实验收顺序。
 - `eval/P3_offline_strategy_results.json`：36 次逐次离线结果。
 - `eval/P3_http_integration_status.json`：真实集成待授权清单。
@@ -105,6 +107,8 @@ C:\Users\20573\anaconda3\python.exe -m unittest discover -s tests -v
 4. 容量 64 KiB／1 MiB、服务处理 2 秒上限均为工程试跑配置，不是课程冻结。试跑边界和正式接受条件需负责人复核，班级最终预算按原治理要求办理。
 5. 新证据保存经过验证的有限合成字段，不保留任意真实 HTTP 原文；不宣称通用 HTTP 脱敏完成。真实响应证据充分性与人工复核仍待授权试跑。
 6. REQ-021 离线比较已完成，真实成本、完整人工时间、正式工程取舍和课程验收尚未完成；ADR-005 保持 Proposed。REQ-022 真实 LLM 未接入。
+
+此处沿用撰写时点的 Proposed 结论。当前有限内部接受见[现行 ADR-005](../design/ADR_005_deterministic_strategy_comparison.md)及[正式接受记录](P3_adr005_acceptance_20261116.md)。
 
 这些事项阻塞真实网络与正式验收，不否定本轮离线测试，也不扩大为普通工程技术选择的教师前置审批。
 

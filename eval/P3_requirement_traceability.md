@@ -57,7 +57,7 @@
 
 REQ-013 实际响应证据和 REQ-021 真实策略比较仍待授权。见 [机器清单](P3_c3_acceptance_manifest.json)、[生命周期设计](../design/P3_supervisor_lifecycle.md) 和 [本轮报告](../review/P3_c3_supervisor_review.md)。
 
-[RC2](../brief/P3_specification_v1.0-rc2.md) 为规范基线；本表不修改 ID 或强度。没有真实 HTTP 或正式课程验收通过声明。158 项为本地无网络测试数量，并非 158 个 GWT 全项通过。
+[RC2](../brief/P3_specification_v1.0-rc2.md) 为规范基线；本表不修改 ID 或强度。没有真实 HTTP 或正式课程验收通过声明。158 项为 2026-10-19 后续接入准备轮次的本地无网络测试数量，并非 158 个 GWT 全项通过。各次执行与归档身份见[历史测试数量及版本对账](P3_experiment_evidence_index.md#历史测试数量及版本对账)。
 
 | 稳定 ID | 强度 | 原 GWT | 当前实现／验证状态 | 可定位自动化测试 |
 | --- | --- | --- | --- | --- |

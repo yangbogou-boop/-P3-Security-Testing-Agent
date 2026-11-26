@@ -53,6 +53,8 @@
 - 状态／证据：PARTIAL，依据历史记录补录；策略 `0ab1dd5`／`30c98db`，宿主 `b79a4e3`／`c3ea320`；[36 次结果](../eval/P3_offline_strategy_results.json)、[C-3D 报告](P3_c3d_implementation_review.md)。离线部分已有结果，不等于 REQ-021 全部完成。
 - 未完成：原始记录交付与执行版本绑定、准备／人工成本、伙伴复现、真实比较；[ADR-005](../design/ADR_005_deterministic_strategy_comparison.md)仍 Proposed。本轮不开展实验。
 
+原 Proposed 为撰写时点快照。TC-06 的候选待审核为 2026-10-28 的补录状态。任务卡已随 `67242ba` 入库，实际责任确认仍待本人。现行状态见[现行 ADR-005](../design/ADR_005_deterministic_strategy_comparison.md)及[正式接受记录](P3_adr005_acceptance_20261116.md)，2026-11-16 Accepted，仅限内部离线模拟工程基线。教师批准和正式课程验收仍有独立条件。
+
 ## TC-06：第二章 Pack 与责任整理
 
 - 目标／需求：为 P3-REQ-001～022 建立文档导航和开发约束，不新增产品要求。

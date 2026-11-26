@@ -31,3 +31,33 @@
 - 原日志目录为`D:\codex\2026-10-12\referenced-chatgpt-conversation-this-is-an\outputs\c3-supervisor`（私有来源，原件保留）。2026-11-16 已将同批23个历史文件按字节复制入[c3c_supervisor_20261022](../evidence/course_ch03/c3c_supervisor_20261022/INVENTORY_SHA256.json)：`unittest-final.txt`末尾为258项、OK；`registration-reset-races.json`、`baseline.json`、`P3-c3-supervisor-review.diff`等均在，作为版本/竞争时序材料。执行版本为 `3199b3f + 当时工作区增量`，不是当前HEAD重新执行；本轮没有重放12时序或复验历史保护。
 - [真实HTTP状态](P3_http_integration_status.json)仍为14项PENDING_AUTHORIZATION；独立未派发证明UNAVAILABLE。历史离线成功、完整性哈希、个人决定均不替代目标许可、教师验收或来源认证。
 - 此前620个链接通过仅覆盖当时检查器识别的本地相对链接；本页仓库外路径、跨平台获取、输出语义和人工批准须分别核验。后续新增批次只登记入口及限制，不复制36次明细或覆盖原件。
+
+## 历史实验的 ADR 状态导航
+
+[第四章历史实验报告](P3_engineering_experiment.md) §7 第 87 行的 Proposed 属于 2026-10-28 起的报告撰写时点。§9 第 97 行的未提交记述沿用第一轮候选语境，报告已入库（9754048、04214d3）。[现行 ADR-005](../design/ADR_005_deterministic_strategy_comparison.md)及[正式接受记录](../review/P3_adr005_acceptance_20261116.md)记载 2026-11-16 的有限内部离线接受。受保护报告原件逐字节保留，若要在原件加限定须单独授权。
+
+36 次策略运行仍为 NOT_FULLY_BOUND，归档与执行身份分列；人工准备与复核成本未测，每格 3 次不支持统计显著性。Fixed 继续作为离线默认，Dynamic 作为对照及重评对象。C-02 完整比较及 REQ-021 正式验收仍待办。
+
+## 历史测试数量及版本对账
+
+各批次数量按对应日志或报告记录，执行身份与归档分别列出。全量、专项、重跑与静态引用不累加。当前 6B-2 只核对现存证据，产品测试、实验和模拟均为 NOT_REEXECUTED。私有原始日志按包内相对路径定位，公开索引不附私人原件。
+
+| 阶段 | 执行日期 | 测试数量 | 测试范围 | 测试结果 | 执行版本 | 归档版本 | 原始依据 | 核验等级 | 限制 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 离线核心 | 2026-10-14 | 42 → 49 | 本地全量 | 均通过 | 离线核心初轮／审核修复，精确工作区未独立绑定 | `b3a0da7`（49 阶段节点） | [离线核心验证](P3_offline_core_validation.md) | 历史报告 | 不同子轮，不相加 |
+| 无网络 HTTP 核心／C-1 | 2026-10-19 | 103／127 | 本地全量 | 均通过 | 对应两轮当时工作区，逐次执行 SHA 未独立绑定 | `bd888e2`／`e0e85d1`（阶段节点） | [核心报告](../review/P3_http_offline_core_review.md)、[夹具报告](../review/P3_mock_api_c1_review.md) | 历史报告 | 归档节点不代替执行 SHA |
+| 后续接入准备 | 2026-10-19 | 148／154／157／158 | 本地全量，中间轮次及最终 | 均通过（报告） | `e0e85d1` 加当时工作区 | `30c98db`（交付与报告） | [开发审核报告](../review/P3_remaining_development_review.md) 第 65、72 行（原基线） | 历史报告 | 完整原始日志未取得 |
+| C-3A/B 安全加固 | 2026-10-19 | 175 → 182 | 本地全量 | 均通过（报告） | `30c98db` 加当时工作区 | `3199b3f`（交付与报告） | [加固审核](../review/P3_c3_preflight_review.md) 第 47、57 行（原基线） | 历史报告 | 原始全量日志未取得 |
+| C-3C 监督中间轮次 | 2026-10-21／22（分轮） | 213／217／227 | 本地全量 | 213 有 1 错误；217、227 通过 | `3199b3f` 加对应工作区快照 | `8019021`（日志）；`767b15e`／`8e56767`（交付） | [213 原日志](../evidence/course_ch03/c3c_supervisor_20261022/unittest-first.txt)、[217 原日志](../evidence/course_ch03/c3c_supervisor_20261022/unittest-second.txt)、[227 独立日志](../evidence/course_ch03/c3c_supervisor_20261022/independent-review-unittest.txt) | 原始日志 | 分别读取；对应中间工作区不推定为纯提交 |
+| C-3C 后续修复 | 2026-10-21／22（分轮） | 237／257 | 本地全量 | 均通过（报告） | `3199b3f` 加对应工作区快照 | `8e56767`（审核） | [监督审核](../review/P3_c3_supervisor_review.md) 第 11、159 行（原基线） | 历史报告 | 未取得这两个数量的全量日志 |
+| C-3C 最终交付 | 2026-10-22 | 258 | 本地全量 | 258 通过 | `3199b3f` 加当时工作区增量 | `8019021`（日志）；`767b15e`／`8e56767`（实现／审核） | [unittest-final.txt](../evidence/course_ch03/c3c_supervisor_20261022/unittest-final.txt)、[原差异与清单](../evidence/course_ch03/c3c_supervisor_20261022/INVENTORY_SHA256.json) | 原始日志 | 12 种重置竞争时序独立登记 |
+| C-3D 本地与既有 CI | 2026-10-23；10-26 再出现于发布记录 | 278 | 本地全量／CI 历史运行 | 278 通过（报告） | 本地 `8e56767` 加 C-3D 候选；CI `c3ea320`（39925047670）、`cc7ab40`（40279651027）据历史报告 | `b79a4e3`（实现）、`c3ea320`（审核）、`cc7ab40`（阶段报告） | [实现审核](../review/P3_c3d_implementation_review.md)、[CI 旧查询与发布核验](../review/P3_offline_engineering_summary.md)；[Pack 原记录](../review/P3_spec_harness_pack_index.md)另记 40642916025 | 历史审核／CI 摘录 | 本轮未取得 CI 原日志或独立绑定 Pack 所引运行的 SHA；278 也是 Harness 原快照引用 |
+| R01 修复与证据契约 | 2026-10-28 | 285 | 本地全量 | 285 通过 | `67242ba` 加当次代码差异 | `5c16b2b`（归档） | [全量原日志](../evidence/course_ch03/eval_20261028_02/full_suite_output.txt)、[执行上下文](../evidence/course_ch03/eval_20261028_02/execution_context.json) | 原始日志 | 与 36 次策略实验及其版本独立 |
+| P1 冻结版回传 | 2026-11-25 | 562／153／71 | 全量／V2 专项／旧重点 | 三份日志均 OK | P1 记录的 `103a9ed` 冻结提交 | `cfbc89e`（去身份化验收记录）；日志在私有回传 ZIP | [回传验收](../review/P3_6b5a_peer_return_acceptance.md)，包内 `evidence/suite/full.log`、`v2.log`、`legacy_focus.log` | 原始日志 | 本轮按测试标识核实两个专项均为全量子集，交集 17；执行归属依 P1 回传记录 |
+| 3B-2A 中间轮次 | 未取得精确执行日期 | 591／602 | 本机全量 | 591 通过；602 有 1 失败 | `103a9ed` 基线上的对应工作区快照 | 未入 Git 的本地日志；`711550a` 为后续正式交付 | 本机 3B-2A 工件 `baseline/full.log`、`integration/full.log`、`final/full.log` 及终端摘要；[范围设计](../review/P3_reviewed_scope_binding_design_review.md) | 原始日志 | 591 在两个中间日志分别出现；602 失败与 603 接受记录分开 |
+| 3B-2A 接受轮次 | 未取得精确执行日期 | 603 | 本机全量 | 603 通过 | `103a9ed` 加接受轮工作区增量 | `711550a`（正式交付）；日志未入 Git | `accepted-terminal.txt`、`accepted/full.log`；[范围设计](../review/P3_reviewed_scope_binding_design_review.md) | 原始日志 | 源码归档提交与历史执行身份分列 |
+| 3B-2B Windows 重做 | 未取得精确执行日期 | 617 | 实施与首次独立审核各一次全量 | 两份均 OK | `711550a` 加 Windows 重做工作区补丁 | Windows ZIP；最终工程提交 `7178dbb` 含后续 F1/F2 | [验收记录](../review/P3_reviewed_metrics_v1_acceptance.md)，Windows ZIP `test-results/full.log`；首次审核 `rerun/full.log` | 原始日志 | 首次审核准入仍 NEEDS_FIX |
+| 3B-2B Windows F1 | 未取得精确执行日期 | 622 | F1 与第二轮独立审核各一次全量 | 两份均 OK | `711550a` 加 F1 工作区补丁 | F1 ZIP；最终工程提交 `7178dbb` 含 F2 | [验收历史](../review/P3_reviewed_metrics_v1_acceptance.md)，F1 ZIP `logs/full.log`；第二轮 `run/full.log` | 原始日志 | 第二轮审核准入仍 NEEDS_FIX |
+| 3B-2B Windows F2 | 2026-11-25（既有核验记录） | 625 | F2 与第三轮独立审核各一次全量 | 两份均 OK | `711550a058d185ce81bef008f834afd846b76d1e` 加当时 F2 工作区补丁 | `7178dbbb5f3caedca6e7e53cf85a5785d70ecc82`（正式工程归档） | [矩阵 Evidence F](P3_acceptance_matrix_6b4.md#evidence-f)，F2 ZIP `logs/full.log`；第三轮 `run/full.log` | 原始日志 | 最近已核验产品技术基线；归档提交不是执行版本 |
+| 3B-2B Linux 原报告 | 未取得 | 618 | 报告所述全量 | 报告称通过；未独立核验 | 未取得 | 未恢复 | [Windows 验收记录的历史说明](../review/P3_reviewed_metrics_v1_acceptance.md) | 历史报告／原件缺失 | Linux 实施成果、补丁及日志未恢复；单列，不并入 Windows |
+| 6B-5B-2／F1 | 文档提交 2026-11-26 | 40 | 矩阵具名测试引用 | 静态核对数量 | NOT_REEXECUTED | `862a632`（文档提交） | [Acceptance Matrix](P3_acceptance_matrix_6b4.md) | 静态引用 | 原 36 加附录 4；不是全量或重新执行 |

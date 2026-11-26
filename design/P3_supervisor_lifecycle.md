@@ -6,6 +6,8 @@
 
 状态：实现候选，等待人工代码审核。本文件不更改 ADR-001～004 的 Accepted、ADR-005 的 Proposed，也不授予网络许可。规范沿用 [RC2](../brief/P3_specification_v1.0-rc2.md)、[授权边界](../brief/P3_authorization_boundary.md) 和 [ADR-004](ADR_004_http_dispatch_and_cancellation.md)。
 
+原 Proposed 为撰写时点快照。候选待审核为 C-3C 设计快照。实现见 `767b15e`，本设计与审核材料见 `8e56767`。本页不新增执行许可。现行状态见[现行 ADR-005](ADR_005_deterministic_strategy_comparison.md)及[正式接受记录](../review/P3_adr005_acceptance_20261116.md)，2026-11-16 Accepted，仅限内部离线模拟工程基线。教师批准和正式课程验收仍有独立条件。
+
 ## 最小组件与责任
 
 | 组件 | 责任与边界 |

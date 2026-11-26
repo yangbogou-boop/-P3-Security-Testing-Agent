@@ -23,7 +23,7 @@
 | 6 | 一张状态图或 Impact Map | 状态：`design/P3_http_integration_design.md` §2 mermaid + §5 action 阶段 + RC2 §5；Impact Map：`docs/P3_project_harness.md` §最小影响图 | 具备 | — | 未完成 | 待确认 |
 | 7 | 一张 Acceptance Matrix | `eval/P3_requirement_traceability.md`（REQ↔GWT↔测试映射） | 基本具备 | 离线映射已有；完整 HTTP 未完成 | 未完成 | 待确认 |
 | 8 | 一份 Plan + 5～8 个 Tasks | `review/P3_development_task_cards.md`（TC-01～07，7 张） | 具备（历史补录） | — | 未完成 | 待确认 |
-| 9 | 一份 Repository Map | `README.md` §目录结构 + `AGENTS.md` §模块地图 + `review/P3_spec_harness_pack_index.md` | 具备 | — | 未完成 | 待确认 |
+| 9 | 一份 Repository Map | [README 文档导航](../README.md#文档导航) + [总索引按任务查找](../docs/INDEX.md#按任务查找) + [根 AGENTS.md 开发导航与模块定位](../AGENTS.md#开发导航与模块定位) + [Pack 索引](P3_spec_harness_pack_index.md) | 具备 | — | 未完成 | 待确认 |
 | 10 | Validation Commands / Permissions / Stop-Ask-Rollback | 命令→`README.md`／`AGENTS.md`；权限→`docs/P3_project_harness.md`；停止恢复→`AGENTS.md`／harness | 具备 | — | 未完成 | 待确认 |
 
 ## 关键口径说明（本核查采用）

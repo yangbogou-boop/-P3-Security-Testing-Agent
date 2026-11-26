@@ -11,7 +11,7 @@
 
 ## 权威入口、发现及冲突处理
 
-先检查分支、HEAD、暂存／工作区和适用的 AGENTS.md，再读[Pack 索引](../review/P3_spec_harness_pack_index.md)。本次未在仓库发现 AGENTS.md；不能据此推断 Agent 无其他平台规则。
+先检查分支、HEAD、暂存／工作区和适用的 AGENTS.md，再读[Pack 索引](../review/P3_spec_harness_pack_index.md)。本次未在仓库发现 AGENTS.md；不能据此推断 Agent 无其他平台规则。此为 2026-10-28 原稿快照（`67242ba`）。根 [AGENTS.md](../AGENTS.md#开发导航与模块定位) 于 2026-11-03 随 `183b2c8` 引入，现行入口见本页 [6B-4 可用性证据](#6b-4-可用性证据与执行边界)。
 
 - 活动需求：[RC2](../brief/P3_specification_v1.0-rc2.md)；执行边界：[授权边界](../brief/P3_authorization_boundary.md)；审批分类：[治理登记](../brief/P3_decision_governance.md)。
 - 验收定义：[GWT](../eval/P3_GWT_scenarios.md)；实现映射：[需求追踪](../eval/P3_requirement_traceability.md)。场景定义不是执行证据。
@@ -43,7 +43,7 @@ $env:PYTHONDONTWRITEBYTECODE = '1'
 python -m unittest discover -s tests -v
 ```
 
-当前 278 项来自既有 CI／交付记录，不是本文新增结果。成功不代表真实网络验收。各测试中的假传输和网络阻断不能自动证明 discovery 阶段也被全局阻断；全程保护的历史外部驱动尚未形成可直接引用的仓库统一入口。后续任务若要求全程保护，必须先核对实际驱动及发现前阻断，再执行；不能把普通命令称为同等证明。
+当前 278 项来自既有 CI／交付记录，不是本文新增结果。此处“当前”指 2026-10-28 写作时点，所引是既有离线回归套件，执行与归档版本见[历史测试数量及版本对账](../eval/P3_experiment_evidence_index.md#历史测试数量及版本对账)。成功不代表真实网络验收。各测试中的假传输和网络阻断不能自动证明 discovery 阶段也被全局阻断；全程保护的历史外部驱动尚未形成可直接引用的仓库统一入口。后续任务若要求全程保护，必须先核对实际驱动及发现前阻断，再执行；不能把普通命令称为同等证明。
 
 本轮文档检查使用 `git diff --check`、`git status --short` 和相对链接静态检查。未跟踪文档需额外检查内容／空白或用 `git diff --no-index` 检查，不能仅凭普通 diff 没输出认定已覆盖新增文件。
 

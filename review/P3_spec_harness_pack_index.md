@@ -25,6 +25,8 @@
 | 11 | AI 使用披露 | [披露与责任登记](P3_ai_usage_and_responsibility.md) | PARTIAL：可支持的辅助范围已整理；完整调用记录、个人操作和逐文件归属未核验 | 课程披露格式待确认 |
 | 12 | 未解决问题 | [RC2 §9](../brief/P3_specification_v1.0-rc2.md)、[治理 A/B/C](../brief/P3_decision_governance.md)、[责任登记](P3_ai_usage_and_responsibility.md) | 阻断范围、建议角色和验证时点已补；责任人 PENDING_OWNER_CONFIRMATION | 仅既有 A 类及课程映射需确认 |
 
+原 Proposed 为撰写时点快照。第 3 行及课程适用范围段的候选待审核为 2026-10-28 快照。Pack 索引已随 `67242ba` 入库，现行逐项追踪见 [Acceptance Matrix](../eval/P3_acceptance_matrix_6b4.md)。原课件适用及教师确认边界仍适用。现行状态见[现行 ADR-005](../design/ADR_005_deterministic_strategy_comparison.md)及[正式接受记录](P3_adr005_acceptance_20261116.md)，2026-11-16 Accepted，仅限内部离线模拟工程基线。教师批准和正式课程验收仍有独立条件。
+
 ## 当前状态与历史阅读规则
 
 - 当前基线的既有 [CI Run 40642916025](https://github.com/yangbogou-boop/-P3-Security-Testing-Agent/actions/runs/40642916025) 已由前轮只读审计核实为 278 项通过。本轮不复跑，不把 CI 当作正式验收。

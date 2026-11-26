@@ -79,6 +79,8 @@
 
 ADR-001～004 保持 Accepted；ADR-005 保持 Proposed。本轮取舍写入设计文件等待审核，没有自动修改任何已接受架构决策。
 
+原 Proposed 为撰写时点快照。开头和后段的未提交、未推送、待审核是 2026-10-21 至 22 日各轮快照。离线监督实现见 `767b15e`，审核与设计见 `8e56767`，历史日志移交见 `8019021`。各轮失败、风险和审核建议按原文保留。现行状态见[现行 ADR-005](../design/ADR_005_deterministic_strategy_comparison.md)及[正式接受记录](P3_adr005_acceptance_20261116.md)，2026-11-16 Accepted，仅限内部离线模拟工程基线。教师批准和正式课程验收仍有独立条件。
+
 ## 证据与失败规则
 
 服务端摘要关联 connection／action，可信宿主再附加 run／fixture／generation／scope。action 从 Controller 的已允许动作集合登记，不接受 Planner 自称授权。摘要仅含固定标识、字节计数、首末发送序号、撤权请求／生效信息、原因码、清理标志与递增序号。

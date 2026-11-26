@@ -72,6 +72,8 @@ C:\Users\20573\anaconda3\python.exe -m unittest discover -s tests -v
 - 关闭异常时保留失败并停止进一步服务，不伪造清理成功；后续人工处置和实际资源回收仍待验。网络和审计无法原子提交，发送未知区间不重放。
 - ADR-005 保持 Proposed；本轮没有新策略实验或正式课程验收，前轮 36 次离线结果保持历史原件。
 
+原 Proposed 为撰写时点快照。第 79 行的未提交、待人工审核为 C-3A/B 原快照。所列加固与报告已纳入 `3199b3f`，真实 HTTP 仍待授权。现行状态见[现行 ADR-005](../design/ADR_005_deterministic_strategy_comparison.md)及[正式接受记录](P3_adr005_acceptance_20261116.md)，2026-11-16 Accepted，仅限内部离线模拟工程基线。教师批准和正式课程验收仍有独立条件。
+
 ## 交付与停止点
 
 聊天工作区 `outputs/c3-preflight/`：`P3-c3-preflight.diff`（含全部新增文件）、`unittest-final.txt`（全量日志）、`regression-before.txt`（修复前复现）、`delivery-checks.json`（文件／链接／保护检查）。不纳入历史 Evidence。
