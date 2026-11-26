@@ -78,3 +78,85 @@
 | P3-REQ-020 | 为后续策略对比记录策略版本、候选集合、夹具版本、相同预算、实际请求数、覆盖和有据结果；不伪造比较结果。 | MUST | GWT-P04 | [ADR-005](../design/ADR_005_deterministic_strategy_comparison.md) | [experiments.py](../src/p3_core/experiments.py)、[reviewed_evidence.py](../src/p3_core/http/reviewed_evidence.py) | [test_comparison_records_actual_observations](../tests/test_remaining.py)、[test_s1_scope_binding_is_consistent](../tests/test_reviewed_evidence.py) | [F](#evidence-f)、[S](#evidence-s)、[Q](#evidence-q) | F2：711550a + 审核补丁（代码字节对应 7178dbb）；NOT_FULLY_BOUND（36 次）；711550a 对应 3B-2A 交付；见范围评审及已存验收摘录 | F2 ZIP，未入 Git 的日志；9754048 归档基线；04214d3 路径提交；711550a（设计/说明归档；本地原始日志未入 Git） | 历史策略元数据；V2 内部范围绑定可补追溯 | PARTIAL：离线元数据已提交并验证 | 待负责人／适用时 P1 | PENDING_TEACHER_CONFIRMATION | 历史逐次版本/环境未完全绑定；实际网络请求未实测 | P3 负责人（策略与证据） |
 | P3-REQ-021 | 基础闭环后比较固定顺序与基于既有结果的确定性动态选择策略，采用相同输入、声明目标、授权、重置夹具及预算；报告覆盖、检出、误确认、未确定、工具故障、越界动作、成本和规划开销，并以 ADR 记录采用／限制采用／保留固定／需要更多证据。依据 S3 37、42、46、73、99 的课程任务映射，不预设动态更优。 | MUST | GWT-P05 | [ADR-005](../design/ADR_005_deterministic_strategy_comparison.md) | [strategies.py](../src/p3_core/http/strategies.py)、[experiments.py](../src/p3_core/experiments.py) | [test_comparison_records_actual_observations](../tests/test_remaining.py)、[test_strategy_repeatable](../tests/test_remaining.py) | [F](#evidence-f)、[S](#evidence-s) | F2：711550a + 审核补丁（代码字节对应 7178dbb）；NOT_FULLY_BOUND（36 次） | F2 ZIP，未入 Git 的日志；9754048 归档基线；04214d3 路径提交 | 36 次历史策略记录，ADR-005 有限工程接受 | PARTIAL：离线对照已提交，正式验收未完成 | 待负责人／适用时 P1 | PENDING_TEACHER_CONFIRMATION | 事前卡未形成；准备/复核成本未测；每格 3 次；P1 未复现 | P3 负责人（策略实验） |
 | P3-REQ-022 | 基础验收后经负责人另行决策、满足数据与成本授权后可接入真实 LLM；不得改变 Controller 权限边界，真实成本单独计量。 | MAY | GWT-A04（后续） | [ADR-001](../design/ADR_001_controller_split.md) | 未接入 | 未接入；[RC2 可选范围](../brief/P3_specification_v1.0-rc2.md) | [GWT-A04（后续）](P3_GWT_scenarios.md)；无实际 LLM 运行原件 | 无实际 LLM 执行 | 不适用，无 LLM 运行原件 | 真实 LLM 可选后续，本次无执行 | NOT_STARTED（MAY；当前范围外） | 待范围确认 | 可选；未申报正式验收 | 未接入、没有执行证据，无数据/成本授权 | P3 负责人（项目范围与授权） |
+
+## 6B-5B-2 P1 Finding 追踪附录
+
+此附录为非规范性导航，原 22 项需求矩阵、16 个字段及正式场景定义继续适用。下列关联仅用于查找局部证据，完整 HTTP 场景仍为 PENDING_AUTHORIZATION。本轮产品测试、模拟及实验为 NOT_REEXECUTED。[P1 原登记](../review/P3_6b5a_peer_finding_register.md) · [回传验收与冻结版本](../review/P3_6b5a_peer_return_acceptance.md)
+
+### C-05 场景导航
+
+RC2 §8 的 19 行为 16 个主场景与 A01-a／b／c。GWT §2／§3 共 32 行，其余 13 行为既有细化。父子关系沿用原编号。关联 REQ 取自主场景追踪或子行自带标注。A01-a～c 通过父场景关联 REQ-010，原条款仍以 RC2 §4 项9 为准。适用版本列说明证据切片，整张表的规范基线都是 RC2。V1 合成指旧 HTTP 模型切片，历史离线指旧核心无 HTTP 验证，V2 子集指独立列出的范围或审查记录。
+
+证据入口 [L 离线核心验证](P3_offline_core_validation.md)、[F 既有回归](#evidence-f)、[B R01 整改后](#evidence-b)、[S 历史策略对照](#evidence-s)、[P P1 冻结版记录](../review/P3_6b5a_peer_return_acceptance.md)、[H 真实执行缺口](#evidence-h)。REQ 编号可在主矩阵定位原证据。下表的限制列适用于各行，任何已有离线证据均不提升完整场景验收状态。
+
+| 场景 ID | 父场景 | RC2 位置 | GWT 位置 | 关联 REQ | 适用版本 | 已有证据入口 | 验收状态及限制 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| GWT-P01 | — | [§8 L145](../brief/P3_specification_v1.0-rc2.md) | [L22](P3_GWT_scenarios.md) | 002 / 013 / 014 | V1 合成 | [F](#evidence-f)、正向说明 | 许可与合成响应断言；无实际请求响应验收 |
+| GWT-P02 | — | [§8 L146](../brief/P3_specification_v1.0-rc2.md) | [L23](P3_GWT_scenarios.md) | 004 / 005 / 006 / 014 / 018 | V1 合成 | [F](#evidence-f)、正向说明 | 三类预期拒绝与对照条件的合成判定；真实配对待授权 |
+| GWT-P03 | — | [§8 L147](../brief/P3_specification_v1.0-rc2.md) | [L24](P3_GWT_scenarios.md) | 015 / 016 | 历史离线／V1 合成 | [L](P3_offline_core_validation.md)、[F](#evidence-f)（REQ-015／016） | 唯一 ID、防覆盖及脱敏的应用层断言；无完整实跑 |
+| GWT-P04 | — | [§8 L148](../brief/P3_specification_v1.0-rc2.md) | [L25](P3_GWT_scenarios.md) | 003 / 018 / 019 / 020 | 历史离线／V1 合成 | [L](P3_offline_core_validation.md)、[F](#evidence-f)（REQ-003／019／020） | 确定性规划、离线入口与元数据有局部证据；正式比较另列 |
+| GWT-P05 | — | [§8 L149](../brief/P3_specification_v1.0-rc2.md) | [L26](P3_GWT_scenarios.md) | 003 / 020 / 021（003 取自 RC2 需求表，020／021 见 GWT L26） | V1 历史合成 | [S](#evidence-s)、[P](../review/P3_6b5a_peer_return_acceptance.md) | 36 次历史离线对照为 NOT_FULLY_BOUND。P1 冻结版 103a9ed 的 Good 配对为独立记录。当前工程版 7178dbb 单列，两批记录均无完整成本比较或策略优势证明。REQ-021 正式验收待办 |
+| GWT-N01 | — | [§8 L150](../brief/P3_specification_v1.0-rc2.md) | [L27](P3_GWT_scenarios.md) | 001 / 012 / 019 | 历史离线／V1、V2 子集 | [L](P3_offline_core_validation.md)、[F](#evidence-f)（REQ-001） | 预检无规划／无派发及 V2 矩阵冲突；离线局部支持 |
+| GWT-N02 | — | [§8 L151](../brief/P3_specification_v1.0-rc2.md) | [L28](P3_GWT_scenarios.md) | 004 / 005 / 006 / 014 / 018 | V1 合成 | [F](#evidence-f)（REQ-004～006） | 三类合成缺陷样例；实际响应与全部变体未验收 |
+| GWT-N03 | — | [§8 L152](../brief/P3_specification_v1.0-rc2.md) | [L29](P3_GWT_scenarios.md) | 008 / 015 | 历史离线／V1 合成 | [L](P3_offline_core_validation.md)、[B](#evidence-b)、[F](#evidence-f)（REQ-008） | 输入校验和未批准提案拒绝为局部材料，各参数分支需分别举证 |
+| GWT-N04 | — | [§8 L153](../brief/P3_specification_v1.0-rc2.md) | [L30](P3_GWT_scenarios.md) | 010 / 017 | 历史离线／V1 合成 | [L](P3_offline_core_validation.md)、[F](#evidence-f)（REQ-010） | 累计预算、拒绝、终态为局部证据；V2 槽位语义不套用 |
+| GWT-N05 | — | [§8 L154](../brief/P3_specification_v1.0-rc2.md) | [L31](P3_GWT_scenarios.md) | 010 / 012 | 历史离线 | [L](P3_offline_core_validation.md) | 可控时钟、预算、回拨为局部证据；真实等待或并发未验收 |
+| GWT-N06 | — | [§8 L155](../brief/P3_specification_v1.0-rc2.md) | [L32](P3_GWT_scenarios.md) | 012 / 013 | V1 合成 | [F](#evidence-f)（REQ-012）、来源说明 | 合成故障安全停止有证据；正式停止规则语义待确认 |
+| GWT-N07 | — | [§8 L156](../brief/P3_specification_v1.0-rc2.md) | [L33](P3_GWT_scenarios.md) | 014 / 016 / 017 | 历史离线／V1、V2 子集 | [B](#evidence-b)、[F](#evidence-f)（REQ-014／017） | R01 拒绝及 V2 缺对照／缺关联的保守结论；无完整实跑 |
+| GWT-A01 | — | [§8 L157](../brief/P3_specification_v1.0-rc2.md) | [L34](P3_GWT_scenarios.md) | 007 / 009 / 010 | 历史离线／V1、V2 子集 | [L](P3_offline_core_validation.md)、[F](#evidence-f)（REQ-007／009） | 不扩权与防提前停止仅覆盖所列控制分支 |
+| GWT-A02 | — | [§8 L158](../brief/P3_specification_v1.0-rc2.md) | [L35](P3_GWT_scenarios.md) | 002 / 007 | 历史离线／V1 合成 | [L](P3_offline_core_validation.md)、[F](#evidence-f)（REQ-002／008） | 本地范围、输入及替换拒绝的局部证据；无真实转发验收 |
+| GWT-A03 | — | [§8 L159](../brief/P3_specification_v1.0-rc2.md) | [L36](P3_GWT_scenarios.md) | 011 / 015 / 017 | 历史离线／V1、V2 子集 | [L](P3_offline_core_validation.md)、[F](#evidence-f)（REQ-011）、授权说明 | 撤权、模型发送与接受后消费前中止分列；授权到期另见说明 |
+| GWT-A04 | — | [§8 L160](../brief/P3_specification_v1.0-rc2.md) | [L37](P3_GWT_scenarios.md) | 022 | 可选真实 LLM | [H](#evidence-h)（仅状态） | 未接入；无执行原件 |
+| GWT-N04-a | GWT-N04 | [§8 GWT-N04 L153](../brief/P3_specification_v1.0-rc2.md)（子行仅在 GWT） | [L43](P3_GWT_scenarios.md) | 010 / 015 / 017 | 历史离线 | [L](P3_offline_core_validation.md) | 8 尝试、7 假派发、实际 HTTP 0；原场景 request_count=7 未验证 |
+| GWT-N04-b | GWT-N04 | [§8 GWT-N04 L153](../brief/P3_specification_v1.0-rc2.md)（子行仅在 GWT） | [L44](P3_GWT_scenarios.md) | 010 / 017 | 历史离线／V1 合成 | [L](P3_offline_core_validation.md)、[F](#evidence-f)（REQ-010） | 达到 8 后超限停止有局部证据；不把其他运行的计数当该变体 |
+| GWT-N04-c | GWT-N04 | [§8 GWT-N04 L153](../brief/P3_specification_v1.0-rc2.md)（子行仅在 GWT） | [L45](P3_GWT_scenarios.md) | 010 / 014 / 017 | 历史离线 | [L](P3_offline_core_validation.md) | 终态不重开及 8／9 边界有局部证据；待决追加和结束时点应区分 |
+| GWT-N04-d | GWT-N04 | [§8 GWT-N04 L153](../brief/P3_specification_v1.0-rc2.md)（子行仅在 GWT） | [L46](P3_GWT_scenarios.md) | 008 / 010 / 015 | 历史离线／V1 合成 | [L](P3_offline_core_validation.md)、[F](#evidence-f)（REQ-010） | 旧入口失败提案的累计名额有局部证据；V2 计数口径待负责人 |
+| GWT-N04-e | GWT-N04 | [§8 GWT-N04 L153](../brief/P3_specification_v1.0-rc2.md)（子行仅在 GWT） | [L47](P3_GWT_scenarios.md) | 008 / 010 / 015 | 历史离线／V1 合成 | [L](P3_offline_core_validation.md) | 历史重复／替换拒绝留存，原项不应重复计数；V2 另列 |
+| GWT-N04-f | GWT-N04 | [§8 GWT-N04 L153](../brief/P3_specification_v1.0-rc2.md)（子行仅在 GWT） | [L48](P3_GWT_scenarios.md) | 010 / 014 | 历史离线／V1 合成 | [L](P3_offline_core_validation.md)、[F](#evidence-f)（REQ-014） | 拒绝时的保守结论和正常完成条件分别有材料；未据此确认完整时序变体 |
+| GWT-N05-a | GWT-N05 | [§8 GWT-N05 L154](../brief/P3_specification_v1.0-rc2.md)（子行仅在 GWT） | [L49](P3_GWT_scenarios.md) | 010 / 012 | 历史离线 | [L](P3_offline_core_validation.md) | 含首次规划耗尽的可控时钟结果；无真实计时证明 |
+| GWT-N05-b | GWT-N05 | [§8 GWT-N05 L154](../brief/P3_specification_v1.0-rc2.md)（子行仅在 GWT） | [L50](P3_GWT_scenarios.md) | 010 / 012 | 历史离线 | [L](P3_offline_core_validation.md) | 仅注入回调耗时；真实剩余超时及取消未验证 |
+| GWT-N05-c | GWT-N05 | [§8 GWT-N05 L154](../brief/P3_specification_v1.0-rc2.md)（子行仅在 GWT） | [L51](P3_GWT_scenarios.md) | 010 / 014 | 历史离线 | [L](P3_offline_core_validation.md) | 89／90 秒及证据耗时的验证记录；不外推真实执行 |
+| GWT-N05-d | GWT-N05 | [§8 GWT-N05 L154](../brief/P3_specification_v1.0-rc2.md)（子行仅在 GWT） | [L52](P3_GWT_scenarios.md) | 010 | 历史离线 | [L](P3_offline_core_validation.md) | 墙钟回拨不延长单调时钟预算；无真实网络测量 |
+| GWT-A03-a | GWT-A03 | [§8 GWT-A03 L159](../brief/P3_specification_v1.0-rc2.md)（子行仅在 GWT） | [L53](P3_GWT_scenarios.md) | 010 / 011 / 015 | 历史离线 | [L](P3_offline_core_validation.md) | 多原因优先有离线材料；未作真实在途或 OS 层验证 |
+| GWT-P05-a | GWT-P05 | [§8 GWT-P05 L149](../brief/P3_specification_v1.0-rc2.md)（子行仅在 GWT） | [L54](P3_GWT_scenarios.md) | 020 / 021 | V1 历史合成／文档核查 | [S](#evidence-s)、[P](../review/P3_6b5a_peer_return_acceptance.md) | 历史内部取舍存在，C-02 未全部完成，正式比较验收待办 |
+| GWT-P05-b | GWT-P05 | [§8 GWT-P05 L149](../brief/P3_specification_v1.0-rc2.md)（子行仅在 GWT） | [L55](P3_GWT_scenarios.md) | 020 / 021 | V1 历史合成 | [S](#evidence-s)、[P](../review/P3_6b5a_peer_return_acceptance.md) | 已有历史对照和冻结版 Good 配对；正式可比条件与完整成本证据待验收 |
+| GWT-A01-a | GWT-A01 | [§8 L168](../brief/P3_specification_v1.0-rc2.md) | [L65](P3_GWT_scenarios.md) | 010 / 014 / 017（[GWT L61 共同映射](P3_GWT_scenarios.md)） | 历史离线 | [L](P3_offline_core_validation.md) | 无价值重复控制分支有历史证据；完整 HTTP 未执行 |
+| GWT-A01-b | GWT-A01 | [§8 L169](../brief/P3_specification_v1.0-rc2.md) | [L66](P3_GWT_scenarios.md) | 010 / 014 / 017（[GWT L61 共同映射](P3_GWT_scenarios.md)） | 历史离线 | [L](P3_offline_core_validation.md) | 仍有候选时不提前停止；测试为无响应假派发 |
+| GWT-A01-c | GWT-A01 | [§8 L170](../brief/P3_specification_v1.0-rc2.md) | [L67](P3_GWT_scenarios.md) | 010 / 014 / 017（[GWT L61 共同映射](P3_GWT_scenarios.md)） | 历史离线 | [L](P3_offline_core_validation.md) | 必要对照不被跳过；未验证真实 403／404 及其判定 |
+
+### C-06 不变量追踪
+
+定义来自 [Problem Frame §4](../brief/P3_problem_frame.md)。关联依据为 [RC2 §6 的分组](../brief/P3_specification_v1.0-rc2.md) 及各行列明的 GWT 条件。以下为 P3 的局部证据索引，保留原定义及原判定范围。
+
+| INV | 原始定义 | 关联 REQ | 关联 GWT | 已有验证证据 | 验证范围 | 剩余限制 |
+| --- | --- | --- | --- | --- | --- | --- |
+| INV-01 | Controller 否决优先：未经完整授权核验的请求不得发送。 | 007／008／011／012 | N01、N03、A02、A03 | [R01](#evidence-b)、[F](#evidence-f) REQ-007／011、下方授权说明 | 记录中未批准候选 DENY、无对应 action，以及 V2 到期后未消费 | 应用层和内存证据，缺独立 OS 未发送及真实授权证明 |
+| INV-02 | 授权不可由不可信数据扩大：目标响应、意图和错误反馈均不能修改政策或预算。 | 007～010 | A01、A02、N03 | [F](#evidence-f) REQ-009／010、[范围绑定](#evidence-q) | 只读快照的授权字段不可变，预算约束与审核候选范围绑定有独立离线证据。迟到响应测试仅补充撤权停止与结论边界（REVOKED，模拟结论仍为 INCONCLUSIVE），未直接比对响应前后的授权字段或预算 | 缺同进程任意代码隔离及真实权限验收 |
+| INV-03 | 结论诚实：EXECUTED 不等于 PASS；证据不足、被阻断或未执行的用例为 INCONCLUSIVE。 | 014～017 | N02、N07、P03 | [R01 首次](#evidence-a)、[R01 整改后](#evidence-b)、[F](#evidence-f) REQ-014／017 | 保留证据不足和拒绝的结论，未关联断言不作有效指标 | 保留真实执行和模拟结论的区分，摘要不认证来源 |
+| INV-04 | 撤权或预算到达停止条件后不得派发新请求；已发送请求不能被追溯撤销。 | 010～012 | N04、N05、A03、A03-a | [离线核心](P3_offline_core_validation.md)、[F](#evidence-f) REQ-010／011 | 预算边界、模型分段发送和消费前中止为局部证据 | 缺真实在途取消、时延与 OS 层验证 |
+| INV-05 | 检查仅使用已批准的本地模拟目标、模拟身份和只读资源；证据不得泄露原始凭据。 | 002／016，补充 008 输入边界 | P01、A02、P03 | [F](#evidence-f) REQ-002／008／016 | 合成许可不能进入真实模式，所测字段投影与凭据扫描受限 | 缺真实目标验收及通用脱敏证明 |
+
+### C-09 REQ-001 正向关联说明
+
+- **N01 原正式关联保持。** REQ-001 主行证据支持缺契约或矩阵冲突时的预检拒绝，所列预检用例断言无计划，V2 用例断言拒绝冲突矩阵。完整 N01 场景仍沿用原定义。
+- **P01 部分正向关联。** 批准的只读输入、矩阵预期 ALLOW 与契约响应对应 REQ-001 的有效输入和基于契约检查。下方历史合成测试对预期允许内容给出模拟 PASS；原 P01 的实际响应、EXECUTED 和单次真实派发没有验收证据。
+- **P02 部分正向关联。** 已批准的检查、预期拒绝矩阵和合法对照共同体现基于契约验证预期权限。下方单元测试以已满足对照条件求值，另外可参阅主矩阵 REQ-005 对照不足时的断言。实际拒绝响应、独立成功对照与请求计数仍待正式验收。两场景实际 HTTP 均维持 PENDING_AUTHORIZATION。
+
+### C-01 已有授权证据导航
+
+RC2 §4 项7及 §7 已区分授权失效与可信撤权，同一检查点的撤权优先于授权失效。N01 处理缺失授权等静态输入问题，A03／A03-a 处理可信撤权与仲裁。GWT 目前没有独立 AUTHORIZATION_INVALID 到期场景。REQ-011／012 可由此定位现有启动到期和运行中到期证据。完整正式到期场景、适用协议、原因码验收与真实在途处理仍待批准。V2 已接受的 Ticket 在消费前过期的证据支持未消费、已中止、夹具未启动，接受记录仍保留。
+
+| 附录测试引用 | 代码及断言范围 | 既有日志 |
+| --- | --- | --- |
+| [test_expiration_during_run](../tests/test_core.py#L311) | 旧核心在运行中到期，AUTHORIZATION_INVALID，8 个计划、0 尝试、0 假派发 | F2 实施与第三轮独立技术审核 full.log 各第 155 行 |
+| [test_expired_licence_blocks_start](../tests/test_reviewed_runtime.py#L263) | V2 已绑定许可过期时 STOPPED、AUTHORIZATION_INVALID、无夹具启动 | 两份 full.log 各第 573 行 |
+| [test_licence_expiry_between_accept_and_consume_aborts_ticket](../tests/test_reviewed_runtime.py#L436) | V2 接受计数 1，过期后无消费、中止 1、无夹具启动且原因为 AUTHORIZATION_INVALID | 两份 full.log 各第 578 行 |
+| [test_good_three_denials_and_controls](../tests/test_http_core.py#L200) | C-09 的 V1 正向／预期拒绝合成断言。对照布尔值传入为真，断言模拟 PASS 而实际执行状态保持 NOT_EXECUTED、结论 INCONCLUSIVE | 两份 full.log 各第 307 行 |
+
+四个方法按模块、类、方法核对源码与历史日志，执行身份仍为 711550a 加 F2 工作区补丁，源码与 7178dbb 对应。主矩阵的 36 个方法保持原样，附录另增 4 个不同方法，全文去重为 40。没有新增自动化用例或运行。
+
+### C-02 RC1 来源说明
+
+原 P1 Finding 与原分级保留。原冻结分发 ZIP 的 SHA-256 为 `ffa669b4654232b025dfb3018e088241c0b787a7932024a579ac7899a6022f72`。其中 `P1_P3_Complete_Review/Frozen_Snapshot/brief/P3_specification_v1.0-rc1.md` 实测 27,610 字节，SHA-256 为 `e3cec25af32ee5f8efc53d13833a354792137527e012511d3a4a572d1083e418`，与 P1 冻结提交 103a9ed 的 Git 对象和当前 RC1 文件逐字节一致。「冻结包没有 RC1」这一原观察由原件校核更正，原 P1 回传文档及 Finding 未改。
+
+规范来源为 [RC1 §7 5xx／无法解析预期 JSON 行](../brief/P3_specification_v1.0-rc1.md) 与 [RC2 §7 同行](../brief/P3_specification_v1.0-rc2.md)。RC1 记载停止提议，RC2 记载沿用 RC1 并标记 RESPONSE_ERROR。两版未给出累计 N 次阈值。正式停止语义及适用版本待负责人确认。本附录仅提供来源定位。
